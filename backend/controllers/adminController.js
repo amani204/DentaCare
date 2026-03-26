@@ -1,5 +1,5 @@
 import validator from 'validator';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import {v2 as cloudinary} from 'cloudinary';
 import jwt from 'jsonwebtoken';
 import Doctor from '../models/doctorModel.js';
@@ -10,7 +10,7 @@ const adminLogin = async (req, res) => {
     const {email, password} = req.body;
 
     if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASS ){
-    const token = jwt.sign(email+password, process.env.JWT_SECRET);
+    const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '7d' })
          return res.status(200).json({ success: true, message: 'Login successful', token });
     }
     else {
@@ -69,7 +69,8 @@ const addDoctor = async (req, res) => {
         await newDoctor.save();
         res.status(201).json({ success: true, message: 'Doctor added successfully' });
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Error adding doctor' });
+        res.status(500).json({ success: false, message: error.message })
+
     }
 }
 //get all doctors API for admin dashboard

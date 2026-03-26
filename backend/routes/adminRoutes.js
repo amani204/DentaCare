@@ -1,6 +1,6 @@
 import express from 'express';
-import {adminLogin, addDoctor, getAllDoctors, toggleDoctorAvailability} from '../controllers/adminController.js';
-import authAdmin from '../middleware/authMiddleware.js';
+import {adminLogin, addDoctor, getAllDoctors, getDoctorById, toggleDoctorAvailability} from '../controllers/adminController.js';
+import {authAdmin} from '../middleware/authMiddleware.js';
 import upload from '../middleware/uploadMiddleware.js';
 
 const adminRouter = express.Router();
