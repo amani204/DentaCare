@@ -73,7 +73,7 @@ const loginUser = async (req, res) => {
 const getProfile = async (req, res) => {
     try {
         //userId was attached bu authUser middleware
-         const { userId } = req.body
+         const  userId  = req.userId;
         const user = await User.findById(userId).select('-password');
         if(!user){
             return res.status(404).json({success: false, message: 'User not found'})
@@ -87,8 +87,9 @@ const getProfile = async (req, res) => {
 //API to update user profile 
 const updateProfile = async (req, res) => {
   try {
-    const { userId, name, phone, address, dob, gender } = req.body
-    const imageFile = req.file
+    const userId = req.userId;
+     const { name, phone, address, dob, gender } = req.body;
+    const imageFile = req.file;
 
     const updateData = {}
 
@@ -109,8 +110,12 @@ const updateProfile = async (req, res) => {
       return res.status(400).json({ success: false, message: 'No fields to update' })
     }
 
-    await User.findByIdAndUpdate(userId, updateData, { new: true })
-    res.status(200).json({ success: true, message: 'Profile updated successfully' })
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, { returnDocument: 'after', runvalidators: true }).select('-password')
+    res.status(200).json({ success: true, message: 'Profile updated successfully', user: updatedUser })
+
+    if(!updatedUser){
+      return res.status(400).json({ success: false, message: 'User Not Found' })
+    }
 
   } catch (error) {
     res.status(500).json({ success: false, message: error.message })

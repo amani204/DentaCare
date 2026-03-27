@@ -7,6 +7,8 @@ import connectCloudinary from './config/cloudinary.js';
 import adminRouter from './routes/adminRoutes.js'
 import userRouter from './routes/userRoutes.js';
 import doctorRouter from './routes/doctorRoutes.js';
+import appointmentRouter from './routes/appointmentRoutes.js';
+import paymentRouter from './routes/paymentRoutes.js';
 
 //app config
 const app = express();
@@ -23,7 +25,9 @@ app.use(express.urlencoded({ extended: true }));
 // routes
 app.use('/api/admin', adminRouter);
 app.use('/api/user', userRouter);
-app.use('/api/doctors', doctorRouter);
+app.use('/api/doctor', doctorRouter);
+app.use('/api/appointment', appointmentRouter);
+app.use('/api/payment', paymentRouter);
 //api endpointes
 app.get('/', (req, res) => {
     res.send('API Working');

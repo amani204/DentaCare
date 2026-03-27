@@ -8,10 +8,12 @@ const appointmentSchema = new mongoose.Schema({
   userData:  { type: Object, required: true },  // snapshot of user at booking time
   docData:   { type: Object, required: true },  // snapshot of doctor at booking time
   amount:    { type: Number, required: true },
-  date:      { type: Number, required: true },  // Date.now() timestamp
+  date:      { type: Number, required: true },  
   cancelled: { type: Boolean, default: false },
-  payment:   { type: Boolean, default: false },
-  isCompleted:{ type: Boolean, default: false },
+  isPaid:   { type: Boolean, default: false },
+  stripeSessionId:  { type: String, default: '' },
+  paymentIntentId:  { type: String, default: '' },
+  paymentDate:      { type: Date },
 }, { timestamps: true })
-const  Appointment =  mongoose.model. Appointment || mongoose.model(' Appointment', appointmentSchema);
+const  Appointment =  mongoose.model.Appointment || mongoose.model(' Appointment', appointmentSchema);
 export default  Appointment;

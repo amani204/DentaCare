@@ -61,7 +61,7 @@ const addDoctor = async (req, res) => {
             degree,
             experience,
             fees,
-            address: parsedAddress, // Use the parsed address
+            address: parsedAddress, 
             date:Date.now(),
             image: imageUrl,
             available: true
@@ -99,7 +99,7 @@ const getDoctorById = async (req, res) => {
 //toggle doctor availability
 const toggleDoctorAvailability = async (req, res) => {
     try {
-        const { docId } = req.body
+        const { docId } = req.params
         const doctor = await Doctor.findById(docId)
         await Doctor.findByIdAndUpdate(docId, {
         available: !doctor.available
