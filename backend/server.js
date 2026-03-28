@@ -11,10 +11,11 @@ import appointmentRouter from './routes/appointmentRoutes.js';
 import paymentRouter from './routes/paymentRoutes.js';
 
 //app config
-const app = express();
-const port = process.env.PORT || 5000;
 connectDB();
 connectCloudinary();
+const app = express();
+const port = process.env.PORT || 5000;
+
 
 
 //middlewares

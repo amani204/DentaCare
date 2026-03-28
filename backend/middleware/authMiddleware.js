@@ -30,13 +30,35 @@ const authPatient = async (req, res, next) => {
     }
      const decoded = jwt.verify(token, process.env.JWT_SECRET)
     // attach the user id to req.body so controllers can use it
-    req.user = decoded;
-    req.userId = decoded.id || decoded.userId;
+    req.userId = decoded.id ;
     next()
   } catch (error) {
      res.status(500).json({ success: false, message: error.message });
   }
 }
 
+//------------DOCTOR AUTH MIDDLEWARE------------------
+const authDoctor = async (req, res, next) => {
+  try {
+    const {dtoken} = req.headers;
+    
+    if(!dtoken){
+      return res.status(401).json({ success: false, message: 'Not authorized, doctor login required'});
+    }
 
-export {authAdmin, authPatient}
+    const decoded = jwt.verify(dtoken, process.env.JWT_SECRET);
+
+    //verify it's the doctor token
+    if(decoded.role !== 'doctor'){
+      return res.status(403).json({ success: false, message: 'Doctor access required'});
+    }
+
+     // attach the doctor id to req.body so controllers can use it
+    req.doctorId = decoded.id;
+    next();
+  } catch (error) {
+    res.status(401).json({ success: false, message: 'Not authorized, login again' });
+  }
+}
+
+export {authAdmin, authPatient, authDoctor }
