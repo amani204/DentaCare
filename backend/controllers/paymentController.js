@@ -1,4 +1,5 @@
 import Stripe from 'stripe';
+import { ChargilyClient } from '@chargily/chargily-pay'
 import Appointment from '../models/appointmentModel.js';
 import Doctor from '../models/doctorModel.js';
 import User from '../models/userModel.js';
@@ -7,7 +8,7 @@ import User from '../models/userModel.js';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 //create stripe checkout session
-const createCheckoutSession = async (req, res) => {
+const createCheckoutStripeSession = async (req, res) => {
     try {
         const userId = req.userId;
         const { appointmentId } = req.body;
@@ -68,7 +69,7 @@ const createCheckoutSession = async (req, res) => {
 };
 
 //verify payment
-const verifyPayment = async (req, res) => {
+const verifyStripePayment = async (req, res) => {
     try {
         const { sessionId } = req.body;
         console.log('Verifying payment for session:', sessionId);
@@ -99,4 +100,92 @@ const verifyPayment = async (req, res) => {
     }
 };
 
-export { createCheckoutSession, verifyPayment }
+//
+const chargilyClient = new ChargilyClient({
+  api_key: process.env.CHARGILY_API_KEY,
+  mode:    process.env.CHARGILY_MODE || 'test'
+})
+
+
+const createChargilyCheckout = async (req, res) => {
+  try {
+    const userId = req.userId
+    const { appointmentId } = req.body
+
+    // find appointment
+    const appointment = await Appointment.findById(appointmentId)
+    if (!appointment) {
+      return res.json({ success: false, message: 'Appointment not found' })
+    }
+
+    // ownership check
+    if (appointment.userId.toString() !== userId.toString()) {
+      return res.json({ success: false, message: 'Not authorized' })
+    }
+
+    // already paid check
+    if (appointment.isPaid) {
+      return res.json({ success: false, message: 'Appointment already paid' })
+    }
+    // get doctor name for description
+    const doctor = await Doctor.findById(appointment.docId)
+
+    // create Chargily checkout
+    const checkout = await chargilyClient.createCheckout({
+      items: [{
+        price:    appointment.amount * 100,  // centimes
+        quantity: 1,
+        name:     `Consultation - Dr. ${doctor.name}`,
+      }],
+      success_url: `${process.env.FRONTEND_URL}/payment-success`,
+      failure_url: `${process.env.FRONTEND_URL}/payment-cancel`,
+      metadata: {
+        appointmentId: appointment._id.toString(),
+        userId:        userId.toString(),
+      },
+      description: `${appointment.slotDate} at ${appointment.slotTime}`,
+      locale: 'ar',  // Arabic UI for Algerian users
+    })
+
+    // save checkout id on appointment
+    await Appointment.findByIdAndUpdate(appointmentId, {
+      chargilyCheckoutId: checkout.id
+    })
+
+    res.json({ success: true, checkoutUrl: checkout.checkout_url })
+     } catch (error) {
+    res.json({ success: false, message: error.message })
+  }
+}
+
+
+const verifyChargilyPayment = async (req, res) => {
+  try {
+    const { checkoutId } = req.body
+
+    if (!checkoutId) {
+      return res.json({ success: false, message: 'Checkout ID required' })
+    }
+
+    // retrieve checkout from Chargily
+    const checkout = await chargilyClient.getCheckout(checkoutId)
+
+    if (checkout.status === 'paid') {
+      const appointmentId = checkout.metadata.appointmentId
+
+      await Appointment.findByIdAndUpdate(appointmentId, {
+        isPaid:      true,
+        paymentDate: new Date(),
+      })
+
+      return res.json({ success: true, message: 'Payment verified successfully' })
+    }
+
+    res.json({ success: false, message: 'Payment not completed' })
+
+  } catch (error) {
+     res.json({ success: false, message: error.message })
+  }
+}
+
+export { createCheckoutStripeSession, verifyStripePayment ,createChargilyCheckout, verifyChargilyPayment }

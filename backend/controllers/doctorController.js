@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';     
 import bcrypt from 'bcryptjs';
 import Doctor from '../models/doctorModel.js';
 import Appointment from '../models/appointmentModel.js';
@@ -27,8 +27,6 @@ const getDoctorById = async (req, res) => {
         res.status(500).json({success: false, message: error.message})
     }
 }
-
-
 
 
 // DOCTOR LOGIN 
@@ -71,7 +69,7 @@ const getDoctorAppointments = async (req, res) => {
     try {
         const doctorId = req.doctorId;
         const appointments = await Appointment.find({ docId: doctorId })
-            .sort({ slotDate: -1, slotTime: 1 });
+            .sort({ slotDate: -1, slotTime: 1 }); //Sorts by date (newest first) then by time
 
         res.json({ success: true, appointments });
 
@@ -122,7 +120,7 @@ const getIncomingAppointments = async (req, res) => {
         const todayStr = `${today.getDate()}_${today.getMonth() + 1}_${today.getFullYear()}`;
 
         // Get upcoming appointments (not cancelled, not completed)
-        const appointments = await Appointment.find({ docId: doctorId, cancelled: false, isCompleted: false }).sort({ slotDate: 1, slotTime: 1 });
+        const appointments = await Appointment.find({ docId: doctorId, cancelled: false, isCompleted: false}).sort({ date: -1 });
         res.json({ success: true, appointments });
 
     } catch (error) {
@@ -161,9 +159,8 @@ const doctorCancelAppointment = async (req, res) => {
             doctor.slots_booked[slotDate] = doctor.slots_booked[slotDate].filter(
                 time => time !== slotTime
             );
-            
             if (doctor.slots_booked[slotDate].length === 0) {
-                delete doctor.slots_booked[slotDate];
+               delete doctor.slots_booked[slotDate];
             }
             await doctor.save();
         }
@@ -220,7 +217,7 @@ const getDoctorDashboard = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({ success: false,nmessage: error.message });
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
@@ -235,7 +232,7 @@ const updateDoctorProfile = async (req, res) => {
         
         if (name) updateData.name = name;
         if (about) updateData.about = about;
-        if (fees) updateData.fees = fees;
+        if (fees) updateData.fees = Number(fees);
         if (available !== undefined) updateData.available = available;
         
         // Handle image upload if provided

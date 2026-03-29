@@ -4,16 +4,16 @@ import { authDoctor } from '../middleware/authMiddleware.js';
 import upload from '../middleware/uploadMiddleware.js';
 
 const doctorRouter = express.Router();
-doctorRouter.get('/all-doctors', getAllDoctors);
-doctorRouter.get('/:docId', getDoctorById);
-
 doctorRouter.post('/login', doctorLogin);
+doctorRouter.get('/all-doctors', getAllDoctors);
 
 // Protected routes (doctor token required)
 doctorRouter.get('/appointments', authDoctor, getDoctorAppointments);
-doctorRouter.post('/complete', authDoctor, completeAppointment);
 doctorRouter.get('/incoming', authDoctor, getIncomingAppointments);
+doctorRouter.post('/complete', authDoctor, completeAppointment);
 doctorRouter.post('/cancel', authDoctor, doctorCancelAppointment);
 doctorRouter.get('/dashboard', authDoctor, getDoctorDashboard);
 doctorRouter.put('/update-profile', authDoctor, upload.single('image'), updateDoctorProfile);
+doctorRouter.get('/:docId', getDoctorById);
+
 export default doctorRouter;

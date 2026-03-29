@@ -4,12 +4,12 @@ import {authAdmin} from '../middleware/authMiddleware.js';
 import upload from '../middleware/uploadMiddleware.js';
 
 const adminRouter = express.Router();
-adminRouter.post('/admin-login',adminLogin);
+adminRouter.post('/login',adminLogin);
 adminRouter.post('/add-doctor',authAdmin,upload.single('image'),addDoctor);
-adminRouter.get('/all-doctors',authAdmin,getAllDoctors);
+adminRouter.get('/doctors',authAdmin,getAllDoctors); //***** */
 adminRouter.get('/doctors/:docId',authAdmin,getDoctorById);
 adminRouter.put('/doctors/:docId',authAdmin,toggleDoctorAvailability);
-adminRouter.get('/appointments', authAdmin, getAllAppointments);     
-adminRouter.post('/cancel', authAdmin, adminCancelAppointment);      
+adminRouter.get('/appointments', authAdmin, getAllAppointments);     /***** */ 
+adminRouter.post('/cancel', authAdmin, adminCancelAppointment);       
 adminRouter.get('/dashboard', authAdmin, getAdminDashboard);      
 export default adminRouter;

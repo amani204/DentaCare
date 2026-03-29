@@ -10,8 +10,10 @@ const appointmentSchema = new mongoose.Schema({
   amount:    { type: Number, required: true },
   date:      { type: Number, required: true },  
   cancelled: { type: Boolean, default: false },
-  isPaid:   { type: Boolean, default: false },
+  isCompleted: { type: Boolean, default: false },
+  isPaid:      { type: Boolean, default: false },
   stripeSessionId:  { type: String, default: '' },
+  chargilyCheckoutId: { type: String, default: '' },
   paymentIntentId:  { type: String, default: '' },
   paymentDate:      { type: Date },
 }, { timestamps: true })

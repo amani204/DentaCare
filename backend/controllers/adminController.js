@@ -28,7 +28,7 @@ const addDoctor = async (req, res) => {
         const {name, email, password, speciality, degree, experience, fees, address} = req.body;
         const imageFile = req.file; 
         //checking for all data to add doctor
-        if (!name || !email || !password || !speciality || !degree || !experience || !fees || !address || !imageFile) {
+        if (!name || !email || !password || !speciality || !degree || !experience || !fees || !address ) {
             return res.status(400).json({ success: false, message: 'All fields are required' });
         }
         //validating email format 
