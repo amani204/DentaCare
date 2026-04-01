@@ -171,6 +171,24 @@ const adminCancelAppointment = async (req, res) => {
     }
 };
 
+//delet Doctor 
+const deleteDoctor = async (req, res) => {
+  try {
+    const { docId } = req.params
+    
+    const doctor = await Doctor.findById(docId)
+    if (!doctor) {
+      return res.status(404).json({ success: false, message: 'Doctor not found' })
+    }
+    
+    await Doctor.findByIdAndDelete(docId)
+    
+    res.json({ success: true, message: 'Doctor deleted successfully' })
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message })
+  }
+}
+
 // Admin dashboard with all stats
 const getAdminDashboard = async (req, res) => {
     try {
@@ -249,4 +267,4 @@ const getAdminDashboard = async (req, res) => {
     }
 };
 
-export {adminLogin, addDoctor, getAllDoctors, getDoctorById, toggleDoctorAvailability,  getAllAppointments, adminCancelAppointment, getAdminDashboard };
+export {adminLogin, addDoctor, getAllDoctors, getDoctorById, toggleDoctorAvailability,  getAllAppointments, adminCancelAppointment,deleteDoctor, getAdminDashboard };
