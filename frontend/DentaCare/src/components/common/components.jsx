@@ -42,11 +42,12 @@ const statVariants = {
     text: 'text-emerald-600',
     iconBg: 'bg-emerald-500/10',
   },
-  accent: {
-    bg: 'bg-accent/5',
-    border: 'border-l-accent',
-    text: 'text-accent',
-    iconBg: 'bg-accent/10',
+ purple: {
+    bg: 'bg-purple-500/5',
+    border: 'border-l-purple-500',
+    text: 'text-purple-600',
+    iconBg: 'bg-purple-500/10',
+    
   },
   info: {
     bg: 'bg-blue-500/5',
@@ -54,6 +55,14 @@ const statVariants = {
     text: 'text-blue-600',
     iconBg: 'bg-blue-500/10',
   },
+  rose: {
+    bg: 'bg-rose-500/5',
+    border: 'border-l-rose-500',
+    text: 'text-rose-500',
+    iconBg: 'bg-rose-500/10',
+    
+  },
+
 }
 
 export function StatCard({ title, value, icon: Icon, trend, color = 'primary' }) {
@@ -115,7 +124,7 @@ export function EmptyState({ message, icon: Icon, action }) {
       ) : (
         <Inbox size={40} className="text-muted/50 mb-3.5" />
       )}
-      <p className="sub-text max-w-[240px] leading-relaxed">{message}</p>
+      <p className="sub-text max-w-60 leading-relaxed">{message}</p>
       {action && (
         <button onClick={action.onClick} className="btn btn-primary mt-5 text-sm">
           {action.label}

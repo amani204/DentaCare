@@ -1,14 +1,13 @@
-
 import { useEffect, useState } from 'react'
 import { 
   Search, X, User, Stethoscope, Calendar, Clock, DollarSign, 
   CreditCard, Activity, XCircle, CheckCircle, Clock3, 
-  ChevronDown, Filter, Ban 
+  ChevronDown, Filter, Ban, ArrowRight 
 } from 'lucide-react'
-import { Badge, Loader, EmptyState, Modal } from '../components/common/components'
-import useAdminStore from '../store/adminStore'
-import useT from '../hooks/useT'
-import api from '../lib/axios'
+import { Badge, Loader, EmptyState, Modal } from '../../components/common/components'
+import useAdminStore from '../../store/adminStore'
+import useT from '../../hooks/useT'
+import api from '../../lib/axios'
 
 const FILTERS = ['all', 'pending', 'completed', 'cancelled']
 
@@ -79,66 +78,92 @@ export default function Appointments() {
   return (
     <div className="flex flex-col gap-5 animate-fade-in">
 
-      {/* Header */}
+      {/* Header Section */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="page-title">{t('allAppointments')}</h2>
           <p className="sub-text">{apts.length} {t('total')}</p>
         </div>
+      </div>
 
-        {/* Filter tabs */}
-        <div className="flex gap-0.5 p-0.5 rounded-lg bg-bg border border-border">
-          {FILTERS.map(f => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
-                filter === f
-                  ? 'bg-primary text-white shadow-sm'
-                  : 'text-sub hover:text-text hover:bg-bg/80'
-              }`}
-            >
-              {f === 'all' && <Filter size={12} />}
-              {f === 'pending' && <Clock3 size={12} />}
-              {f === 'completed' && <CheckCircle size={12} />}
-              {f === 'cancelled' && <XCircle size={12} />}
-              {t(f)}
-              <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
-                filter === f
-                  ? 'bg-white/20 text-white'
-                  : 'bg-border text-sub'
-              }`}>
-                {counts[f]}
-              </span>
-            </button>
-          ))}
+      {/* Appointments Control Center */}
+      <div className="flex flex-col gap-6 bg-white p-5 rounded-2xl border border-border shadow-sm mb-2">
+        
+        {/* TStats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-primary/5 p-3 rounded-xl border border-primary/10">
+            <p className="text-[10px] uppercase tracking-wider text-primary font-bold">{t('total')}</p>
+            <p className="text-xl font-bold text-primary-deep">{counts.all}</p>
+          </div>
+          <div className="bg-amber-50 p-3 rounded-xl border border-amber-100">
+            <p className="text-[10px] uppercase tracking-wider text-amber-600 font-bold">{t('pending')}</p>
+            <p className="text-xl font-bold text-amber-700">{counts.pending}</p>
+          </div>
+          <div className="bg-emerald-50 p-3 rounded-xl border border-green-100">
+            <p className="text-[10px] uppercase tracking-wider text-green-600 font-bold">{t('completed')}</p>
+            <p className="text-xl font-bold text-green-700">{counts.completed}</p>
+          </div>
+          <div className="bg-rose-500/5 p-3 rounded-xl border border-rose-100">
+            <p className="text-[10px] uppercase tracking-wider text-rose-500 font-bold">{t('cancelled')}</p>
+            <p className="text-xl font-bold text-rose-500">{counts.cancelled}</p>
+          </div>
+        </div>
+
+        {/* Tabs and Search */}
+        <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between pt-4 border-t border-dashed border-border">
+          
+          {/* Segmented Filter Tabs */}
+          <div className="flex bg-bg p-1 rounded-xl border border-border w-full lg:w-auto overflow-x-auto">
+            {FILTERS.map(f => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`flex items-center gap-2 px-4 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap ${
+                  filter === f
+                    ? 'bg-white text-primary shadow-sm border border-border/50'
+                    : 'text-sub hover:text-text'
+                }`}
+              >
+                {f === 'all' && <Filter size={14} />}
+                {f === 'pending' && <Clock3 size={14} />}
+                {f === 'completed' && <CheckCircle size={14} />}
+                {f === 'cancelled' && <XCircle size={14} />}
+                {t(f)}
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                  filter === f ? 'bg-primary/10 text-primary' : 'bg-border text-sub'
+                }`}>
+                  {counts[f]}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {/* Modern Search Input */}
+          <div className="relative w-full lg:max-w-md">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+            <input
+              className="input pl-9 bg-bg/50 border-none focus:bg-white transition-all w-full"
+              placeholder={t('search')}
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+            {search && (
+              <button
+                onClick={() => setSearch('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-red-500"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Search */}
-      <div className="relative max-w-xs">
-        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-        <input
-          className="input pl-9"
-          placeholder={t('searchAppointments')}
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
-        {search && (
-          <button
-            onClick={() => setSearch('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-text"
-          >
-            <X size={12} />
-          </button>
-        )}
-      </div>
-
-      {/* Table */}
+      {/* Data Table Section */}
       <div className="card overflow-hidden">
         {filtered.length === 0 ? (
-          <div className="p-4">
-            <EmptyState message={t('noAppointments')}  />
+          <div className="p-10 text-center">
+            <EmptyState message={t('noAppointments')} />
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -161,20 +186,15 @@ export default function Appointments() {
               <tbody>
                 {filtered.map((a, i) => (
                   <tr key={a._id || i} className="table-row border-b border-border hover:bg-bg/30 transition-colors">
-                    {/* # */}
-                    <td className="px-4 py-3 text-xs text-muted whitespace-nowrap">
-                      {i + 1}
-                    </td>
-
+                    <td className="px-4 py-3 text-xs text-muted whitespace-nowrap">{i + 1}</td>
+                    
                     {/* Patient */}
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-2">
                         <div className="w-7 h-7 rounded-full bg-primary-soft flex items-center justify-center text-xs font-bold text-primary-hov flex-shrink-0">
                           {a.userData?.name?.charAt(0) || 'P'}
                         </div>
-                        <span className="text-sm font-medium text-text">
-                          {a.userData?.name || '—'}
-                        </span>
+                        <span className="text-sm font-medium text-text">{a.userData?.name || '—'}</span>
                       </div>
                     </td>
 
@@ -182,43 +202,24 @@ export default function Appointments() {
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-2">
                         {a.docData?.image ? (
-                          <img src={a.docData.image} alt="" className="w-6 h-6 rounded-full object-cover flex-shrink-0" />
+                          <img src={a.docData.image} alt="" className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
                         ) : (
-                          <div className="w-6 h-6 rounded-full bg-primary-soft flex items-center justify-center text-xs font-bold text-primary-hov">
+                          <div className="w-7 h-7 rounded-full bg-primary-soft flex items-center justify-center text-xs font-bold text-primary-hov flex-shrink-0">
                             {a.docData?.name?.charAt(0) || 'D'}
                           </div>
                         )}
                         <div>
                           <p className="text-sm font-medium text-text leading-tight">{a.docData?.name}</p>
-                          <p className="text-xs text-muted">{a.docData?.speciality}</p>
+                          <p className="text-[10px] text-muted uppercase tracking-tighter">{a.docData?.speciality}</p>
                         </div>
                       </div>
                     </td>
 
-                    {/* Date */}
-                    <td className="px-4 py-3 text-sm text-sub whitespace-nowrap">
-                      {a.slotDate?.replace(/_/g, '/')}
-                    </td>
-
-                    {/* Time */}
-                    <td className="px-4 py-3 text-sm text-sub whitespace-nowrap">
-                      {a.slotTime}
-                    </td>
-
-                    {/* Amount */}
-                    <td className="px-4 py-3 text-sm font-semibold text-primary whitespace-nowrap">
-                      ${a.amount}
-                    </td>
-
-                    {/* Payment Status */}
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <Badge status={a.isPaid ? 'paid' : 'unpaid'} />
-                    </td>
-
-                    {/* Appointment Status */}
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <Badge status={getStatus(a)} />
-                    </td>
+                    <td className="px-4 py-3 text-sm text-sub whitespace-nowrap">{a.slotDate?.replace(/_/g, '/')}</td>
+                    <td className="px-4 py-3 text-sm text-sub whitespace-nowrap">{a.slotTime}</td>
+                    <td className="px-4 py-3 text-sm font-semibold text-primary whitespace-nowrap">${a.amount}</td>
+                    <td className="px-4 py-3 whitespace-nowrap"><Badge status={a.isPaid ? 'paid' : 'unpaid'} /></td>
+                    <td className="px-4 py-3 whitespace-nowrap"><Badge status={getStatus(a)} /></td>
 
                     {/* Actions */}
                     <td className="px-4 py-3 whitespace-nowrap">
@@ -242,7 +243,7 @@ export default function Appointments() {
         )}
       </div>
 
-      {/* Cancel Modal */}
+      {/* 4. Cancel Modal */}
       <Modal
         isOpen={!!cancelId}
         onClose={() => setCancelId(null)}

@@ -1,11 +1,11 @@
 
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Plus, Trash2, ToggleLeft, ToggleRight, Stethoscope, User, DollarSign, GraduationCap, Activity, ChevronDown, Users } from 'lucide-react'
-import { Badge, Loader, EmptyState, Modal } from '../components/common/components'
-import useAdminStore from '../store/adminStore'
-import useT from '../hooks/useT'
-import api from '../lib/axios'
+import { Search, Plus, Trash2, ToggleLeft, ToggleRight, Stethoscope, DollarSign, GraduationCap, Activity, ChevronDown, Users } from 'lucide-react'
+import { Badge, Loader, EmptyState, Modal } from '../../components/common/components'
+import useAdminStore from '../../store/adminStore'
+import useT from '../../hooks/useT'
+import api from '../../lib/axios'
 
 const SPECIALITIES = ['General Dentist','Orthodontist','Endodontist','Periodontist','Oral Surgeon','Pediatric Dentist','Prosthodontist']
 
@@ -73,68 +73,80 @@ export default function DoctorsList() {
           {t('addDoctor')}
         </button>
       </div>
-
-      {/*  Filter Section */}
-    <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-   {/* Search */}
-  <div className="relative flex-1 max-w-sm">
-    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-    <input
-      className="input pl-9"
-      placeholder={t('searchDoctors')}
-      value={search}
-      onChange={e => setSearch(e.target.value)}
-    />
+{/* Filter Section */}
+<div className="flex flex-col gap-6 bg-white p-5 rounded-2xl border border-border shadow-sm">
+  
+  {/* TOP ROW: Stats to fill the "Empty" feeling */}
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div className="bg-rose-500/5 p-3 rounded-xl border border-rose-100">
+      <p className="text-[10px] uppercase tracking-wider text-rose-500/50 font-bold">{t('totalDoctors')}</p>
+      <p className="text-xl font-bold text-rose-500">{doctors.length}</p>
+    </div>
+    <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-100">
+      <p className="text-[10px] uppercase tracking-wider text-green-600 font-bold">{t('available')}</p>
+      <p className="text-xl font-bold text-green-700">{doctors.filter(d => d.available).length}</p>
+    </div>
+    <div className="bg-amber-50 p-3 rounded-xl border border-amber-100">
+      <p className="text-[10px] uppercase tracking-wider text-amber-600 font-bold">{t('Onleave')}</p>
+      <p className="text-xl font-bold text-amber-700">{doctors.filter(d => !d.available).length}</p>
+    </div>
+    <div className="bg-primary/5 p-3 rounded-xl border border-primary/10">
+      <p className="text-[10px] uppercase tracking-wider text-primary font-bold">{t("specialities")}</p>
+      <p className="text-xl font-bold text-primary-deep">{SPECIALITIES.length}</p>
+    </div>
   </div>
 
-  {/* Quick Status Filters */}
-  <div className="flex gap-2">
-    <button
-      onClick={() => setFilter('all')}
-      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1 ${
-        filter === 'all'
-          ? 'bg-primary text-white shadow-sm'
-          : 'bg-bg text-sub hover:bg-border'
-      }`}
-    >
-      <Users size={14} /> All ({doctors.length})
-    </button>
-    <button
-      onClick={() => setFilter('active')}
-      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1 ${
-        filter === 'active'
-          ? 'bg-emerald-500 text-white shadow-sm'
-          : 'bg-bg text-sub hover:bg-border'
-      }`}
-    >
-      <Activity size={14} /> Active
-    </button>
-    <button
-      onClick={() => setFilter('inactive')}
-      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1 ${
-        filter === 'inactive'
-          ? 'bg-amber-500 text-white shadow-sm'
-          : 'bg-bg text-sub hover:bg-border'
-      }`}
-    >
-      <ToggleLeft size={14} /> Inactive
-    </button>
-  </div>
+  {/* BOTTOM ROW: The actual controls */}
+  <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between pt-4 border-t border-dashed border-border">
+    
+    {/* Search */}
+    <div className="relative flex-1 w-full max-w-md">
+      <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+      <input
+        className="input pl-9 w-full bg-bg/50 border-none focus:bg-white transition-all"
+        placeholder={t('search')}
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+      />
+    </div>
 
-  {/* Speciality Dropdown */}
-  <div className="relative min-w-45">
-    <Stethoscope size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted z-10" />
-    <select
-      className="input pl-9 pr-8 appearance-none cursor-pointer"
-      value={filter}
-      onChange={e => setFilter(e.target.value)}
-    >
-      <option value="all">All Specialities</option>
-      {SPECIALITIES.map(s => (
-        <option key={s} value={s}>{s}</option>
-      ))}
-    </select>
-    <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
+    <div className="flex flex-wrap gap-3 items-center w-full lg:w-auto">
+      {/* Quick Status Filters */}
+      <div className="flex bg-bg p-1 rounded-xl border border-border">
+        <button
+          onClick={() => setFilter('all')}
+          className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+            filter === 'all' ? 'bg-white text-primary shadow-sm' : 'text-sub hover:text-text'
+          }`}
+        >
+          <Users size={14} /> {t('all')}
+        </button>
+        <button
+          onClick={() => setFilter('active')}
+          className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+            filter === 'active' ? 'bg-white text-emerald-600 shadow-sm' : 'text-sub hover:text-text'
+          }`}
+        >
+          <Activity size={14} /> {t('active')}
+        </button>
+      </div>
+
+      {/* Speciality Dropdown */}
+      <div className="relative min-w-50">
+        <Stethoscope size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted z-10" />
+        <select
+          className="input pl-9 pr-8 appearance-none cursor-pointer bg-bg/50 border-none"
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
+        >
+          <option value="all">{t('filterSpeciality')}</option>
+          {SPECIALITIES.map(s => (
+            <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
+        <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
+      </div>
+    </div>
   </div>
 </div>
 

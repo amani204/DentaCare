@@ -1,10 +1,10 @@
 
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { User, Briefcase, Upload, X, Plus, Image as ImageIcon, CheckCircle, AlertCircle} from 'lucide-react'
-import useAdminStore from '../store/adminStore'
-import useT from '../hooks/useT'
-import api from '../lib/axios'
+import { User, Briefcase, Upload, X, Plus, Image as ImageIcon, CheckCircle, AlertCircle, MapPin} from 'lucide-react'
+import useAdminStore from '../../store/adminStore'
+import useT from '../../hooks/useT'
+import api from '../../lib/axios'
 
 const SPECIALITIES = ['General Dentist','Orthodontist','Endodontist','Periodontist','Oral Surgeon','Pediatric Dentist','Prosthodontist']
 
