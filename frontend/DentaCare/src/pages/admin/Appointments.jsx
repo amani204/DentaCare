@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react'
 import { 
   Search, X, User, Stethoscope, Calendar, Clock, DollarSign, 
   CreditCard, Activity, XCircle, CheckCircle, Clock3, 
-  ChevronDown, Filter, Ban, ArrowRight 
+  ChevronDown, Filter, Ban, ArrowRight, 
+  CalendarDays
 } from 'lucide-react'
-import { Badge, Loader, EmptyState, Modal } from '../../components/common/components'
+import { Badge, Loader, EmptyState, Modal, StatCard, MiniStat } from '../../components/common/components'
 import useAdminStore from '../../store/adminStore'
 import useT from '../../hooks/useT'
 import api from '../../lib/axios'
@@ -87,28 +88,30 @@ export default function Appointments() {
       </div>
 
       {/* Appointments Control Center */}
-      <div className="flex flex-col gap-6 bg-white p-5 rounded-2xl border border-border shadow-sm mb-2">
-        
-        {/* TStats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-primary/5 p-3 rounded-xl border border-primary/10">
-            <p className="text-[10px] uppercase tracking-wider text-primary font-bold">{t('total')}</p>
-            <p className="text-xl font-bold text-primary-deep">{counts.all}</p>
-          </div>
-          <div className="bg-amber-50 p-3 rounded-xl border border-amber-100">
-            <p className="text-[10px] uppercase tracking-wider text-amber-600 font-bold">{t('pending')}</p>
-            <p className="text-xl font-bold text-amber-700">{counts.pending}</p>
-          </div>
-          <div className="bg-emerald-50 p-3 rounded-xl border border-green-100">
-            <p className="text-[10px] uppercase tracking-wider text-green-600 font-bold">{t('completed')}</p>
-            <p className="text-xl font-bold text-green-700">{counts.completed}</p>
-          </div>
-          <div className="bg-rose-500/5 p-3 rounded-xl border border-rose-100">
-            <p className="text-[10px] uppercase tracking-wider text-rose-500 font-bold">{t('cancelled')}</p>
-            <p className="text-xl font-bold text-rose-500">{counts.cancelled}</p>
-          </div>
-        </div>
-
+  <div className="flex flex-col gap-6 bg-white p-5 rounded-2xl border border-border shadow-sm mb-2">
+      
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <MiniStat
+      title={t('total')}
+      value={counts.all}
+      color="success"
+    />
+    <MiniStat
+      title={t('pending')}
+     value={counts.pending}
+      color="primary"
+    />
+    <MiniStat
+      title={t('completed')}
+      value={counts.completed}
+      color="accentSoft"
+    />
+    <MiniStat
+      title={t('cancelled')}
+      value={counts.cancelled}
+      color="accent"
+    />
+  </div>
         {/* Tabs and Search */}
         <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between pt-4 border-t border-dashed border-border">
           
@@ -173,7 +176,7 @@ export default function Appointments() {
                   {headers.map(({ key, icon: Icon, label }) => (
                     <th
                       key={key}
-                      className="text-left text-xs font-semibold text-primary-hov uppercase tracking-wide px-4 py-3 whitespace-nowrap"
+                      className="text-left text-xs text-primary-hov uppercase tracking-wide px-4 py-3 whitespace-nowrap"
                     >
                       <div className="flex items-center gap-1.5">
                         {Icon && <Icon size={12} />}
@@ -191,7 +194,7 @@ export default function Appointments() {
                     {/* Patient */}
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-full bg-primary-soft flex items-center justify-center text-xs font-bold text-primary-hov flex-shrink-0">
+                        <div className="w-7 h-7 rounded-full bg-accent-soft flex items-center justify-center text-xs font-bold text-primary-hov shrink-0">
                           {a.userData?.name?.charAt(0) || 'P'}
                         </div>
                         <span className="text-sm font-medium text-text">{a.userData?.name || '—'}</span>
@@ -202,9 +205,9 @@ export default function Appointments() {
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-2">
                         {a.docData?.image ? (
-                          <img src={a.docData.image} alt="" className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                          <img src={a.docData.image} alt="" className="w-7 h-7 rounded-full object-cover shrink-0" />
                         ) : (
-                          <div className="w-7 h-7 rounded-full bg-primary-soft flex items-center justify-center text-xs font-bold text-primary-hov flex-shrink-0">
+                          <div className="w-7 h-7 rounded-full bg-primary-soft flex items-center justify-center text-xs font-bold text-primary-hov shrink-0">
                             {a.docData?.name?.charAt(0) || 'D'}
                           </div>
                         )}
@@ -217,7 +220,7 @@ export default function Appointments() {
 
                     <td className="px-4 py-3 text-sm text-sub whitespace-nowrap">{a.slotDate?.replace(/_/g, '/')}</td>
                     <td className="px-4 py-3 text-sm text-sub whitespace-nowrap">{a.slotTime}</td>
-                    <td className="px-4 py-3 text-sm font-semibold text-primary whitespace-nowrap">${a.amount}</td>
+                    <td className="px-4 py-3 text-sm  text-primary whitespace-nowrap">${a.amount}</td>
                     <td className="px-4 py-3 whitespace-nowrap"><Badge status={a.isPaid ? 'paid' : 'unpaid'} /></td>
                     <td className="px-4 py-3 whitespace-nowrap"><Badge status={getStatus(a)} /></td>
 
@@ -243,7 +246,7 @@ export default function Appointments() {
         )}
       </div>
 
-      {/* 4. Cancel Modal */}
+      {/* Cancel Modal */}
       <Modal
         isOpen={!!cancelId}
         onClose={() => setCancelId(null)}

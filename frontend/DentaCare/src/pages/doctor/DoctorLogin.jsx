@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useDoctorStore from '../../store/doctorStore';
-import useT from '../../hooks/useT';
+import useDT from '../../hooks/useDT';
 import api from '../../lib/axios';
 import { DualGradientBg } from '../../components/ui/backgrounds';
 import LoginCard from '../../components/ui/loginCard';
@@ -12,7 +12,7 @@ export default function DoctorLogin() {
   const [error, setError] = useState('');
   
   const { setAuth, lang, toggleLang } = useDoctorStore();
-  const t = useT();
+  const t = useDT();
 
   const handleSubmit = async (email, password) => {
     setLoading(true);
@@ -51,7 +51,7 @@ export default function DoctorLogin() {
         {/* Login Card */}
         <LoginCard
           heading={t('welcomeDoctor') || "Welcome Doctor"}
-          buttonText={t('signingIn')}
+          buttonText={t('signIn')}
           isLoading={loading}
           error={error}
           onSubmit={handleSubmit}

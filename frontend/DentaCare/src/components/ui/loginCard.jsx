@@ -3,10 +3,9 @@ import { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, LogIn, Stethoscope, UserCog } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import useT from '../../hooks/useT';
+import useDT from '../../hooks/useDT';
 
 export const LoginCard = ({
-  heading = "Welcome Back",
-  subheading = "Sign in to your account",
   buttonText = "Sign In",
   isLoading = false,
   error = null,
@@ -17,7 +16,9 @@ export const LoginCard = ({
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const t = useT();
+  
+  // Use appropriate translation hook based on role
+  const t = role === 'doctor' ? useDT() : useT();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -28,10 +29,11 @@ export const LoginCard = ({
   const isDoctor = role === 'doctor';
   
   const emailPlaceholder = isDoctor ? "doctor@dentacare.com" : "admin@dentacare.com";
-  const welcomeText = isDoctor ? t('welcomeDoctor') || "Welcome Doctor" : t('welcomeAdmin') || "Welcome Admin";
+  const welcomeText = isDoctor ? t('welcomeDoctor') : t('welcomeAdmin');
+  const buttonTextTranslated = buttonText || t('signIn');
   const Icon = isDoctor ? Stethoscope : UserCog;
-  const iconBgClass =  "bg-primary/10";
-  const iconColorClass = "text-primary";
+  const iconBgClass = "bg-accent-soft/10";
+  const iconColorClass = "text-accent-soft";
 
   return (
     <div className={cn("w-full max-w-md mx-auto", className)}>
@@ -42,14 +44,14 @@ export const LoginCard = ({
             <Icon size={32} className={iconColorClass} />
           </div>
           <h1 className="text-2xl font-bold text-primary-deep mb-1">
-            Denta<span className="text-primary">Care</span>
+            Denta<span className="text-accent-soft">Care</span>
           </h1>
         </div>
 
         {/* Heading */}
         <div className="mb-6 text-center">
           <h2 className="text-xl font-semibold text-text">{welcomeText}</h2>
-          <p className="text-xs text-muted mt-1">{t('enterCredentials') || "Please enter your credentials"}</p>
+          <p className="text-xs text-muted mt-1">{t('enterCredentials')}</p>
         </div>
 
         {/* Error Message */}
@@ -58,12 +60,13 @@ export const LoginCard = ({
             {error}
           </div>
         )}
+        
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email Field */}
           <div>
             <label className="block text-sm font-medium text-text mb-1.5">
-              {t('email') || "Email Address"}
+              {t('email')}
             </label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
@@ -81,7 +84,7 @@ export const LoginCard = ({
           {/* Password Field */}
           <div>
             <label className="block text-sm font-medium text-text mb-1.5">
-              {t('password') || "Password"}
+              {t('password')}
             </label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
@@ -107,17 +110,17 @@ export const LoginCard = ({
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-primary hover:bg-primary-deep text-white font-medium py-2.5 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
+            className="w-full bg-accent-soft hover:bg-accent-soft/80 text-white font-medium py-2.5 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
           >
             {isLoading ? (
               <>
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                {t('signingIn')}
+                {t('signIn')}
               </>
             ) : (
               <>
                 <LogIn size={18} />
-                {buttonText}
+                {buttonTextTranslated}
               </>
             )}
           </button>
@@ -127,9 +130,9 @@ export const LoginCard = ({
         <div className="mt-6 pt-4 border-t border-border text-center">
           <a 
             href={isDoctor ? "/" : "/doctor/login"} 
-            className="text-xs text-primary hover:text-primary-deep transition-colors"
+            className="text-xs text-primary hover:text-primary/70 transition-colors"
           >
-            {isDoctor ? (t('adminLogin') || "Admin login →") : (t('doctorLogin') || "Doctor login →")}
+            {isDoctor ? t('adminLogin') : t('doctorLogin')}
           </a>
         </div>
 

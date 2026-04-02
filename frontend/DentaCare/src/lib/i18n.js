@@ -7,9 +7,10 @@ export const translations = {
    enterCredentials: 'Please enter your credentials',
    email: 'Email Address',
    password: 'Password',
-   signingIn: 'Signing in...',
+   signIn: 'Sign in',
    adminLogin: 'Admin login →',
    doctorLogin: 'Doctor login →',
+   
  
 
     
@@ -134,11 +135,14 @@ export const translations = {
 
     welcomeAdmin: 'Bienvenue Administrateur',
     welcomeDoctor: 'Bienvenue Docteur',
+    welcomeAdmin: 'Bienvenue, Admin',
+    signIn: 'Se connecter',
+    signingIn: 'Connexion...',
     enterCredentials: 'Veuillez saisir vos identifiants',
     email: 'Adresse e-mail',
     password: 'Mot de passe',
     forgotPassword: 'Mot de passe oublié ?',
-    signingIn: 'Connexion...',
+    signIn: 'Connecter',
     adminLogin: 'Connexion administrateur →',
     doctorLogin: 'Connexion médecin →',
     dashboard: 'Tableau de bord', doctors: 'Médecins', addDoctor: 'Ajouter',
@@ -149,7 +153,7 @@ export const translations = {
     totalAppointments: 'Rendez-vous', totalRevenue: 'Revenu total',
     available: 'disponibles', today: "aujourd'hui", paid: 'payés',
     recentAppointments: 'Rendez-vous récents', upcomingToday: "Aujourd'hui",
-    monthlyRevenue: 'Revenu mensuel', appointmentStats: 'Statistiques',
+    monthlyRevenue: 'Revenu mensuel', appointmentStats: 'Statistiques de rendez-vous',
     viewAll: 'Voir tout', noData: 'Aucune donnée',
 
     allDoctors: 'Tous les médecins', registered: 'enregistrés',

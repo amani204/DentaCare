@@ -30,39 +30,28 @@ export function Badge({ status }) {
 
 /* ── STAT CARD ── */
 const statVariants = {
-  primary: {
-    bg: 'bg-primary/5',
-    border: 'border-l-primary',
-    text: 'text-primary',
-    iconBg: 'bg-primary/10',
-  },
   success: {
-    bg: 'bg-emerald-500/5',
-    border: 'border-l-emerald-500',
-    text: 'text-emerald-600',
-    iconBg: 'bg-emerald-500/10',
+    border: 'border-l-primary-soft',
+    text: 'text-primary',
+    iconBg: 'bg-primary-soft/50',
   },
- purple: {
-    bg: 'bg-purple-500/5',
-    border: 'border-l-purple-500',
-    text: 'text-purple-600',
-    iconBg: 'bg-purple-500/10',
+ accentSoft: {
+    border: 'border-l-accent-soft',
+    text: 'text-primary',
+    iconBg: 'bg-accent-soft/50',
     
   },
-  info: {
-    bg: 'bg-blue-500/5',
-    border: 'border-l-blue-500',
-    text: 'text-blue-600',
-    iconBg: 'bg-blue-500/10',
+  accent: {
+    border: 'border-l-accent',
+    text: 'text-primary',
+    iconBg: 'bg-accent/50',
   },
-  rose: {
-    bg: 'bg-rose-500/5',
-    border: 'border-l-rose-500',
-    text: 'text-rose-500',
-    iconBg: 'bg-rose-500/10',
+  primary: {
+    border: 'border-l-primary',
+    text: 'text-priamry',
+    iconBg: 'bg-primary/10',
     
   },
-
 }
 
 export function StatCard({ title, value, icon: Icon, trend, color = 'primary' }) {
@@ -88,11 +77,55 @@ export function StatCard({ title, value, icon: Icon, trend, color = 'primary' })
     </div>
   )
 }
+/* ── MINI STAT VARIANTS ── */
+const miniVariants = {
+  success: {
+    border: 'border-l-primary-soft',
+    bg: 'bg-primary-soft/10',
+    text: 'text-primary-soft',
+  },
+  accent: {
+    border: 'border-l-accent', 
+    bg: 'bg-accent/10',
+    text: 'text-accent',
+  },
+  accentSoft: {
+    border: 'border-l-accent-soft',
+    bg: 'bg-accent-soft/10',
+    text: 'text-accent-soft',
 
+  },
+  primary: {
+    border: 'border-l-primary', 
+    bg: 'bg-primary/5',
+    text: 'text-primary',
+  },
+}
+
+export function MiniStat({ title, value, color = 'primary' }) {
+  const v = miniVariants[color] || miniVariants.primary
+
+  return (
+    <div className={`
+      card p-5 relative overflow-hidden transition-all duration-200 
+      hover:shadow-lg hover:-translate-y-0.5 border-l-2 ${v.border} ${v.bg}
+    `}>
+      <div className="relative">
+        <div className="flex justify-between items-start mb-3.5">
+          <p className="label-text text-xs uppercase tracking-wide text-muted">
+            {title}
+          </p>
+        </div>
+        <p className={`text-2xl font-bold ${v.text} leading-tight`}>{value}</p>
+        
+      </div>
+    </div>
+  )
+}
 /* ── LOADER ── */
 export function Loader({ fullScreen = false }) {
   const spinner = (
-    <Loader2 size={32} className="animate-spin text-primary" />
+    <Loader2 size={32} className="animate-spin text-accent-soft" />
   )
 
   if (fullScreen) {

@@ -1,8 +1,8 @@
 
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Plus, Trash2, ToggleLeft, ToggleRight, Stethoscope, DollarSign, GraduationCap, Activity, ChevronDown, Users } from 'lucide-react'
-import { Badge, Loader, EmptyState, Modal } from '../../components/common/components'
+import { Search, Plus, Trash2, ToggleLeft, ToggleRight, Stethoscope, DollarSign, GraduationCap, Activity, ChevronDown, Users, Clock, Layers, CheckCircle } from 'lucide-react'
+import { Badge, Loader, EmptyState, Modal, StatCard, MiniStat } from '../../components/common/components'
 import useAdminStore from '../../store/adminStore'
 import useT from '../../hooks/useT'
 import api from '../../lib/axios'
@@ -76,27 +76,34 @@ export default function DoctorsList() {
 {/* Filter Section */}
 <div className="flex flex-col gap-6 bg-white p-5 rounded-2xl border border-border shadow-sm">
   
-  {/* TOP ROW: Stats to fill the "Empty" feeling */}
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-    <div className="bg-rose-500/5 p-3 rounded-xl border border-rose-100">
-      <p className="text-[10px] uppercase tracking-wider text-rose-500/50 font-bold">{t('totalDoctors')}</p>
-      <p className="text-xl font-bold text-rose-500">{doctors.length}</p>
-    </div>
-    <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-100">
-      <p className="text-[10px] uppercase tracking-wider text-green-600 font-bold">{t('available')}</p>
-      <p className="text-xl font-bold text-green-700">{doctors.filter(d => d.available).length}</p>
-    </div>
-    <div className="bg-amber-50 p-3 rounded-xl border border-amber-100">
-      <p className="text-[10px] uppercase tracking-wider text-amber-600 font-bold">{t('Onleave')}</p>
-      <p className="text-xl font-bold text-amber-700">{doctors.filter(d => !d.available).length}</p>
-    </div>
-    <div className="bg-primary/5 p-3 rounded-xl border border-primary/10">
-      <p className="text-[10px] uppercase tracking-wider text-primary font-bold">{t("specialities")}</p>
-      <p className="text-xl font-bold text-primary-deep">{SPECIALITIES.length}</p>
-    </div>
+  {/* Stats Overview */}
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <MiniStat
+      title={t('totalDoctors')}
+      value={doctors.length}
+   a   color="success"
+    />
+    <MiniStat
+      title={t('available')}
+      value={doctors.filter(d => d.available).length}
+      color="accentSoft"
+    />
+    <MiniStat
+      title={t('onLeave')}
+      value={doctors.filter(d => !d.available).length}
+      color="accent"
+    />
+    <MiniStat
+      title={t('specialities')}
+      value={SPECIALITIES.length}
+      color="primary"
+    />
   </div>
 
-  {/* BOTTOM ROW: The actual controls */}
+
+
+
+  {/* The actual controls */}
   <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between pt-4 border-t border-dashed border-border">
     
     {/* Search */}

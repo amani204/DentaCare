@@ -1,4 +1,4 @@
-// src/pages/admin/Login.jsx
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAdminStore from '../../store/adminStore';
@@ -11,7 +11,6 @@ export default function AdminLogin() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
   const { setAToken, lang, toggleLang } = useAdminStore();
   const t = useT();
 
@@ -41,7 +40,7 @@ export default function AdminLogin() {
         <div className="absolute top-6 right-6">
           <button
             onClick={toggleLang}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-sub hover:text-primary hover:bg-primary/5 rounded-lg transition-all bg-white/50 backdrop-blur-sm"
+            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-sub hover:text-primary hover:bg-accent-soft/10 rounded-lg transition-all bg-white/50 backdrop-blur-sm"
             title="Toggle language"
           >
             <span>{lang === 'en' ? '🇬🇧' : '🇫🇷'}</span>
@@ -52,7 +51,7 @@ export default function AdminLogin() {
         {/* Login Card */}
         <LoginCard
           heading={t('welcomeAdmin') || "Welcome Admin"}
-          buttonText={t('signingIn')}
+          buttonText={t('signIn')}
           isLoading={loading}
           error={error}
           onSubmit={handleSubmit}

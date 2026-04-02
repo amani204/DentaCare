@@ -3,16 +3,16 @@ import { Link } from 'react-router-dom'
 import { CalendarDays, CheckCircle, DollarSign, Clock, ArrowRight} from 'lucide-react'
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import useDoctorStore from '../../store/doctorStore'
-import useT from '../../hooks/useT'
 import api from '../../lib/axios'
 import { StatCard, Badge, Loader } from '../../components/common/components'
+import useDT from '../../hooks/useDT'
 
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 const monthsFr = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
 
 export default function DoctorDashboard() {
   const { dToken, doctor, lang } = useDoctorStore()
-  const t = useT()
+  const t = useDT()
 
   const [dashboard, setDashboard] = useState(null)
   const [allApts, setAllApts] = useState([])
@@ -85,12 +85,11 @@ export default function DoctorDashboard() {
   const d = dashboard?.stats
 
   if (loading) return <Loader fullScreen />
-
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="bg-linear-to-r from-primary-soft/50 to-surface rounded-2xl border border-primary/20 p-6 flex items-center justify-between">
+      <div className="flex items-center justify-between mt-8">
         <div>
-          <h2 className="text-lg font-bold text-primary-deep mb-1">
+          <h2 className="text-2xl font-bold text-primary mb-2">
             {greeting}, Dr. {doctor?.name?.split(' ')[1] || 'Doctor'}
           </h2>
           <p className="text-sub text-sm">
@@ -99,22 +98,24 @@ export default function DoctorDashboard() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="text-center px-4 py-2 bg-primary/10 rounded-xl border border-primary/20">
+          <div className="text-center px-4 py-2 bg-primary-soft/50 rounded-xl border border-primary-soft/50">
             <p className="text-xl font-bold text-primary-deep">{todayApts.filter(a => !a.isCompleted).length}</p>
             <p className="text-xs text-sub">{t('remaining')}</p>
           </div>
-          <div className="text-center px-4 py-2 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+          <div className="text-center px-4 py-2 bg-accent-soft/50 rounded-xl border border-accent-soft/50">
             <p className="text-xl font-bold text-emerald-600">{todayApts.filter(a => a.isCompleted).length}</p>
             <p className="text-xs text-sub">{t('done')}</p>
           </div>
         </div>
+
+        
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <StatCard title={t('totalAppointments')} value={d?.totalAppointments ?? 0} icon={CalendarDays} trend={t('allTime')} color="rose" />
-        <StatCard title={t('completedApts')} value={d?.completedAppointments ?? 0} icon={CheckCircle} trend={t('fromCompleted')} color="info" />
+        <StatCard title={t('totalAppointments')} value={d?.totalAppointments ?? 0} icon={CalendarDays} trend={t('allTime')} color="accent" />
+        <StatCard title={t('completedApts')} value={d?.completedAppointments ?? 0} icon={CheckCircle} trend={t('fromCompleted')} color="success" />
         <StatCard title={t('upcomingApts')} value={d?.pendingAppointments ?? 0} icon={Clock} trend={t('scheduled')} color="purple" />
-        <StatCard title={t('totalEarnings')} value={`$${(d?.totalEarnings ?? 0).toLocaleString()}`} icon={DollarSign} trend={t('fromCompleted')} color="success" />
+        <StatCard title={t('totalEarnings')} value={`$${(d?.totalEarnings ?? 0).toLocaleString()}`} icon={DollarSign} trend={t('fromCompleted')} color="accentSoft" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -127,8 +128,8 @@ export default function DoctorDashboard() {
             <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#7097D2" stopOpacity={0.2} />
-                  <stop offset="95%" stopColor="#7097D2" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#2C2C2A" stopOpacity={0.2} />
+                  <stop offset="95%" stopColor="#2C2C2A" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#E2EBEA" vertical={false} />
@@ -138,7 +139,7 @@ export default function DoctorDashboard() {
                 contentStyle={{ backgroundColor: '#FFFFFF', border: '1px solid #E2EBEA', borderRadius: 12, padding: '8px 12px' }}
                 cursor={{ fill: 'rgba(112,151,210,0.08)' }}
               />
-              <Area type="monotone" dataKey="revenue" stroke="#7097D2" strokeWidth={2.5} fill="url(#revenueGradient)" dot={{ fill: '#7097D2', strokeWidth: 0, r: 3.5 }} />
+              <Area type="monotone" dataKey="revenue" stroke="#2C2C2A" strokeWidth={2.5} fill="url(#revenueGradient)" dot={{ fill: '#2C2C2A', strokeWidth: 0, r: 3.5 }} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
