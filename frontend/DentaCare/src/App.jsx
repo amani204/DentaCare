@@ -1,26 +1,28 @@
-// src/App.jsx
 import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
 // Admin
 import useAdminStore from './store/adminStore'
-import AdminLogin    from './pages/admin/Login'
-import Dashboard     from './pages/admin/Dashboard'
-import DoctorsList   from './pages/admin/DoctorsList'
-import AddDoctor     from './pages/admin/AddDoctor'
-import Appointments  from './pages/admin/Appointments'
-import AdminSidebar  from './components/admin/Sidebar'
-import AdminNavbar   from './components/admin/Navbar'
+import AdminLogin from './pages/admin/Login'
+import Dashboard from './pages/admin/Dashboard'
+import DoctorsList from './pages/admin/DoctorsList'
+import AddDoctor from './pages/admin/AddDoctor'
+import Appointments from './pages/admin/Appointments'
+import AdminSidebar from './components/admin/Sidebar'
+import AdminNavbar from './components/admin/Navbar'
 
 // Doctor
-import useDoctorStore  from './store/doctorStore'
-import DoctorLogin     from './pages/doctor/DoctorLogin'
-import DoctorSidebar   from './components/doctor/DoctorSidebar'
-import DoctorNavbar    from './components/doctor/DoctorNavbar'
+import useDoctorStore from './store/doctorStore'
+import DoctorLogin from './pages/doctor/DoctorLogin'
+import DoctorSidebar from './components/doctor/doctorSidebar'
+import DoctorNavbar from './components/doctor/doctorNavbar'
 import DoctorDashboard from './pages/doctor/DoctorDashboard'
-import DoctorAppts     from './pages/doctor/DoctorAppointments'
-import DoctorEarnings  from './pages/doctor/DoctorEarnings'
-import DoctorProfile   from './pages/doctor/DoctorProfile'
+import DoctorAppts from './pages/doctor/DoctorAppointments'
+import DoctorEarnings from './pages/doctor/DoctorEarnings'
+import DoctorProfile from './pages/doctor/DoctorProfile'
+
+// Website
+import HomePage from './pages/website/Home'
 
 // Background Component
 import { DualGradientBg } from './components/ui/backgrounds'
@@ -70,10 +72,11 @@ export default function App() {
         v7_relativeSplatPath: true,
       }}
     >
-      {/* Wrap everything with DualGradientBg */}
       <DualGradientBg>
         <Routes>
-
+          {/* ── WEBSITE PUBLIC ROUTES ── */}
+          <Route path="/" element={<HomePage />} />
+       
           {/* ── DOCTOR ROUTES ── */}
           <Route path="/doctor/login" element={
             dToken ? <Navigate to="/doctor/dashboard" /> : <DoctorLogin />
@@ -92,20 +95,20 @@ export default function App() {
           } />
 
           {/* ── ADMIN ROUTES ── */}
-          <Route path="/" element={
+          <Route path="/admin" element={
             aToken ? <AdminShell><Dashboard /></AdminShell> : <AdminLogin />
           } />
-          <Route path="/doctors" element={
-            aToken ? <AdminShell><DoctorsList /></AdminShell> : <Navigate to="/" />
+          <Route path="/admin/doctors" element={
+            aToken ? <AdminShell><DoctorsList /></AdminShell> : <Navigate to="/admin" />
           } />
-          <Route path="/add-doctor" element={
-            aToken ? <AdminShell><AddDoctor /></AdminShell> : <Navigate to="/" />
+          <Route path="/admin/add-doctor" element={
+            aToken ? <AdminShell><AddDoctor /></AdminShell> : <Navigate to="/admin" />
           } />
-          <Route path="/appointments" element={
-            aToken ? <AdminShell><Appointments /></AdminShell> : <Navigate to="/" />
+          <Route path="/admin/appointments" element={
+            aToken ? <AdminShell><Appointments /></AdminShell> : <Navigate to="/admin" />
           } />
 
-          {/* Catch all → admin login */}
+          {/* Catch all → home */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </DualGradientBg>
