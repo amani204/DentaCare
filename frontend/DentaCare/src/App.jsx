@@ -23,9 +23,12 @@ import DoctorProfile from './pages/doctor/DoctorProfile'
 
 // Website
 import HomePage from './pages/website/Home'
-
+import About from './pages/website/About'
+import Auth from './pages/website/Auth'
+import DoctorDetailsPage from './pages/website/DoctorDetailsPage'
 // Background Component
 import { DualGradientBg } from './components/ui/backgrounds'
+
 
 // ── Admin protected layout
 function AdminShell({ children }) {
@@ -76,7 +79,10 @@ export default function App() {
         <Routes>
           {/* ── WEBSITE PUBLIC ROUTES ── */}
           <Route path="/" element={<HomePage />} />
-       
+          <Route path="/about" element={<About />} />
+          <Route path="/Auth" element={<Auth />} />
+          <Route path="/doctors/:docId" element={<DoctorDetailsPage/>} />
+        
           {/* ── DOCTOR ROUTES ── */}
           <Route path="/doctor/login" element={
             dToken ? <Navigate to="/doctor/dashboard" /> : <DoctorLogin />

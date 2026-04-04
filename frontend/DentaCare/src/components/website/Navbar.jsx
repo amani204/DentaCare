@@ -1,16 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Menu, X, ChevronRight, Stethoscope, Globe } from 'lucide-react'
 import gsap from 'gsap'
 import useAdminStore from '../../store/adminStore'
 import useT from '../../hooks/useT'
 
 const NAV_LINKS = [
-  { label: 'Home', href: '/' },
-  { label: 'About', href: '/#about' },
-  { label: 'Services', href: '/#services' },
-  { label: 'Doctors', href: '/#doctors' },
-  { label: 'Contact', href: '/#contact' },
+  { label: 'Home', href: '/', isHash: false },
+  { label: 'About', href: '/about', isHash: false },
+  { label: 'Services', href: '/#services', isHash: true, sectionId: 'services' },
+  { label: 'Doctors', href: '/#doctors', isHash: true, sectionId: 'doctors' },
+  { label: 'Contact', href: '/#contact', isHash: true, sectionId: 'contact' },
 ]
 
 export default function Navbar() {
@@ -18,6 +18,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const navRef = useRef(null)
   const navigate = useNavigate()
+  const location = useLocation()
   const { lang, toggleLang } = useAdminStore()
   const t = useT()
 
@@ -49,15 +50,30 @@ export default function Navbar() {
     }
   }, [menuOpen])
 
-  const handleScroll = (e, href) => {
+  const handleNavigation = (e, link) => {
     e.preventDefault()
     setMenuOpen(false)
-    if (href.includes('#')) {
-      const id = href.split('#')[1]
-      const el = document.getElementById(id)
-      if (el) el.scrollIntoView({ behavior: 'smooth' })
+
+    // If it's a hash link (Services, Doctors, Contact)
+    if (link.isHash) {
+      // If we're not on home page, navigate to home first
+      if (location.pathname !== '/') {
+        navigate('/')
+        // Wait for navigation to complete, then scroll
+        setTimeout(() => {
+          const el = document.getElementById(link.sectionId)
+          if (el) el.scrollIntoView({ behavior: 'smooth' })
+        }, 100)
+      } else {
+        // Already on home page, just scroll
+        const el = document.getElementById(link.sectionId)
+        if (el) el.scrollIntoView({ behavior: 'smooth' })
+      }
     } else {
-      navigate(href)
+      // Regular page navigation (Home, About)
+      navigate(link.href)
+      // Scroll to top when navigating to a new page
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 
@@ -77,7 +93,11 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
+          <Link 
+            to="/" 
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="flex items-center gap-2 group"
+          >
             <span className="font-bold text-xl text-text">
               Denta<span className="text-accent-soft">Care</span>
             </span>
@@ -85,14 +105,14 @@ export default function Navbar() {
 
           {/* Desktop nav links */}
           <div className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.map(({ label, href }) => (
+            {NAV_LINKS.map((link) => (
               <a
-                key={href}
-                href={href}
-                onClick={(e) => handleScroll(e, href)}
+                key={link.href}
+                href={link.href}
+                onClick={(e) => handleNavigation(e, link)}
                 className="relative text-sub font-medium px-4 py-2 rounded-xl transition-all duration-300 hover:text-primary group"
               >
-                {t(label.toLowerCase()) || label}
+                {t(link.label.toLowerCase()) || link.label}
                 <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary-soft transition-all duration-300 group-hover:w-6 group-hover:left-1/2 -translate-x-1/2 rounded-full" />
               </a>
             ))}
@@ -115,7 +135,7 @@ export default function Navbar() {
             <div className="w-px h-6 bg-border" />
 
             {/* Book Appointment */}
-            <Link to="/doctors" className="btn-primary">
+            <Link to="/Auth" className="btn-primary">
               {t('signIn')}
             </Link>
           </div>
@@ -163,14 +183,14 @@ export default function Navbar() {
 
             {/* Navigation Links */}
             <div className="px-6 py-4">
-              {NAV_LINKS.map(({ label, href }) => (
+              {NAV_LINKS.map((link) => (
                 <a
-                  key={href}
-                  href={href}
-                  onClick={(e) => handleScroll(e, href)}
+                  key={link.href}
+                  href={link.href}
+                  onClick={(e) => handleNavigation(e, link)}
                   className="flex items-center justify-between py-4 text-lg font-medium text-text/75 border-b border-border last:border-0 hover:text-primary-deep transition-colors"
                 >
-                  {t(label.toLowerCase()) || label}
+                  {t(link.label.toLowerCase()) || link.label}
                   <ChevronRight size={18} className="text-muted" />
                 </a>
               ))}
@@ -178,10 +198,9 @@ export default function Navbar() {
 
             {/* Actions */}
             <div className="px-6 py-4 border-t border-border space-y-3">
-
               {/* Book Appointment Button */}
               <Link
-                to="/doctors"
+                to="/Auth"
                 onClick={() => setMenuOpen(false)}
                 className="flex items-center justify-center gap-2 btn-primary w-full"
               >

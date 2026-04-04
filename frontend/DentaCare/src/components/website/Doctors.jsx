@@ -1,11 +1,12 @@
-// src/components/website/Doctors.jsx
+
 import { useRef, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Star, ArrowRight, MapPin } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import useT from '../../hooks/useT'
 import api from '../../lib/axios'
-
+import { useNavigate } from 'react-router-dom'
 gsap.registerPlugin(ScrollTrigger)
 
 // Fallback doctors if API not available
@@ -17,17 +18,20 @@ const FALLBACK_DOCTORS = [
 ]
 
 export default function Doctors() {
+  const t = useT()
+  const navigate = useNavigate()
   const sectionRef = useRef(null)
-  const headerRef  = useRef(null)
-  const gridRef    = useRef(null)
+  const headerRef = useRef(null)
+  const gridRef = useRef(null)
   const [doctors, setDoctors] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    api.get('/api/doctor/list')
+    api.get('/api/doctor/all-doctors')
       .then(({ data }) => {
-        if (data.success && data.doctors?.length) {
-          setDoctors(data.doctors.slice(0, 4))
+         console.log('API Response:', data);
+        if (data.success && data.data && data.data.length) {
+          setDoctors(data.data.slice(0, 4))
         } else {
           setDoctors(FALLBACK_DOCTORS)
         }
@@ -57,129 +61,82 @@ export default function Doctors() {
 
   const initials = (name) => name?.split(' ').slice(0,2).map(w => w[0]).join('') || 'DR'
 
-  return (
-    <section id="doctors" className="section-padding" style={{ background: 'var(--color-surface)' }}>
-      <div className="container-main">
+  if (loading) {
+    return (
+      <section id="doctors" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex justify-center py-12">
+            <div className="w-8 h-8 border-2 border-accent-soft border-t-transparent rounded-full animate-spin" />
+          </div>
+        </div>
+      </section>
+    )
+  }
 
+  return (
+    <section id="doctors" ref={sectionRef} className="py-20 bg-white">
+      <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
-        <div ref={headerRef} style={{ opacity: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '3.5rem', flexWrap: 'wrap', gap: '1.5rem' }}>
+        <div ref={headerRef} className="flex justify-between items-end flex-wrap gap-6 mb-14 opacity-0">
           <div>
-            <div className="section-label">
-              <span className="label-caps">Our Specialists</span>
+            <div className="mb-4">
+              <span className="text-xs font-semibold text-accent-soft uppercase tracking-wider bg-accent-soft/10 px-3 py-1 rounded-full">
+                {t('doctorsTag')}
+              </span>
             </div>
-            <h2 className="heading-lg" style={{ maxWidth: 440 }}>
-              Meet Our{' '}
-              <span className="italic-accent">Expert Doctors</span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text max-w-md">
+              {t('doctorsHeading1')}{' '}
+              <span className=" text-text">{t('doctorsHeading2')}</span>
             </h2>
           </div>
-          <div>
-            <p className="body-md" style={{ maxWidth: 320, marginBottom: '1rem' }}>
-              Certified professionals with years of experience, dedicated to your smile.
+          <div className="max-w-xs">
+            <p className="text-sub mb-3">
+              {t('doctorsSub')}
             </p>
-            <Link to="/doctors" className="btn-outline-main" style={{ fontSize: '0.875rem', padding: '0.6rem 1.25rem' }}>
-              View All Doctors <ArrowRight size={15} />
+            <Link to="/doctors" className="inline-flex items-center gap-2 text-text font-medium hover:gap-3 transition-all duration-200">
+              {t('viewAllDoctors')} <ArrowRight size={15} />
             </Link>
           </div>
         </div>
 
         {/* Grid */}
-        {loading
-          ? (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem 0' }}>
-              <div className="loader-spin" />
-            </div>
-          )
-          : (
-            <div ref={gridRef} style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '1.5rem' }}>
-              {doctors.map((doc) => (
-                <div key={doc._id}
-                  className="doctor-card"
-                  style={{
-                    opacity: 0,
-                    background: 'var(--color-surface)',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: 24, overflow: 'hidden',
-                    transition: 'all 0.3s ease',
-                    cursor: 'pointer',
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-6px)'; e.currentTarget.style.boxShadow = 'var(--shadow-blue)'; e.currentTarget.style.borderColor = 'var(--color-primary)' }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; e.currentTarget.style.borderColor = 'var(--color-border)' }}>
-
-                  {/* Image area */}
-                  <div style={{
-                    height: 200, position: 'relative',
-                    background: 'linear-gradient(135deg, var(--color-primary-soft) 0%, var(--color-primary-pale) 100%)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    {doc.image
-                      ? <img src={doc.image} alt={doc.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      : (
-                        <div style={{
-                          width: 80, height: 80, borderRadius: '50%',
-                          background: 'linear-gradient(135deg, #091E5D, #7097D2)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: '1.5rem', fontWeight: 700, color: 'white',
-                          fontFamily: 'var(--font-display)',
-                        }}>{initials(doc.name)}</div>
-                      )
-                    }
-                    {/* Available badge */}
-                    <div style={{
-                      position: 'absolute', top: '0.75rem', right: '0.75rem',
-                      background: doc.available ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.8)',
-                      borderRadius: 999, padding: '0.25rem 0.625rem',
-                      display: 'flex', alignItems: 'center', gap: '0.3rem',
-                      fontSize: '0.7rem', fontWeight: 600,
-                      color: doc.available ? '#16A34A' : '#EF4444',
-                    }}>
-                      <div style={{ width: 6, height: 6, borderRadius: '50%', background: doc.available ? '#16A34A' : '#EF4444' }} />
-                      {doc.available ? 'Available' : 'Unavailable'}
-                    </div>
+        <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6  ">
+          {doctors.map((doc) => (
+            <div
+  key={doc._id}
+  onClick={() => navigate(`/doctors/${doc._id}`)}
+  className="doctor-card opacity-0 bg-white border border-border rounded-[10px] overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-primary group cursor-pointer"
+>
+              {/* Image area */}
+              <div className="h-80 relative bg-linear-to-br from-accent-soft/20 to-accent-soft/5 flex items-center justify-center">
+                {doc.image ? (
+                  <img src={doc.image} alt={doc.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-20 h-20 rounded-full bg-linear-to-br from-accent-soft to-accent-soft/70 flex items-center justify-center text-2xl font-bold text-white">
+                    {initials(doc.name)}
                   </div>
-
-                  {/* Info */}
-                  <div style={{ padding: '1.25rem' }}>
-                    <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.0625rem', fontWeight: 600, color: 'var(--color-text)', marginBottom: '0.25rem' }}>
-                      {doc.name}
-                    </h3>
-                    <p style={{ fontSize: '0.8125rem', color: 'var(--color-primary)', fontWeight: 500, marginBottom: '0.75rem' }}>
-                      {doc.speciality}
-                    </p>
-
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                        {[...Array(5)].map((_, i) => <Star key={i} size={11} fill="#F59E0B" color="#F59E0B" />)}
-                        <span style={{ fontSize: '0.75rem', color: 'var(--color-text-sub)', marginLeft: '0.25rem' }}>5.0</span>
-                      </div>
-                      <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-sub)' }}>{doc.experience} exp.</span>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div>
-                        <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.125rem', fontWeight: 700, color: 'var(--color-primary-deep)' }}>
-                          ${doc.fees}
-                        </span>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--color-text-mute)' }}>/session</span>
-                      </div>
-                      <Link to={`/book/${doc._id}`}
-                        style={{
-                          fontSize: '0.8125rem', fontWeight: 600,
-                          color: 'white', background: 'var(--color-primary-deep)',
-                          padding: '0.45rem 0.875rem', borderRadius: 999,
-                          textDecoration: 'none', transition: 'all 0.2s',
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-primary)' }}
-                        onMouseLeave={e => { e.currentTarget.style.background = 'var(--color-primary-deep)' }}>
-                        Book
-                      </Link>
-                    </div>
-                  </div>
+                )}
+                {/* Available badge */}
+                <div className={`absolute top-3 right-3 flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-semibold backdrop-blur-sm ${
+                  doc.available 
+                    ? 'bg-white/95 text-emerald-600' 
+                    : 'bg-white/80 text-red-500'
+                }`}>
+                  <div className={`w-1.5 h-1.5 rounded-full ${doc.available ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                  {doc.available ? t('available') : t('unavailable')}
                 </div>
-              ))}
-            </div>
-          )
-        }
+              </div>
 
+              {/* Info */}
+              <div className="p-5">
+                <h3 className="text-lg font-bold text-text mb-1">{doc.name}</h3>
+                <p className="text-sm text-text/50 font-medium mb-3">{doc.speciality}</p>
+                <div className="flex items-center justify-between">
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   )

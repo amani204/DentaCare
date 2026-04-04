@@ -1,4 +1,4 @@
-// src/components/website/Services.jsx
+
 import { useRef, useEffect } from 'react'
 import { Stethoscope, Sparkles, Wrench, Building, Leaf, Baby } from 'lucide-react'
 import gsap from 'gsap'
@@ -101,13 +101,13 @@ export default function Services() {
         {/* Header */}
         <div ref={headerRef} className="text-center mb-16 opacity-0">
           <div className="flex justify-center mb-4">
-            <span className="text-xs font-semibold text-primary uppercase tracking-wider bg-primary/10 px-3 py-1 rounded-full">
+            <span className="text-xs font-semibold text-accent-soft uppercase tracking-wider bg-accent-soft/10 px-3 py-1 rounded-full">
               {t('servicesTag')}
             </span>
           </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text mb-4 max-w-2xl mx-auto">
             {t('servicesHeading1')}{' '}
-            <span className="italic text-primary-deep">{t('servicesHeading2')}</span>
+            <span className=" text-primary-deep">{t('servicesHeading2')}</span>
           </h2>
           <p className="text-lg text-sub max-w-xl mx-auto">
             {t('servicesSub')}
@@ -119,7 +119,7 @@ export default function Services() {
           {SERVICES.map(({ icon: Icon, number, titleKey, descKey, color, textColor, featuresKeys }) => (
             <div
               key={titleKey}
-              className="service-card opacity-0 bg-white border border-border rounded-2xl p-6 relative overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-primary group"
+              className="service-card opacity-0 bg-white border border-border rounded-[10px] p-6 relative overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-primary group"
             >
               {/* Number watermark */}
               <span className="absolute top-4 right-5 text-5xl font-bold opacity-20 pointer-events-none">

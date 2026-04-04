@@ -1,7 +1,7 @@
-// src/components/website/Hero.jsx
+
 import { useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Star, Shield, Clock, Stethoscope } from 'lucide-react'
+import { ArrowRight, Star, Shield, Clock } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import useT from '../../hooks/useT'
@@ -120,7 +120,7 @@ export default function Hero() {
             {/* Heading */}
             <h1 ref={headingRef} className="heading-lg text-5xl  md:text-6xl lg:text-7xl font-black text-text opacity-0">
               {t('heroHeading1')}{' '}
-              <span className="relative italic text-[#2C2C2A] ">
+              <span className="relative text-[#2C2C2A] ">
                 {t('heroHeading2')}
                 <svg className="absolute -bottom-2 left-0 w-full h-3 text-[#CDE9FF]" viewBox="0 0 100 10" preserveAspectRatio="none">
                   <path d="M0 5 Q 25 0 50 5 T 100 5" stroke="currentColor" strokeWidth="4" fill="transparent" />
@@ -174,7 +174,7 @@ export default function Hero() {
             </div>
 
             {/* Floating card 1 */}
-            <div ref={floatRef1} className="absolute top-[12%] -left-[5%] lg:-left-[10%] bg-white/95 backdrop-blur-md border border-border rounded-xl p-3 min-w-[160px] shadow-lg opacity-0">
+            <div ref={floatRef1} className="absolute top-[12%] -left-[5%] lg:-left-[10%] bg-white/95 backdrop-blur-md border border-border rounded-xl p-3 min-w-40 shadow-lg opacity-0">
               <div className="flex items-center gap-2">
                 <div className="w-9 h-9 rounded-lg bg-primary-soft flex items-center justify-center">
                   <Shield size={18} className="text-primary-deep" />
@@ -187,7 +187,7 @@ export default function Hero() {
             </div>
 
             {/* Floating card 2 */}
-            <div ref={floatRef2} className="absolute bottom-[15%] -right-[5%] lg:-right-[10%] bg-white/95 backdrop-blur-md border border-border rounded-xl p-3 min-w-[180px] shadow-lg opacity-0">
+            <div ref={floatRef2} className="absolute bottom-[15%] -right-[5%] lg:-right-[10%] bg-white/95 backdrop-blur-md border border-border rounded-xl p-3 min-w-45 shadow-lg opacity-0">
               <div className="flex items-center gap-1 mb-1">
                 {[...Array(5)].map((_, i) => <Star key={i} size={12} fill="#F59E0B" color="#F59E0B" />)}
                 <span className="text-xs font-semibold text-text ml-1">5.0</span>
@@ -211,7 +211,7 @@ export default function Hero() {
       {/* Scroll indicator */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 animate-float">
         <span className="text-[10px] text-muted tracking-wider">{t('scroll')}</span>
-        <div className="w-px h-8 bg-gradient-to-b from-primary to-transparent rounded-full" />
+        <div className="w-px h-8 bg-linear-to-b from-primary to-transparent rounded-full" />
       </div>
     </section>
   )
