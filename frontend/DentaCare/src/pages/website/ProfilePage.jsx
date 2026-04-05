@@ -1,0 +1,803 @@
+import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { 
+  User, Phone, Calendar, MapPin, Camera, Save, 
+  Edit2, Clock, DollarSign, CheckCircle, XCircle, 
+  CalendarDays, CreditCard, Ban, AlertCircle,
+  ChevronRight
+} from 'lucide-react'
+import { toast } from 'react-hot-toast'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import useAuthStore from '../../store/useAuth'
+import useT from '../../hooks/useT'
+import api from '../../lib/axios'
+import Navbar from '../../components/website/Navbar'
+import Footer from '../../components/website/Footer'
+
+gsap.registerPlugin(ScrollTrigger)
+
+export default function ProfilePage() {
+  const { user, token, updateUser } = useAuthStore()
+  const t = useT()
+  const navigate = useNavigate()
+
+  // Refs for animations
+  const pageRef = useRef(null)
+  const profileCardRef = useRef(null)
+  const appointmentsRef = useRef(null)
+  const titleRef = useRef(null)
+
+  // Profile state
+  const [editing, setEditing] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [profileData, setProfileData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    dob: '',
+    gender: ''
+  })
+  const [imageFile, setImageFile] = useState(null)
+  const [imagePreview, setImagePreview] = useState(null)
+
+  // Appointments state
+  const [appointments, setAppointments] = useState([])
+  const [loadingAppointments, setLoadingAppointments] = useState(true)
+  const [cancellingId, setCancellingId] = useState(null)
+  const [showCancelModal, setShowCancelModal] = useState(false)
+  const [selectedAppointment, setSelectedAppointment] = useState(null)
+  
+  // Payment state
+  const [processingPayment, setProcessingPayment] = useState(null) // Track which appointment is being processed
+
+  // GSAP Animations
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.fromTo(titleRef.current,
+        { opacity: 0, y: -30 },
+        { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }
+      )
+      gsap.fromTo(profileCardRef.current,
+        { opacity: 0, x: -30 },
+        { opacity: 1, x: 0, duration: 0.7, delay: 0.2, ease: 'power3.out' }
+      )
+      gsap.fromTo(appointmentsRef.current,
+        { opacity: 0, x: 30 },
+        { opacity: 1, x: 0, duration: 0.7, delay: 0.3, ease: 'power3.out' }
+      )
+    }, pageRef)
+    return () => ctx.revert()
+  }, [])
+
+  // Animate appointment items when they load
+  useEffect(() => {
+    if (!loadingAppointments && appointmentsRef.current) {
+      const appointmentItems = appointmentsRef.current.querySelectorAll('.appointment-item')
+      gsap.fromTo(appointmentItems,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.1, ease: 'power3.out',
+          scrollTrigger: {
+            trigger: appointmentsRef.current,
+            start: 'top 85%',
+            toggleActions: 'play none none none'
+          }
+        }
+      )
+    }
+  }, [loadingAppointments])
+
+  // Fetch user profile
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const { data } = await api.get('/api/user/profile', {
+          headers: { token }
+        })
+        if (data.success) {
+          gsap.fromTo('.profile-info-item',
+            { opacity: 0, x: -20 },
+            { opacity: 1, x: 0, duration: 0.4, stagger: 0.1, delay: 0.5 }
+          )
+          setProfileData({
+            name: data.user.name || '',
+            email: data.user.email || '',
+            phone: data.user.phone || '',
+            address: data.user.address?.line1 || '',
+            dob: data.user.dob || '',
+            gender: data.user.gender || ''
+          })
+          if (data.user.image) setImagePreview(data.user.image)
+        }
+      } catch (error) {
+        console.error('Failed to fetch profile:', error)
+      }
+    }
+    fetchProfile()
+  }, [token])
+
+  // Fetch user appointments
+  const fetchAppointments = async () => {
+    try {
+      const { data } = await api.get('/api/appointment/list', {
+        headers: { token }
+      })
+      if (data.success) {
+        setAppointments(data.appointments)
+      }
+    } catch (error) {
+      console.error('Failed to fetch appointments:', error)
+    } finally {
+      setLoadingAppointments(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchAppointments()
+  }, [token])
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      gsap.fromTo('.avatar-image',
+        { scale: 0.8, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.3 }
+      )
+      setImageFile(file)
+      setImagePreview(URL.createObjectURL(file))
+    }
+  }
+
+  const handleUpdateProfile = async () => {
+    setLoading(true)
+    try {
+      const formData = new FormData()
+      formData.append('name', profileData.name)
+      formData.append('phone', profileData.phone)
+      formData.append('address', JSON.stringify({ line1: profileData.address, line2: '' }))
+      if (profileData.dob) formData.append('dob', profileData.dob)
+      if (profileData.gender) formData.append('gender', profileData.gender)
+      if (imageFile) formData.append('image', imageFile)
+
+      const { data } = await api.put('/api/user/update-profile', formData, {
+        headers: { token, 'Content-Type': 'multipart/form-data' }
+      })
+      
+      if (data.success) {
+        updateUser(data.user)
+        toast.success(t('profileUpdated') || 'Profile updated successfully')
+        
+        gsap.fromTo('.success-message',
+          { scale: 0, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.3, yoyo: true, repeat: 1 }
+        )
+        
+        setEditing(false)
+      } else {
+        toast.error(data.message || t('error'))
+      }
+    } catch (error) {
+      toast.error(t('error'))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCancelAppointment = async () => {
+    if (!selectedAppointment) return
+    
+    setCancellingId(selectedAppointment._id)
+    try {
+      const { data } = await api.post('/api/appointment/cancel', 
+        { appointmentId: selectedAppointment._id },
+        { headers: { token } }
+      )
+      if (data.success) {
+        toast.success(t('appointmentCancelled') || 'Appointment cancelled successfully')
+        
+        const cancelledItem = document.getElementById(`appointment-${selectedAppointment._id}`)
+        if (cancelledItem) {
+          gsap.to(cancelledItem, {
+            opacity: 0,
+            x: -20,
+            duration: 0.3,
+            onComplete: () => {
+              setAppointments(appointments.map(apt => 
+                apt._id === selectedAppointment._id ? { ...apt, cancelled: true } : apt
+              ))
+            }
+          })
+        } else {
+          setAppointments(appointments.map(apt => 
+            apt._id === selectedAppointment._id ? { ...apt, cancelled: true } : apt
+          ))
+        }
+        
+        setShowCancelModal(false)
+        setSelectedAppointment(null)
+      } else {
+        toast.error(data.message || t('error'))
+      }
+    } catch (error) {
+      toast.error(t('error'))
+    } finally {
+      setCancellingId(null)
+    }
+  }
+
+  // ========== PAYMENT HANDLERS ==========
+  
+  // Show payment method selection modal
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [paymentAppointment, setPaymentAppointment] = useState(null)
+
+  const handlePaymentClick = (appointment) => {
+    // Animate payment button click
+    gsap.fromTo('.payment-btn',
+      { scale: 1 },
+      { scale: 0.95, duration: 0.1, yoyo: true, repeat: 1 }
+    )
+    // Show payment method selection modal
+    setPaymentAppointment(appointment)
+    setShowPaymentModal(true)
+  }
+
+  // Stripe Payment Handler
+  const handleStripePayment = async () => {
+    if (!paymentAppointment) return
+    
+    setProcessingPayment(paymentAppointment._id)
+    try {
+      const { data } = await api.post('/api/payment/stripe-checkout', 
+        { 
+          appointmentId: paymentAppointment._id,
+          amount: paymentAppointment.amount,
+          doctorName: paymentAppointment.docData?.name,
+          slotDate: paymentAppointment.slotDate,
+          slotTime: paymentAppointment.slotTime
+        },
+        { headers: { token } }
+      )
+      
+      if (data.success && data.sessionUrl) {
+        // Redirect to Stripe Checkout page
+        window.location.href = data.sessionUrl
+      } else if (data.id) {
+        // If using Stripe SDK directly
+        const stripe = await loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY)
+        await stripe.redirectToCheckout({ sessionId: data.id })
+      } else {
+        toast.error(data.message || 'Failed to create Stripe session')
+      }
+    } catch (error) {
+      console.error('Stripe payment error:', error)
+      toast.error(error.response?.data?.message || 'Payment failed. Please try again.')
+    } finally {
+      setProcessingPayment(null)
+      setShowPaymentModal(false)
+    }
+  }
+
+  // Chargily Payment Handler
+  const handleChargilyPayment = async () => {
+    if (!paymentAppointment) return
+    
+    setProcessingPayment(paymentAppointment._id)
+    try {
+      const { data } = await api.post('/api/payment/chargily-checkout', 
+        { 
+          appointmentId: paymentAppointment._id,
+          amount: paymentAppointment.amount,
+          doctorName: paymentAppointment.docData?.name,
+          slotDate: paymentAppointment.slotDate,
+          slotTime: paymentAppointment.slotTime,
+          patientEmail: profileData.email,
+          patientName: profileData.name,
+          patientPhone: profileData.phone
+        },
+        { headers: { token } }
+      )
+      
+      if (data.success && data.checkoutUrl) {
+        // Redirect to Chargily payment page
+        window.location.href = data.checkoutUrl
+      } else {
+        toast.error(data.message || 'Failed to create Chargily checkout')
+      }
+    } catch (error) {
+      console.error('Chargily payment error:', error)
+      toast.error(error.response?.data?.message || 'Payment failed. Please try again.')
+    } finally {
+      setProcessingPayment(null)
+      setShowPaymentModal(false)
+    }
+  }
+
+  // Optional: Verify payment status after redirect
+  const verifyPaymentStatus = async (appointmentId, paymentMethod) => {
+    try {
+      const endpoint = paymentMethod === 'stripe' 
+        ? '/api/payment/stripe-verify' 
+        : '/api/payment/chargily-verify'
+      
+      const { data } = await api.post(endpoint, 
+        { appointmentId },
+        { headers: { token } }
+      )
+      
+      if (data.success && data.paid) {
+        toast.success('Payment successful!')
+        // Refresh appointments to update status
+        fetchAppointments()
+        return true
+      } else {
+        toast.error('Payment verification failed')
+        return false
+      }
+    } catch (error) {
+      console.error('Payment verification error:', error)
+      toast.error('Could not verify payment status')
+      return false
+    }
+  }
+
+  // Check for payment callback on page load (for returning from payment gateway)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const sessionId = urlParams.get('session_id')
+    const paymentStatus = urlParams.get('payment_status')
+    const appointmentId = urlParams.get('appointment_id')
+    const paymentMethod = urlParams.get('payment_method')
+    
+    if (paymentStatus === 'success' && appointmentId) {
+      // Verify and update appointment status
+      verifyPaymentStatus(appointmentId, paymentMethod)
+      // Clean URL
+      window.history.replaceState({}, document.title, window.location.pathname)
+    } else if (paymentStatus === 'cancelled') {
+      toast.info('Payment was cancelled')
+      window.history.replaceState({}, document.title, window.location.pathname)
+    } else if (sessionId) {
+      // Stripe callback
+      verifyPaymentStatus(appointmentId, 'stripe')
+      window.history.replaceState({}, document.title, window.location.pathname)
+    }
+  }, [])
+
+  const getStatusBadge = (appointment) => {
+    if (appointment.cancelled) {
+      return { text: t('cancelled'), color: 'bg-red-100 text-red-600', icon: XCircle }
+    }
+    if (appointment.isCompleted) {
+      return { text: t('completed'), color: 'bg-green-100 text-green-600', icon: CheckCircle }
+    }
+    if (appointment.isPaid) {
+      return { text: t('confirmed'), color: 'bg-blue-100 text-blue-600', icon: CheckCircle }
+    }
+    return { text: t('pending'), color: 'bg-yellow-100 text-yellow-600', icon: Clock }
+  }
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return ''
+    return dateStr.replace(/_/g, '/')
+  }
+
+  return (
+    <>
+      <Navbar />
+      <div ref={pageRef} className="min-h-screen bg-gray-50 pt-24 pb-12">
+        <div className="max-w-7xl mx-auto px-6">
+          {/* Page Title */}
+          <h1 ref={titleRef} className="text-3xl font-bold text-text mb-8 opacity-0">
+            {t('myProfile')}
+          </h1>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column - Profile Card */}
+            <div ref={profileCardRef} className="lg:col-span-1 opacity-0">
+              <div className="bg-white rounded-2xl shadow-sm border border-border overflow-hidden sticky top-24">
+                <div className="h-24 bg-gradient-to-r from-primary-deep to-primary" />
+                
+                <div className="relative -mt-12 px-6">
+                  <div className="relative inline-block avatar-image">
+                    {imagePreview ? (
+                      <img 
+                        src={imagePreview} 
+                        alt={profileData.name} 
+                        className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md"
+                      />
+                    ) : (
+                      <div className="w-24 h-24 rounded-full bg-primary-soft flex items-center justify-center border-4 border-white shadow-md">
+                        <span className="text-3xl font-bold text-primary-deep">
+                          {profileData.name?.charAt(0) || 'U'}
+                        </span>
+                      </div>
+                    )}
+                    {editing && (
+                      <label className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center cursor-pointer shadow-md hover:bg-primary-deep transition">
+                        <Camera size={14} />
+                        <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                      </label>
+                    )}
+                  </div>
+                </div>
+
+                <div className="p-6 pt-4">
+                  {editing ? (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium text-text">{t('name')}</label>
+                        <input
+                          type="text"
+                          value={profileData.name}
+                          onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                          className="w-full mt-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:border-primary"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-text">{t('email')}</label>
+                        <input
+                          type="email"
+                          value={profileData.email}
+                          disabled
+                          className="w-full mt-1 px-3 py-2 border border-border rounded-lg bg-gray-50 text-gray-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-text">{t('phone')}</label>
+                        <input
+                          type="tel"
+                          value={profileData.phone}
+                          onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                          className="w-full mt-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:border-primary"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-text">{t('dob')}</label>
+                        <input
+                          type="date"
+                          value={profileData.dob}
+                          onChange={(e) => setProfileData({ ...profileData, dob: e.target.value })}
+                          className="w-full mt-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:border-primary"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-text">{t('gender')}</label>
+                        <select
+                          value={profileData.gender}
+                          onChange={(e) => setProfileData({ ...profileData, gender: e.target.value })}
+                          className="w-full mt-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:border-primary"
+                        >
+                          <option value="">Select</option>
+                          <option value="male">{t('male')}</option>
+                          <option value="female">{t('female')}</option>
+                          <option value="other">{t('other')}</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-text">{t('address')}</label>
+                        <textarea
+                          value={profileData.address}
+                          onChange={(e) => setProfileData({ ...profileData, address: e.target.value })}
+                          rows={2}
+                          className="w-full mt-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:border-primary"
+                        />
+                      </div>
+                      <div className="flex gap-3 pt-2">
+                        <button
+                          onClick={() => setEditing(false)}
+                          className="flex-1 py-2 rounded-lg border border-border text-sub hover:bg-gray-50 transition"
+                        >
+                          {t('cancel')}
+                        </button>
+                        <button
+                          onClick={handleUpdateProfile}
+                          disabled={loading}
+                          className="flex-1 py-2 rounded-lg bg-primary text-white hover:bg-primary-deep transition flex items-center justify-center gap-2"
+                        >
+                          {loading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save size={16} />}
+                          {t('save')}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <h2 className="text-xl font-bold text-text">{profileData.name}</h2>
+                      <p className="text-sub text-sm mt-1">{profileData.email}</p>
+                      
+                      <div className="mt-4 space-y-2 profile-info-item">
+                        {profileData.phone && (
+                          <div className="flex items-center gap-2 text-sub">
+                            <Phone size={14} /> <span className="text-sm">{profileData.phone}</span>
+                          </div>
+                        )}
+                        {profileData.dob && (
+                          <div className="flex items-center gap-2 text-sub">
+                            <Calendar size={14} /> <span className="text-sm">{profileData.dob}</span>
+                          </div>
+                        )}
+                        {profileData.gender && (
+                          <div className="flex items-center gap-2 text-sub">
+                            <User size={14} /> <span className="text-sm capitalize">{profileData.gender}</span>
+                          </div>
+                        )}
+                        {profileData.address && (
+                          <div className="flex items-start gap-2 text-sub">
+                            <MapPin size={14} className="mt-0.5" /> 
+                            <span className="text-sm">{profileData.address}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      <button
+                        onClick={() => setEditing(true)}
+                        className="mt-6 w-full py-2 rounded-lg border border-primary text-primary hover:bg-primary/5 transition flex items-center justify-center gap-2"
+                      >
+                        <Edit2 size={16} /> {t('editProfile')}
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column - Appointments */}
+            <div ref={appointmentsRef} className="lg:col-span-2 opacity-0">
+              <div className="bg-white rounded-2xl shadow-sm border border-border overflow-hidden">
+                <div className="p-6 border-b border-border">
+                  <h2 className="text-xl font-bold text-text flex items-center gap-2">
+                    <CalendarDays size={20} className="text-primary" /> {t('myAppointments')}
+                  </h2>
+                </div>
+
+                {loadingAppointments ? (
+                  <div className="flex justify-center py-12">
+                    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  </div>
+                ) : appointments.length === 0 ? (
+                  <div className="text-center py-12">
+                    <CalendarDays size={48} className="text-muted mx-auto mb-4" />
+                    <p className="text-sub">{t('noAppointments')}</p>
+                    <button
+                      onClick={() => navigate('/doctors')}
+                      className="mt-4 btn-primary py-2 px-4 rounded-lg"
+                    >
+                      {t('bookAppointment')}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-border">
+                    {appointments.map((apt) => {
+                      const status = getStatusBadge(apt)
+                      const StatusIcon = status.icon
+                      return (
+                        <div 
+                          key={apt._id} 
+                          id={`appointment-${apt._id}`}
+                          className="appointment-item p-6 hover:bg-gray-50 transition opacity-0"
+                        >
+                          <div className="flex flex-wrap justify-between items-start gap-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                {apt.docData?.image ? (
+                                  <img src={apt.docData.image} alt="" className="w-10 h-10 rounded-full object-cover" />
+                                ) : (
+                                  <div className="w-10 h-10 rounded-full bg-primary-soft flex items-center justify-center">
+                                    <span className="text-sm font-bold text-primary-deep">
+                                      {apt.docData?.name?.charAt(0) || 'D'}
+                                    </span>
+                                  </div>
+                                )}
+                                <div>
+                                  <h3 className="font-semibold text-text">{apt.docData?.name}</h3>
+                                  <p className="text-xs text-sub">{apt.docData?.speciality}</p>
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-2 gap-3 mt-3">
+                                <div className="flex items-center gap-2 text-sm text-sub">
+                                  <Calendar size={14} />
+                                  <span>{formatDate(apt.slotDate)}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-sm text-sub">
+                                  <Clock size={14} />
+                                  <span>{apt.slotTime}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+                                  <DollarSign size={14} />
+                                  <span>{apt.amount}DA</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${status.color}`}>
+                                    <StatusIcon size={12} />
+                                    {status.text}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex gap-2">
+                              {!apt.cancelled && !apt.isCompleted && (
+                                <>
+                                  {!apt.isPaid && (
+                                    <button
+                                      onClick={() => handlePaymentClick(apt)}
+                                      disabled={processingPayment === apt._id}
+                                      className="payment-btn flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary text-white hover:bg-primary-deep transition text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                      {processingPayment === apt._id ? (
+                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                      ) : (
+                                        <CreditCard size={14} />
+                                      )}
+                                      {t('payNow')}
+                                    </button>
+                                  )}
+                                  <button
+                                    onClick={() => {
+                                      setSelectedAppointment(apt)
+                                      setShowCancelModal(true)
+                                    }}
+                                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition text-sm font-medium"
+                                  >
+                                    <Ban size={14} /> {t('cancel')}
+                                  </button>
+                                </>
+                              )}
+                              {apt.cancelled && (
+                                <span className="text-xs text-muted">{t('cancelled')}</span>
+                              )}
+                              {apt.isCompleted && (
+                                <span className="text-xs text-green-600">{t('completed')}</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Payment Method Selection Modal */}
+      {showPaymentModal && paymentAppointment && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowPaymentModal(false)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-scale-up">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 rounded-full bg-primary-soft flex items-center justify-center mx-auto mb-4">
+                <CreditCard size={24} className="text-primary" />
+              </div>
+              <h3 className="text-xl font-bold text-text">Select Payment Method</h3>
+              <p className="text-sub text-sm mt-1">
+                Pay {paymentAppointment.amount}DA for appointment with {paymentAppointment.docData?.name}
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {/* Stripe Button */}
+              <button
+                onClick={handleStripePayment}
+                disabled={processingPayment === paymentAppointment._id}
+                className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-border hover:border-primary transition-all hover:shadow-md disabled:opacity-50"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-[#635BFF]/10 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-[#635BFF]" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M16.5 7.5h-3v6h3v-6zm-4.5 0h-3v6h3v-6zm-4.5 0H6v6h1.5v-6zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                    </svg>
+                  </div>
+                  <div className="text-left">
+                    <p className="font-semibold text-text">Pay with Stripe</p>
+                    <p className="text-xs text-sub">Credit card, debit card, Apple Pay</p>
+                  </div>
+                </div>
+                {processingPayment === paymentAppointment._id ? (
+                  <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <ChevronRight size={20} className="text-muted" />
+                )}
+              </button>
+
+              {/* Chargily Button */}
+              <button
+                onClick={handleChargilyPayment}
+                disabled={processingPayment === paymentAppointment._id}
+                className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-border hover:border-primary transition-all hover:shadow-md disabled:opacity-50"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                  </div>
+                  <div className="text-left">
+                    <p className="font-semibold text-text">Pay with Chargily</p>
+                    <p className="text-xs text-sub">CIB, CCP, EDAHABIA, Visa, Mastercard</p>
+                  </div>
+                </div>
+                {processingPayment === paymentAppointment._id ? (
+                  <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <ChevronRight size={20} className="text-muted" />
+                )}
+              </button>
+            </div>
+
+            <button
+              onClick={() => setShowPaymentModal(false)}
+              className="w-full mt-6 py-2 text-sub hover:text-text transition"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelModal && selectedAppointment && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowCancelModal(false)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-scale-up">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                <AlertCircle size={20} className="text-red-500" />
+              </div>
+              <h3 className="text-lg font-bold text-text">{t('cancelAppointment')}</h3>
+            </div>
+            <p className="text-sub mb-6">
+              {t('cancelAppointmentConfirm', { 
+                doctor: selectedAppointment.docData?.name,
+                date: formatDate(selectedAppointment.slotDate),
+                time: selectedAppointment.slotTime
+              })}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowCancelModal(false)}
+                className="flex-1 py-2 rounded-lg border border-border text-sub hover:bg-gray-50 transition"
+              >
+                {t('no')}
+              </button>
+              <button
+                onClick={handleCancelAppointment}
+                disabled={cancellingId === selectedAppointment._id}
+                className="flex-1 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition flex items-center justify-center gap-2"
+              >
+                {cancellingId === selectedAppointment._id ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Ban size={16} />
+                )}
+                {t('yesCancel')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Footer />
+
+      <style jsx>{`
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes scale-up {
+          from { transform: scale(0.95); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.2s ease forwards;
+        }
+        .animate-scale-up {
+          animation: scale-up 0.2s ease forwards;
+        }
+      `}</style>
+    </>
+  )
+}

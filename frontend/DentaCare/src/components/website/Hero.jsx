@@ -1,4 +1,3 @@
-
 import { useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Star, Shield, Clock } from 'lucide-react'

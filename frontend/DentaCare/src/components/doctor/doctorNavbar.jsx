@@ -4,7 +4,7 @@ import useDT from '../../hooks/useDT';
 
 export default function DoctorNavbar() {
   const { pathname } = useLocation();
-  const { theme, toggleTheme, lang, toggleLang, doctor } = useDoctorStore();
+  const {lang, toggleLang, doctor } = useDoctorStore();
   const t = useDT();
 
   const titles = {

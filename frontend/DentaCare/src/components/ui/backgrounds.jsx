@@ -1,6 +1,4 @@
 import { cn } from "../../lib/utils";
-
-// DentaCare Blue Color Palette
 const colors = {
   primary: '#94D7BC',
   primarySoft: '#D0E4FF',

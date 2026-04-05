@@ -21,7 +21,7 @@ export default function AdminLogin() {
       const { data } = await api.post('/api/admin/login', { email, password });
       if (data.success) {
         setAToken(data.token);
-        navigate('/');
+        navigate('/admin');
       } else {
         setError(data.message || t('error'));
       }

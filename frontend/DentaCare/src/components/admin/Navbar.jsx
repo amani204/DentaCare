@@ -5,7 +5,7 @@ import useT from '../../hooks/useT';
 
 export default function Navbar() {
   const { pathname } = useLocation();
-  const { theme, toggleTheme, lang, toggleLang } = useAdminStore();
+  const {  lang, toggleLang } = useAdminStore();
   const t = useT();
 
   const titles = {
@@ -16,7 +16,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-6 bg-white/95 backdrop-blur-sm border border-primary/20 ">
+    <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-6 bg-white backdrop-blur-sm border border-primary/20 ">
       {/* Page Title */}
       <h2 className="text-lg font-semibold text-text">
         {titles[pathname] || 'DentaCare'}

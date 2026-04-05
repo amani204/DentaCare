@@ -1,5 +1,4 @@
 
-
 import { useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Phone, Calendar, CreditCard } from 'lucide-react'

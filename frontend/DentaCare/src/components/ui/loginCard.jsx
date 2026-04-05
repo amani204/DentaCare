@@ -1,4 +1,4 @@
-// src/components/ui/login-card.jsx
+
 import { useState, useEffect, useRef } from 'react'
 import { Mail, Lock, Eye, EyeOff, LogIn, UserPlus, User, Phone, ArrowLeft, Send, KeyRound, ShieldCheck } from 'lucide-react'
 import { cn } from '../../lib/utils'
@@ -11,7 +11,7 @@ export const LoginCard = ({
   error = null,
   onSubmit,
   onForgotPassword,
-  mode = "login", // 'login', 'signup', 'forgot', 'verify-otp', 'reset-password'
+  mode = "login", 
   className,
 }) => {
   const [email, setEmail] = useState('')

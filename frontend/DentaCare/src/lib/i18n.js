@@ -40,8 +40,8 @@ export const translations = {
     forgotPasswordDesc: 'Enter your email to receive OTP',
     alreadyHaveAccount: 'Already have an account? Sign in',
     noAccount: "Don't have an account? Sign up",
-    back : 'back',
-    
+    back: 'back',
+
     // ========== NAVIGATION ==========
     dashboard: 'Dashboard',
     doctors: 'Doctors',
@@ -50,7 +50,7 @@ export const translations = {
     logout: 'Logout',
     adminPanel: 'Admin Panel',
     doctorPortal: 'Doctor Portal',
-    
+
     // ========== DASHBOARD ==========
     welcome: 'Welcome back',
     goodMorning: 'Good morning',
@@ -81,7 +81,7 @@ export const translations = {
     recentActivity: 'Recent Activity',
     monthlyEarnings: 'Monthly Earnings',
     aptStats: 'Appointment Overview',
-    
+
     // ========== DOCTORS PAGE ==========
     allDoctors: 'All Doctors',
     registered: 'registered',
@@ -95,9 +95,9 @@ export const translations = {
     fees: 'Fees',
     noDoctors: 'No doctors found',
     doctorAdded: 'Doctor added successfully',
-    Onleave: "On leave",
+    Onleave: 'On leave',
     specialities: 'Specialities',
-    
+
     // ========== ADD DOCTOR ==========
     addNewDoctor: 'Add New Doctor',
     addDoctorSub: 'Register a new doctor to the system',
@@ -122,7 +122,7 @@ export const translations = {
     invalidEmail: 'Invalid email',
     minFees: 'Must be greater than 0',
     uploadImage: 'Please upload a doctor photo',
-    
+
     // ========== APPOINTMENTS ==========
     allAppointments: 'All Appointments',
     total: 'total',
@@ -148,7 +148,7 @@ export const translations = {
     allApts: 'All Appointments',
     noApts: 'No appointments found',
     payment: 'Payment',
-    
+
     // ========== MODAL ==========
     cancelAppt: 'Cancel Appointment',
     cancelApptMsg: 'This will release the slot back to the doctor. This action cannot be undone.',
@@ -158,7 +158,7 @@ export const translations = {
     completeMsg: 'Confirm this appointment is done?',
     yesConfirm: 'Yes, Confirm',
     close: 'Close',
-    
+
     // ========== BADGES ==========
     statusCompleted: 'Completed',
     statusCancelled: 'Cancelled',
@@ -167,11 +167,11 @@ export const translations = {
     statusUnpaid: 'Unpaid',
     statusActive: 'Active',
     statusInactive: 'Inactive',
-    
+
     // ========== TOAST ==========
     error: 'Something went wrong',
     success: 'Done!',
-    
+
     // ========== EARNINGS ==========
     totalRev: 'Total Revenue',
     thisMonth: 'This Month',
@@ -180,7 +180,7 @@ export const translations = {
     earningsHistory: 'Earnings History',
     earningsChart: 'Revenue Trend',
     noEarnings: 'No earnings data yet',
-    
+
     // ========== PROFILE ==========
     myProfile: 'My Profile',
     editProfile: 'Edit Profile',
@@ -188,14 +188,14 @@ export const translations = {
     saving: 'Saving...',
     name: 'Full Name',
     profileUpdated: 'Profile updated successfully',
-    
+
     // ========== WEBSITE - NAVBAR ==========
     home: 'Home',
     about: 'About',
     services: 'Services',
     contact: 'Contact',
     bookAppointment: 'Book Appointment',
-    
+
     // ========== WEBSITE - HERO ==========
     heroTag: 'Premium Dental Care in Algiers',
     heroHeading1: 'Your',
@@ -212,7 +212,7 @@ export const translations = {
     verifiedPatient: 'Verified Patient',
     openHours: 'Open Today 9AM–6PM',
     scroll: 'SCROLL',
-    
+
     // ========== WEBSITE - ABOUT ==========
     aboutTag: 'About DentaCare',
     aboutHeading1: 'Where Modern Dentistry Meets',
@@ -228,7 +228,7 @@ export const translations = {
     statExpertDoctors: 'Expert Doctors',
     statSatisfaction: 'Satisfaction Rate',
     statYearsExperience: 'Years Experience',
-    
+
     // ========== WEBSITE - VALUE CARDS ==========
     value1Title: 'Patient First',
     value1Desc: 'Every decision we make is guided by your comfort and wellbeing.',
@@ -238,49 +238,49 @@ export const translations = {
     value3Desc: 'We treat patients of all ages, from children to seniors.',
     value4Title: 'Transparent Pricing',
     value4Desc: 'No hidden fees. You know exactly what you\'re paying before treatment.',
-    
+
     // ========== WEBSITE - SERVICES ==========
     servicesTag: 'Our Services',
     servicesHeading1: 'Complete Dental Care',
     servicesHeading2: 'Under One Roof',
     servicesSub: 'From routine checkups to complex procedures — our specialists cover every aspect of your oral health.',
-    
+
     service1Title: 'General Dentistry',
     service1Desc: 'Comprehensive checkups, cleanings, fillings, and preventive care to keep your teeth healthy.',
     service1Feature1: 'Dental Checkups',
     service1Feature2: 'Teeth Cleaning',
     service1Feature3: 'Cavity Fillings',
-    
+
     service2Title: 'Cosmetic Dentistry',
     service2Desc: 'Transform your smile with whitening, veneers, bonding, and aesthetic treatments.',
     service2Feature1: 'Teeth Whitening',
     service2Feature2: 'Porcelain Veneers',
     service2Feature3: 'Smile Makeover',
-    
+
     service3Title: 'Orthodontics',
     service3Desc: 'Straighten your teeth with modern braces, invisible aligners, and retainers.',
     service3Feature1: 'Metal Braces',
     service3Feature2: 'Clear Aligners',
     service3Feature3: 'Retainers',
-    
+
     service4Title: 'Oral Surgery',
     service4Desc: 'Expert surgical procedures including extractions, implants, and bone grafting.',
     service4Feature1: 'Tooth Extraction',
     service4Feature2: 'Dental Implants',
     service4Feature3: 'Bone Grafting',
-    
+
     service5Title: 'Periodontics',
     service5Desc: 'Treat gum disease and protect the foundations of your teeth with specialist care.',
     service5Feature1: 'Gum Treatment',
     service5Feature2: 'Deep Cleaning',
     service5Feature3: 'Gum Surgery',
-    
+
     service6Title: 'Pediatric Dentistry',
     service6Desc: 'Gentle, child-friendly dental care in a warm and welcoming environment.',
     service6Feature1: 'Child Checkups',
     service6Feature2: 'Sealants',
     service6Feature3: 'Fluoride Treatment',
-    
+
     // ========== WEBSITE - DOCTORS ==========
     doctorsTag: 'Our Specialists',
     doctorsHeading1: 'Meet Our',
@@ -291,6 +291,38 @@ export const translations = {
     session: 'session',
     bookBtn: 'Book',
     
+    // ========== WEBSITE - DOCTORS PAGE (ADDED) ==========
+    doctorsHeroTitle: 'Our Expert',
+    doctorsHeroHighlight: 'Dentists',
+    doctorsHeroSub: 'Book your appointment with the best dental specialists',
+    searchDoctorsPlaceholder: 'Search by doctor name or speciality...',
+    filters: 'Filters',
+    sortBy: 'Sort by',
+    sortName: 'Name',
+    sortFeesLow: 'Price: Low to High',
+    sortFeesHigh: 'Price: High to Low',
+    sortExperience: 'Most Experienced',
+    availability: 'Availability',
+    availableOnly: 'Available only',
+    clearFilters: 'Clear all filters',
+    showing: 'Showing',
+    of: 'of',
+    matching: 'matching',
+    clearSearch: 'Clear search',
+    noDoctorsFound: 'No doctors found',
+    noDoctorsFoundMsg: 'Try adjusting your search or filters to find the right specialist for you.',
+    clearAllFilters: 'Clear all filters',
+    
+    // Speciality keys (lowercase, no spaces)
+    allspecialities: 'All Specialities',
+    generaldentist: 'General Dentist',
+    orthodontist: 'Orthodontist',
+    endodontist: 'Endodontist',
+    periodontist: 'Periodontist',
+    oralsurgeon: 'Oral Surgeon',
+    pediatricdentist: 'Pediatric Dentist',
+    prosthodontist: 'Prosthodontist',
+
     // ========== WEBSITE - BOOKING STEPS ==========
     bookingTag: 'Simple Process',
     bookingHeading1: 'Book in',
@@ -301,7 +333,7 @@ export const translations = {
     step2Desc: 'Pick a convenient date and time that fits your schedule.',
     step3Title: 'Pay Securely',
     step3Desc: 'Pay online with Stripe or Chargily — fast, safe, and simple.',
-    
+
     // ========== WEBSITE - CTA ==========
     ctaBadge: 'Online Booking Available 24/7',
     ctaHeading1: 'Ready for a',
@@ -311,7 +343,7 @@ export const translations = {
     trustSecure: 'Secure Payment',
     trustCancel: 'Free Cancellation',
     trustConfirm: 'Instant Confirmation',
-    
+
     // ========== WEBSITE - FOOTER ==========
     footerDesc: 'Algiers\' most trusted dental clinic. Modern dentistry with a personal touch since 2010.',
     footerAddress: '123 Rue Didouche Mourad, Algiers',
@@ -319,46 +351,61 @@ export const translations = {
     footerServices: 'Our Services',
     footerPatient: 'Patient Info',
     footerRights: 'All rights reserved.',
-    
+
     navHome: 'Home',
     navAbout: 'About',
     navServices: 'Services',
     navDoctors: 'Doctors',
     navContact: 'Contact',
-    
+
     serviceGeneralDentistry: 'General Dentistry',
     serviceCosmeticDentistry: 'Cosmetic Dentistry',
     serviceOrthodontics: 'Orthodontics',
     serviceOralSurgery: 'Oral Surgery',
     servicePediatricDentistry: 'Pediatric Dentistry',
-    
+
     patientPortal: 'Patient Portal',
     privacyPolicy: 'Privacy Policy',
     termsOfService: 'Terms of Service',
     cookiePolicy: 'Cookie Policy',
+
     // ========== WEBSITE - DOCTOR DETAIL PAGE ==========
-backToDoctors: 'Back to Doctors',
-aboutDoctor: 'About the Doctor',
-credentials: 'Credentials',
-consultationFee: 'Consultation Fee',
-feePerSession: 'Fee per session',
-location: 'Location',
-years: 'years',
-noBio: 'No biography available.',
-selectDateTime: 'Select Date & Time',
-confirmBooking: 'Confirm Booking',
-confirmDetails: 'Confirm Your Appointment Details',
-bookingNotice: 'Payment will be processed after confirmation. You can cancel up to 24 hours before your appointment.',
-booking: 'Booking...',
-signInToBook: 'Sign In to Book',
-bookingSuccess: 'Appointment Booked!',
-bookingSuccessMsg: 'Your appointment with {name} on {date} at {time} is confirmed.',
-bookingConfirmationNote: 'You\'ll receive a confirmation email. Go to your profile to view and manage your appointments.',
-myAppointments: 'My Appointments',
-continue: 'Continue',
-bookingFailed: 'Booking failed. Please try again.',
-connectionError: 'Connection error. Please try again.',
-backToDoctors: 'Back to Doctors',
+    backToDoctors: 'Back to Doctors',
+    aboutDoctor: 'About the Doctor',
+    credentials: 'Credentials',
+    consultationFee: 'Consultation Fee',
+    feePerSession: 'Fee per session',
+    location: 'Location',
+    years: 'years',
+    noBio: 'No biography available.',
+    selectDateTime: 'Select Date & Time',
+    confirmBooking: 'Confirm Booking',
+    confirmDetails: 'Confirm Your Appointment Details',
+    bookingNotice: 'Payment will be processed after confirmation. You can cancel up to 24 hours before your appointment.',
+    booking: 'Booking...',
+    signInToBook: 'Sign In to Book',
+    bookingSuccess: 'Appointment Booked!',
+    bookingSuccessMsg: 'Your appointment with {name} on {date} at {time} is confirmed.',
+    bookingConfirmationNote: 'You\'ll receive a confirmation email. Go to your profile to view and manage your appointments.',
+    myAppointments: 'My Appointments',
+    continue: 'Continue',
+    bookingFailed: 'Booking failed. Please try again.',
+    connectionError: 'Connection error. Please try again.',
+
+    // Patient Profile
+    dob: 'Date of Birth',
+    gender: 'Gender',
+    male: 'Male',
+    female: 'Female',
+    other: 'Other',
+    payNow: 'Pay Now',
+    cancelAppointment: 'Cancel Appointment',
+    cancelAppointmentConfirm: 'Are you sure you want to cancel your appointment with {doctor} on {date} at {time}?',
+    yes: 'Yes',
+    no: 'No',
+    appointmentCancelled: 'Appointment cancelled successfully',
+    confirmed: 'Confirmed',
+    viewMyAppointments: 'View My Appointment',
   },
 
   fr: {
@@ -402,7 +449,8 @@ backToDoctors: 'Back to Doctors',
     forgotPasswordDesc: 'Entrez votre email pour recevoir un OTP',
     alreadyHaveAccount: 'Déjà un compte ? Se connecter',
     noAccount: 'Pas de compte ? S\'inscrire',
-    
+    back: 'retour',
+
     // ========== NAVIGATION ==========
     dashboard: 'Tableau de bord',
     doctors: 'Médecins',
@@ -411,7 +459,7 @@ backToDoctors: 'Back to Doctors',
     logout: 'Déconnexion',
     adminPanel: 'Panneau Admin',
     doctorPortal: 'Portail Médecin',
-    
+
     // ========== DASHBOARD ==========
     welcome: 'Bon retour',
     goodMorning: 'Bonjour',
@@ -442,7 +490,7 @@ backToDoctors: 'Back to Doctors',
     recentActivity: 'Activité récente',
     monthlyEarnings: 'Revenus mensuels',
     aptStats: 'Vue d\'ensemble',
-    
+
     // ========== DOCTORS PAGE ==========
     allDoctors: 'Tous les médecins',
     registered: 'enregistrés',
@@ -458,7 +506,7 @@ backToDoctors: 'Back to Doctors',
     doctorAdded: 'Médecin ajouté avec succès',
     Onleave: 'En congé',
     specialities: 'Spécialités',
-    
+
     // ========== ADD DOCTOR ==========
     addNewDoctor: 'Ajouter un médecin',
     addDoctorSub: 'Enregistrer un nouveau médecin',
@@ -483,7 +531,7 @@ backToDoctors: 'Back to Doctors',
     invalidEmail: 'Email invalide',
     minFees: 'Doit être supérieur à 0',
     uploadImage: 'Veuillez télécharger une photo',
-    
+
     // ========== APPOINTMENTS ==========
     allAppointments: 'Tous les rendez-vous',
     total: 'total',
@@ -509,7 +557,7 @@ backToDoctors: 'Back to Doctors',
     allApts: 'Tous les rendez-vous',
     noApts: 'Aucun rendez-vous trouvé',
     payment: 'Paiement',
-    
+
     // ========== MODAL ==========
     cancelAppt: 'Annuler le rendez-vous',
     cancelApptMsg: 'Le créneau sera libéré. Cette action est irréversible.',
@@ -519,7 +567,7 @@ backToDoctors: 'Back to Doctors',
     completeMsg: 'Confirmer que ce rendez-vous est terminé ?',
     yesConfirm: 'Oui, confirmer',
     close: 'Fermer',
-    
+
     // ========== BADGES ==========
     statusCompleted: 'Terminé',
     statusCancelled: 'Annulé',
@@ -528,11 +576,11 @@ backToDoctors: 'Back to Doctors',
     statusUnpaid: 'Non payé',
     statusActive: 'Actif',
     statusInactive: 'Inactif',
-    
+
     // ========== TOAST ==========
     error: 'Une erreur est survenue',
     success: 'Succès !',
-    
+
     // ========== EARNINGS ==========
     totalRev: 'Revenu total',
     thisMonth: 'Ce mois',
@@ -541,7 +589,7 @@ backToDoctors: 'Back to Doctors',
     earningsHistory: 'Historique des revenus',
     earningsChart: 'Tendance des revenus',
     noEarnings: 'Aucune donnée de revenus',
-    
+
     // ========== PROFILE ==========
     myProfile: 'Mon profil',
     editProfile: 'Modifier le profil',
@@ -549,14 +597,14 @@ backToDoctors: 'Back to Doctors',
     saving: 'Enregistrement...',
     name: 'Nom complet',
     profileUpdated: 'Profil mis à jour',
-    
+
     // ========== WEBSITE - NAVBAR ==========
     home: 'Accueil',
     about: 'À propos',
     services: 'Services',
     contact: 'Contact',
     bookAppointment: 'Prendre RDV',
-    
+
     // ========== WEBSITE - HERO ==========
     heroTag: 'Soins Dentaires Premium à Alger',
     heroHeading1: 'Votre',
@@ -573,7 +621,7 @@ backToDoctors: 'Back to Doctors',
     verifiedPatient: 'Patient vérifié',
     openHours: 'Ouvert aujourd\'hui 9h–18h',
     scroll: 'DÉFILER',
-    
+
     // ========== WEBSITE - ABOUT ==========
     aboutTag: 'À propos de DentaCare',
     aboutHeading1: 'Là où la dentisterie moderne rencontre',
@@ -589,7 +637,7 @@ backToDoctors: 'Back to Doctors',
     statExpertDoctors: 'Médecins experts',
     statSatisfaction: 'Taux de satisfaction',
     statYearsExperience: "Années d'expérience",
-    
+
     // ========== WEBSITE - VALUE CARDS ==========
     value1Title: 'Patient avant tout',
     value1Desc: 'Chaque décision que nous prenons est guidée par votre confort et votre bien-être.',
@@ -599,49 +647,49 @@ backToDoctors: 'Back to Doctors',
     value3Desc: 'Nous traitons les patients de tous âges, des enfants aux personnes âgées.',
     value4Title: 'Prix transparents',
     value4Desc: 'Pas de frais cachés. Vous savez exactement ce que vous payez avant le traitement.',
-    
+
     // ========== WEBSITE - SERVICES ==========
     servicesTag: 'Nos Services',
     servicesHeading1: 'Soins Dentaires Complets',
     servicesHeading2: 'Sous un Même Toit',
     servicesSub: 'Des bilans de routine aux procédures complexes — nos spécialistes couvrent tous les aspects de votre santé bucco-dentaire.',
-    
+
     service1Title: 'Dentisterie Générale',
     service1Desc: 'Bilans complets, nettoyages, obturations et soins préventifs pour garder vos dents en bonne santé.',
     service1Feature1: 'Bilans dentaires',
     service1Feature2: 'Nettoyage dentaire',
     service1Feature3: 'Obturations des caries',
-    
+
     service2Title: 'Dentisterie Cosmétique',
     service2Desc: 'Transformez votre sourire avec le blanchiment, les facettes, le collage et les traitements esthétiques.',
     service2Feature1: 'Blanchiment dentaire',
     service2Feature2: 'Facettes en porcelaine',
     service2Feature3: 'Makeover du sourire',
-    
+
     service3Title: 'Orthodontie',
     service3Desc: 'Redressez vos dents avec des bagues modernes, des aligneurs invisibles et des appareils de contention.',
     service3Feature1: 'Bagues métalliques',
     service3Feature2: 'Aligneurs transparents',
     service3Feature3: 'Appareils de contention',
-    
+
     service4Title: 'Chirurgie Buccale',
     service4Desc: 'Procédures chirurgicales expertes incluant extractions, implants et greffes osseuses.',
     service4Feature1: 'Extraction dentaire',
     service4Feature2: 'Implants dentaires',
     service4Feature3: 'Greffe osseuse',
-    
+
     service5Title: 'Parodontologie',
     service5Desc: 'Traitez les maladies des gencives et protégez les fondations de vos dents avec des soins spécialisés.',
     service5Feature1: 'Traitement des gencives',
     service5Feature2: 'Nettoyage en profondeur',
     service5Feature3: 'Chirurgie des gencives',
-    
+
     service6Title: 'Dentisterie Pédiatrique',
     service6Desc: 'Soins dentaires doux et adaptés aux enfants dans un environnement chaleureux et accueillant.',
     service6Feature1: 'Bilans enfant',
     service6Feature2: 'Scellants',
     service6Feature3: 'Traitement au fluor',
-    
+
     // ========== WEBSITE - DOCTORS ==========
     doctorsTag: 'Nos Spécialistes',
     doctorsHeading1: 'Rencontrez Nos',
@@ -652,6 +700,38 @@ backToDoctors: 'Back to Doctors',
     session: 'séance',
     bookBtn: 'Réserver',
     
+    // ========== WEBSITE - DOCTORS PAGE (ADDED) ==========
+    doctorsHeroTitle: 'Nos Dentistes',
+    doctorsHeroHighlight: 'Experts',
+    doctorsHeroSub: 'Prenez rendez-vous avec les meilleurs spécialistes dentaires',
+    searchDoctorsPlaceholder: 'Rechercher par nom ou spécialité...',
+    filters: 'Filtres',
+    sortBy: 'Trier par',
+    sortName: 'Nom',
+    sortFeesLow: 'Prix : Croissant',
+    sortFeesHigh: 'Prix : Décroissant',
+    sortExperience: 'Plus d\'expérience',
+    availability: 'Disponibilité',
+    availableOnly: 'Disponibles uniquement',
+    clearFilters: 'Effacer les filtres',
+    showing: 'Affichage',
+    of: 'de',
+    matching: 'correspondant à',
+    clearSearch: 'Effacer la recherche',
+    noDoctorsFound: 'Aucun médecin trouvé',
+    noDoctorsFoundMsg: 'Essayez d\'ajuster votre recherche ou vos filtres pour trouver le spécialiste qui vous convient.',
+    clearAllFilters: 'Effacer tous les filtres',
+    
+    // Speciality keys (lowercase, no spaces)
+    allspecialities: 'Toutes les spécialités',
+    generaldentist: 'Dentiste Généraliste',
+    orthodontist: 'Orthodontiste',
+    endodontist: 'Endodontiste',
+    periodontist: 'Parodontiste',
+    oralsurgeon: 'Chirurgien Oral',
+    pediatricdentist: 'Dentiste Pédiatrique',
+    prosthodontist: 'Prothésiste Dentaire',
+
     // ========== WEBSITE - BOOKING STEPS ==========
     bookingTag: 'Processus Simple',
     bookingHeading1: 'Réservez en',
@@ -662,7 +742,7 @@ backToDoctors: 'Back to Doctors',
     step2Desc: 'Choisissez une date et une heure qui correspondent à votre emploi du temps.',
     step3Title: 'Payez en Toute Sécurité',
     step3Desc: 'Payez en ligne avec Stripe ou Chargily — rapide, sûr et simple.',
-    
+
     // ========== WEBSITE - CTA ==========
     ctaBadge: 'Réservation en ligne disponible 24h/24 et 7j/7',
     ctaHeading1: 'Prêt pour un',
@@ -672,7 +752,7 @@ backToDoctors: 'Back to Doctors',
     trustSecure: 'Paiement sécurisé',
     trustCancel: 'Annulation gratuite',
     trustConfirm: 'Confirmation instantanée',
-    
+
     // ========== WEBSITE - FOOTER ==========
     footerDesc: 'La clinique dentaire la plus fiable d\'Alger. Une dentisterie moderne avec une touche personnelle depuis 2010.',
     footerAddress: '123 Rue Didouche Mourad, Alger',
@@ -680,46 +760,60 @@ backToDoctors: 'Back to Doctors',
     footerServices: 'Nos Services',
     footerPatient: 'Infos Patients',
     footerRights: 'Tous droits réservés.',
-    
+
     navHome: 'Accueil',
     navAbout: 'À propos',
     navServices: 'Services',
     navDoctors: 'Médecins',
     navContact: 'Contact',
-    
+
     serviceGeneralDentistry: 'Dentisterie Générale',
     serviceCosmeticDentistry: 'Dentisterie Cosmétique',
     serviceOrthodontics: 'Orthodontie',
     serviceOralSurgery: 'Chirurgie Buccale',
     servicePediatricDentistry: 'Dentisterie Pédiatrique',
-    
+
     patientPortal: 'Portail Patient',
     privacyPolicy: 'Confidentialité',
     termsOfService: "Conditions d'utilisation",
     cookiePolicy: 'Politique des cookies',
-    back : 'retour',
+
     // ========== WEBSITE - DOCTOR DETAIL PAGE ==========
-backToDoctors: 'Retour aux médecins',
-aboutDoctor: 'À propos du médecin',
-credentials: 'Qualifications',
-consultationFee: 'Frais de consultation',
-feePerSession: 'Frais par séance',
-location: 'Adresse',
-years: 'ans',
-noBio: 'Aucune biographie disponible.',
-selectDateTime: 'Sélectionnez la date et l\'heure',
-confirmBooking: 'Confirmer le rendez-vous',
-confirmDetails: 'Confirmez les détails de votre rendez-vous',
-bookingNotice: 'Le paiement sera traité après confirmation. Vous pouvez annuler jusqu\'à 24 heures avant votre rendez-vous.',
-booking: 'Réservation...',
-signInToBook: 'Connectez-vous pour réserver',
-bookingSuccess: 'Rendez-vous confirmé !',
-bookingSuccessMsg: 'Votre rendez-vous avec {name} le {date} à {time} est confirmé.',
-bookingConfirmationNote: 'Vous recevrez un email de confirmation. Allez dans votre profil pour voir et gérer vos rendez-vous.',
-myAppointments: 'Mes rendez-vous',
-continue: 'Continuer',
-bookingFailed: 'La réservation a échoué. Veuillez réessayer.',
-connectionError: 'Erreur de connexion. Veuillez réessayer.',
-backToDoctors: 'Retour aux médecins',
+    backToDoctors: 'Retour aux médecins',
+    aboutDoctor: 'À propos du médecin',
+    credentials: 'Qualifications',
+    consultationFee: 'Frais de consultation',
+    feePerSession: 'Frais par séance',
+    location: 'Adresse',
+    years: 'ans',
+    noBio: 'Aucune biographie disponible.',
+    selectDateTime: 'Sélectionnez la date et l\'heure',
+    confirmBooking: 'Confirmer le rendez-vous',
+    confirmDetails: 'Confirmez les détails de votre rendez-vous',
+    bookingNotice: 'Le paiement sera traité après confirmation. Vous pouvez annuler jusqu\'à 24 heures avant votre rendez-vous.',
+    booking: 'Réservation...',
+    signInToBook: 'Connectez-vous pour réserver',
+    bookingSuccess: 'Rendez-vous confirmé !',
+    bookingSuccessMsg: 'Votre rendez-vous avec {name} le {date} à {time} est confirmé.',
+    bookingConfirmationNote: 'Vous recevrez un email de confirmation. Allez dans votre profil pour voir et gérer vos rendez-vous.',
+    myAppointments: 'Mes rendez-vous',
+    continue: 'Continuer',
+    bookingFailed: 'La réservation a échoué. Veuillez réessayer.',
+    connectionError: 'Erreur de connexion. Veuillez réessayer.',
+
+    // Patient Profile
+    dob: 'Date de naissance',
+    gender: 'Genre',
+    male: 'Homme',
+    female: 'Femme',
+    other: 'Autre',
+    payNow: 'Payer maintenant',
+    cancelAppointment: 'Annuler le rendez-vous',
+    cancelAppointmentConfirm: 'Êtes-vous sûr de vouloir annuler votre rendez-vous avec {doctor} le {date} à {time} ?',
+    yes: 'Oui',
+    no: 'Non',
+    appointmentCancelled: 'Rendez-vous annulé avec succès',
+    confirmed: 'Confirmé',
+    viewMyAppointments: 'Voir Mon Rendez-Vous',
   },
-}
+};

@@ -25,9 +25,11 @@ import DoctorProfile from './pages/doctor/DoctorProfile'
 import HomePage from './pages/website/Home'
 import About from './pages/website/About'
 import Auth from './pages/website/Auth'
+import DoctorsPage from './pages/website/DoctorsPage'
 import DoctorDetailsPage from './pages/website/DoctorDetailsPage'
 // Background Component
 import { DualGradientBg } from './components/ui/backgrounds'
+import ProfilePage from './pages/website/profilepage'
 
 
 // ── Admin protected layout
@@ -81,6 +83,8 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<About />} />
           <Route path="/Auth" element={<Auth />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/doctors" element={<DoctorsPage/>} />
           <Route path="/doctors/:docId" element={<DoctorDetailsPage/>} />
         
           {/* ── DOCTOR ROUTES ── */}

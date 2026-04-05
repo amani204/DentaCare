@@ -1,7 +1,7 @@
-// src/pages/patient/Auth.jsx
+
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Globe } from 'lucide-react'
+import { useNavigate, useLocation } from 'react-router-dom'  
+
 import { DualGradientBg } from '../../components/ui/backgrounds'
 import LoginCard from '../../components/ui/loginCard'
 import api from '../../lib/axios'
@@ -12,6 +12,7 @@ import { toast } from 'react-hot-toast'
 
 export default function Auth() {
   const navigate = useNavigate()
+  const location = useLocation()  
   const t = useT()
   const { login } = useAuthStore()
   const { lang, toggleLang } = useAdminStore()
@@ -21,6 +22,9 @@ export default function Auth() {
   const [error, setError] = useState('')
   const [resetToken, setResetToken] = useState('')
   const [tempEmail, setTempEmail] = useState('')
+
+  // Get the page user was trying to visit before login
+  const from = location.state?.from || '/profile'
 
   // Listen for mode switches from LoginCard
   useEffect(() => {
@@ -56,7 +60,9 @@ export default function Auth() {
       if (data.success) {
         login(data.token, data.user, 'patient')
         toast.success(t('loginSuccess') || 'Login successful!')
-        navigate('/doctors')
+        
+        // ✅ Redirect to the page user came from, or profile
+        navigate(from)
       } else {
         setError(data.message || t('invalidCredentials'))
       }
@@ -149,10 +155,9 @@ export default function Auth() {
     }
     
     try {
-        // Use the reset-password endpoint directly (it should verify OTP internally)
         const { data } = await api.post('/api/user/reset-password', {
             email: tempEmail,
-            otp: formData.otp,  // Send OTP along with new password
+            otp: formData.otp,
             newPassword: formData.newPassword,
         })
         if (data.success) {
@@ -165,7 +170,7 @@ export default function Auth() {
     } catch (err) {
         setError(err.response?.data?.message || t('error'))
     } finally {
-        setLoading(false)
+      setLoading(false)
     }
   }
 

@@ -1,16 +1,21 @@
-// src/pages/website/DoctorDetail.jsx
-import { useState, useEffect } from 'react'
+
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { 
   Star, Calendar, Clock, User, Stethoscope, GraduationCap, 
-  MapPin, DollarSign, Phone, Mail, ArrowLeft, CheckCircle,
+  MapPin, DollarSign, ArrowLeft, CheckCircle,
   ChevronLeft, ChevronRight, X, Award, Briefcase, Heart
 } from 'lucide-react'
 import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import useT from '../../hooks/useT'
+import useAuthStore from '../../store/useAuth'
 import api from '../../lib/axios'
 import Navbar from '../../components/website/Navbar'
 import Footer from '../../components/website/Footer'
+import { toast } from 'react-hot-toast'
+
+gsap.registerPlugin(ScrollTrigger)
 
 const TIME_SLOTS = [
   '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
@@ -40,14 +45,29 @@ function getWeekDates(baseDate) {
 
 function BookingModal({ doctor, onClose }) {
   const t = useT()
+  const { token, isAuthenticated } = useAuthStore()
+  const navigate = useNavigate()
+  const modalRef = useRef(null)
   const [weekBase, setWeekBase] = useState(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d })
   const [selectedDate, setSelectedDate] = useState(null)
   const [selectedTime, setSelectedTime] = useState(null)
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState(1)
   const [error, setError] = useState('')
-  const navigate = useNavigate()
-  const token = localStorage.getItem('patientToken') || sessionStorage.getItem('patientToken')
+
+  // GSAP Modal Animation
+  useEffect(() => {
+    if (modalRef.current) {
+      gsap.fromTo(modalRef.current,
+        { opacity: 0, scale: 0.9, y: 20 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: 'back.out(0.4)' }
+      )
+    }
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [])
 
   const weekDates = getWeekDates(weekBase)
   const today = new Date(); today.setHours(0, 0, 0, 0)
@@ -72,12 +92,16 @@ function BookingModal({ doctor, onClose }) {
   const handleBook = async () => {
     if (!token) {
       onClose()
+      toast.error('Please login to book an appointment')
       navigate('/auth', { state: { from: `/doctors/${doctor._id}` } })
       return
     }
 
+    if (!selectedDate || !selectedTime) return
+
     setLoading(true)
     setError('')
+
     try {
       const { data } = await api.post('/api/appointment/book', {
         docId: doctor._id,
@@ -87,11 +111,12 @@ function BookingModal({ doctor, onClose }) {
 
       if (data.success) {
         setStep(3)
+        toast.success('Appointment booked successfully!')
       } else {
-        setError(data.message || t('bookingFailed'))
+        setError(data.message || 'Booking failed. Please try again.')
       }
-    } catch {
-      setError(t('connectionError'))
+    } catch (err) {
+      setError('Connection error. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -101,13 +126,13 @@ function BookingModal({ doctor, onClose }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div onClick={onClose} className="absolute inset-0 bg-primary-deep/40 backdrop-blur-sm" />
       
-      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl">
+      <div ref={modalRef} className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl">
         <div className="sticky top-0 bg-white z-10 px-5 py-4 border-b border-border flex items-start justify-between rounded-t-2xl">
           <div className="flex items-center gap-3">
             {doctor.image ? (
               <img src={doctor.image} alt="" className="w-11 h-11 rounded-full object-cover border-2 border-primary-soft" />
             ) : (
-              <div className="w-11 h-11 rounded-full bg-linear-to-br from-primary-deep to-primary flex items-center justify-center text-base font-bold text-white">
+              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-primary-deep to-primary flex items-center justify-center text-base font-bold text-white">
                 {doctor.name?.charAt(0) || 'D'}
               </div>
             )}
@@ -142,9 +167,9 @@ function BookingModal({ doctor, onClose }) {
 
         <div className="p-5">
           {step === 1 && (
-            <div className="space-y-5 ">
+            <div className="space-y-5">
               <div>
-                <div className="flex items-center justify-between mb-3 ">
+                <div className="flex items-center justify-between mb-3">
                   <h4 className="text-sm font-semibold text-text flex items-center gap-1.5">
                     <Calendar size={14} className="text-primary" /> {t('selectDate')}
                   </h4>
@@ -198,7 +223,7 @@ function BookingModal({ doctor, onClose }) {
                           onClick={() => { if (!booked) setSelectedTime(time) }}
                           disabled={booked}
                           className={`py-2 rounded-lg text-sm font-medium transition-all ${
-                            isSelected ? 'bg-accent text-white' : booked ? 'bg-gray-100 text-muted line-through cursor-not-allowed' :' hover:bg-gray-50'
+                            isSelected ? 'bg-accent text-white' : booked ? 'bg-gray-100 text-muted line-through cursor-not-allowed' : 'hover:bg-gray-50'
                           }`}
                         >
                           {time}
@@ -212,7 +237,7 @@ function BookingModal({ doctor, onClose }) {
               <button
                 onClick={() => setStep(2)}
                 disabled={!selectedDate || !selectedTime}
-                className="w-full py-3 rounded-xl text-white font-semibold bg-linear-to-r from-primary-deep to-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="w-full py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-primary-deep to-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 {t('continue')} →
               </button>
@@ -257,8 +282,8 @@ function BookingModal({ doctor, onClose }) {
                 <button onClick={() => { setStep(1); setError('') }} className="flex-1 py-3 rounded-xl border border-border text-sub font-medium hover:bg-gray-50 transition">
                   <ArrowLeft size={14} className="inline mr-1" /> {t('back')}
                 </button>
-                <button onClick={handleBook} disabled={loading} className="flex-1 py-3 rounded-xl bg-linear-to-r from-primary-deep to-primary text-white font-semibold disabled:opacity-50 transition-all">
-                  {loading ? t('booking') : (!token ? t('signInToBook') : t('confirmBooking'))}
+                <button onClick={handleBook} disabled={loading} className="flex-1 py-3 rounded-xl bg-gradient-to-r from-primary-deep to-primary text-white font-semibold disabled:opacity-50 transition-all">
+                  {loading ? t('booking') : t('confirmBooking')}
                 </button>
               </div>
             </div>
@@ -273,12 +298,21 @@ function BookingModal({ doctor, onClose }) {
               <p className="text-sm text-sub">
                 {t('bookingSuccessMsg', { name: doctor.name, date: fmtDisplay(selectedDate), time: selectedTime })}
               </p>
+              <div className="bg-primary-soft/20 rounded-xl p-3 text-xs text-primary-deep leading-relaxed border border-primary/20">
+                {t('bookingConfirmationNote')}
+              </div>
               <div className="flex gap-3">
-                <button onClick={onClose} className="flex-1 py-3 rounded-xl border border-border text-sub font-medium hover:bg-gray-50 transition">
-                  {t('close')}
+                <button 
+                  onClick={() => navigate('/profile')} 
+                  className="flex-1 py-3 rounded-xl border border-primary text-primary font-medium hover:bg-primary/5 transition"
+                >
+                  {t('viewMyAppointments')}
                 </button>
-                <button onClick={() => { onClose(); navigate('/profile/appointments') }} className="flex-1 py-3 rounded-xl bg-linear-to-r from-primary-deep to-primary text-white font-semibold transition-all">
-                  {t('myAppointments')}
+                <button 
+                  onClick={onClose} 
+                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-primary-deep to-primary text-white font-semibold transition-all"
+                >
+                  {t('close')}
                 </button>
               </div>
             </div>
@@ -293,9 +327,19 @@ export default function DoctorDetailsPage() {
   const { docId } = useParams()
   const t = useT()
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuthStore()
   const [doctor, setDoctor] = useState(null)
   const [loading, setLoading] = useState(true)
   const [showBookingModal, setShowBookingModal] = useState(false)
+  
+  // Refs for GSAP animations
+  const pageRef = useRef(null)
+  const backBtnRef = useRef(null)
+  const profileCardRef = useRef(null)
+  const detailsRef = useRef(null)
+  const aboutRef = useRef(null)
+  const credentialsRef = useRef(null)
+  const addressRef = useRef(null)
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -311,6 +355,54 @@ export default function DoctorDetailsPage() {
       .catch(() => navigate('/doctors'))
       .finally(() => setLoading(false))
   }, [docId, navigate])
+
+  // GSAP Page Animations
+  useEffect(() => {
+    if (!loading && doctor) {
+      const ctx = gsap.context(() => {
+        // Back button animation
+        gsap.fromTo(backBtnRef.current,
+          { opacity: 0, x: -20 },
+          { opacity: 1, x: 0, duration: 0.5, ease: 'power2.out' }
+        )
+
+        // Profile card animation
+        gsap.fromTo(profileCardRef.current,
+          { opacity: 0, x: -40 },
+          { opacity: 1, x: 0, duration: 0.7, delay: 0.2, ease: 'power3.out' }
+        )
+
+        // Details sections staggered
+        gsap.fromTo([aboutRef.current, credentialsRef.current, addressRef.current],
+          { opacity: 0, y: 30 },
+          { 
+            opacity: 1, 
+            y: 0, 
+            duration: 0.6, 
+            stagger: 0.15, 
+            delay: 0.3,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: detailsRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none none'
+            }
+          }
+        )
+      }, pageRef)
+
+      return () => ctx.revert()
+    }
+  }, [loading, doctor])
+
+  const handleBookClick = () => {
+    if (!isAuthenticated) {
+      toast.error(t('pleaseLoginToBook'))
+      navigate('/auth', { state: { from: `/doctors/${docId}`, message: 'Please login to book an appointment' } })
+      return
+    }
+    setShowBookingModal(true)
+  }
 
   if (loading) {
     return (
@@ -329,12 +421,13 @@ export default function DoctorDetailsPage() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-bg pt-28 pb-16">
+      <div ref={pageRef} className="min-h-screen bg-bg pt-28 pb-16">
         <div className="max-w-7xl mx-auto px-6">
           {/* Back button */}
           <button
+            ref={backBtnRef}
             onClick={() => navigate('/doctors')}
-            className="flex items-center gap-2 text-sub hover:text-primary transition mb-6 group"
+            className="flex items-center gap-2 text-sub hover:text-primary transition mb-6 group opacity-0"
           >
             <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> 
             {t('backToDoctors')}
@@ -343,13 +436,17 @@ export default function DoctorDetailsPage() {
           {/* Doctor Profile */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Image & Basic Info */}
-            <div className="lg:col-span-1">
+            <div ref={profileCardRef} className="lg:col-span-1 opacity-0">
               <div className="bg-white rounded-2xl overflow-hidden shadow-lg border border-border sticky top-28">
                 <div className="aspect-square overflow-hidden">
                   {doctor.image ? (
-                    <img src={doctor.image} alt={doctor.name} className="w-full h-full object-cover" />
+                    <img 
+                      src={doctor.image} 
+                      alt={doctor.name} 
+                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                    />
                   ) : (
-                    <div className="w-full h-full bg-linear-to-br from-primary-soft to-primary flex items-center justify-center text-6xl font-bold text-white">
+                    <div className="w-full h-full bg-gradient-to-br from-primary-soft to-primary flex items-center justify-center text-6xl font-bold text-white">
                       {doctor.name?.charAt(0) || 'D'}
                     </div>
                   )}
@@ -357,25 +454,31 @@ export default function DoctorDetailsPage() {
                 <div className="p-6">
                   <h1 className="text-2xl font-bold text-text mb-1">{doctor.name}</h1>
                   <p className="text-primary font-medium mb-4">{doctor.speciality}</p>
+                  
                   <button
-                    onClick={() => setShowBookingModal(true)}
-
-                    className={` w-full py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 ${
+                    onClick={handleBookClick}
+                    className={`w-full py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
                       doctor.available
-                        ? ' btn-primary text-white shadow-md hover:shadow-lg hover:-translate-y-0.5'
+                        ? 'btn-primary text-white shadow-md hover:shadow-lg hover:-translate-y-0.5'
                         : 'bg-gray-100 text-muted cursor-not-allowed'
                     }`}
                   >
                     {doctor.available ? t('bookAppointment') : t('unavailable')}
                   </button>
+                  
+                  {!isAuthenticated && doctor.available && (
+                    <p className="text-xs text-center text-muted mt-3 animate-pulse">
+                      {t('loginToBookHint')}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
 
             {/* Details */}
-            <div className="lg:col-span-2 space-y-6">
+            <div ref={detailsRef} className="lg:col-span-2 space-y-6">
               {/* About */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-border">
+              <div ref={aboutRef} className="bg-white rounded-2xl p-6 shadow-sm border border-border opacity-0">
                 <h2 className="text-xl font-bold text-text mb-3 flex items-center gap-2">
                   <Heart size={20} className="text-primary" /> {t('aboutDoctor')}
                 </h2>
@@ -385,13 +488,13 @@ export default function DoctorDetailsPage() {
               </div>
 
               {/* Education & Credentials */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-border">
+              <div ref={credentialsRef} className="bg-white rounded-2xl p-6 shadow-sm border border-border opacity-0">
                 <h2 className="text-xl font-bold text-text mb-4 flex items-center gap-2">
                   <Award size={20} className="text-primary" /> {t('credentials')}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {doctor.degree && (
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-primary-soft/20 transition-all duration-300 hover:translate-x-1">
                       <GraduationCap size={18} className="text-primary" />
                       <div>
                         <p className="text-xs text-muted">{t('degree')}</p>
@@ -399,21 +502,21 @@ export default function DoctorDetailsPage() {
                       </div>
                     </div>
                   )}
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-primary-soft/20 transition-all duration-300 hover:translate-x-1">
                     <Briefcase size={18} className="text-primary" />
                     <div>
                       <p className="text-xs text-muted">{t('experience')}</p>
                       <p className="font-medium text-text">{doctor.experience} {t('years')}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-primary-soft/20 transition-all duration-300 hover:translate-x-1">
                     <Stethoscope size={18} className="text-primary" />
                     <div>
                       <p className="text-xs text-muted">{t('speciality')}</p>
                       <p className="font-medium text-text">{doctor.speciality}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-primary-soft/20 transition-all duration-300 hover:translate-x-1">
                     <DollarSign size={18} className="text-primary" />
                     <div>
                       <p className="text-xs text-muted">{t('feePerSession')}</p>
@@ -425,7 +528,7 @@ export default function DoctorDetailsPage() {
 
               {/* Address */}
               {doctor.address && (doctor.address.line1 || doctor.address.line2) && (
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-border">
+                <div ref={addressRef} className="bg-white rounded-2xl p-6 shadow-sm border border-border opacity-0">
                   <h2 className="text-xl font-bold text-text mb-3 flex items-center gap-2">
                     <MapPin size={20} className="text-primary" /> {t('location')}
                   </h2>

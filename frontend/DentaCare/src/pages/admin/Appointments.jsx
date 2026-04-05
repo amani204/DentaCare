@@ -2,10 +2,9 @@ import { useEffect, useState } from 'react'
 import { 
   Search, X, User, Stethoscope, Calendar, Clock, DollarSign, 
   CreditCard, Activity, XCircle, CheckCircle, Clock3, 
-  ChevronDown, Filter, Ban, ArrowRight, 
-  CalendarDays
+  Filter, Ban
 } from 'lucide-react'
-import { Badge, Loader, EmptyState, Modal, StatCard, MiniStat } from '../../components/common/components'
+import { Badge, Loader, EmptyState, Modal, MiniStat } from '../../components/common/components'
 import useAdminStore from '../../store/adminStore'
 import useT from '../../hooks/useT'
 import api from '../../lib/axios'
