@@ -14,7 +14,7 @@ const BAR_COLORS = { Completed: '#94d7bc', Pending: '#cde9ff', Cancelled: '#f3af
 const BAR_COLORS_FR = { Terminés: '#94d7bc', 'En attente': '#cde9ff', Annulés: '#f3afb8' }
 
 export default function Dashboard() {
-  const { aToken, theme, lang } = useAdminStore()
+  const { aToken, lang } = useAdminStore()
   const t = useT()
 
   const [stats, setStats] = useState(null)
@@ -26,8 +26,8 @@ export default function Dashboard() {
   const fetchAll = async () => {
     try {
       const [d, a] = await Promise.all([
-        api.get('/api/admin/dashboard', { headers: { atoken: aToken } }),
-        api.get('/api/admin/appointments', { headers: { atoken: aToken } }),
+        api.get('/admin/dashboard', { headers: { atoken: aToken } }),
+        api.get('/admin/appointments', { headers: { atoken: aToken } }),
       ])
       if (d.data.success) setStats(d.data.dashboard)
       if (a.data.success) setApts(a.data.appointments.slice(0, 6))
@@ -40,7 +40,7 @@ export default function Dashboard() {
   const handleCancel = async () => {
     setCancelling(true)
     try {
-      const { data } = await api.post('/api/admin/cancel', { appointmentId: cancelId }, { headers: { atoken: aToken } })
+      const { data } = await api.post('/admin/cancel', { appointmentId: cancelId }, { headers: { atoken: aToken } })
       if (data.success) { setCancelId(null); fetchAll() }
     } catch (e) { console.error(e) }
     finally { setCancelling(false) }

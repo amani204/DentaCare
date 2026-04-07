@@ -25,7 +25,7 @@ export default function DoctorAppointments() {
 
   const fetchApts = async () => {
     try {
-      const { data } = await api.get('/api/doctor/appointments', { headers: { dtoken: dToken } })
+      const { data } = await api.get('/doctor/appointments', { headers: { dtoken: dToken } })
       if (data.success) setApts(data.appointments)
     } catch (e) { console.error(e) }
     finally { setLoading(false) }
@@ -34,7 +34,7 @@ export default function DoctorAppointments() {
   const handleComplete = async (id) => {
     setCompleting(id)
     try {
-      const { data } = await api.post('/api/doctor/complete', { appointmentId: id }, { headers: { dtoken: dToken } })
+      const { data } = await api.post('/doctor/complete', { appointmentId: id }, { headers: { dtoken: dToken } })
       if (data.success) fetchApts()
     } catch (e) { console.error(e) }
     finally { setCompleting(null) }
@@ -43,7 +43,7 @@ export default function DoctorAppointments() {
   const handleCancel = async () => {
     setCancelling(true)
     try {
-      const { data } = await api.post('/api/doctor/cancel', { appointmentId: cancelId }, { headers: { dtoken: dToken } })
+      const { data } = await api.post('/doctor/cancel', { appointmentId: cancelId }, { headers: { dtoken: dToken } })
       if (data.success) { setCancelId(null); fetchApts() }
     } catch (e) { console.error(e) }
     finally { setCancelling(false) }

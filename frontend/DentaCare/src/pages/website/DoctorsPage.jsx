@@ -128,7 +128,7 @@ export default function DoctorsPage() {
   const pageRef = useRef(null)
 
   useEffect(() => {
-    api.get('/api/doctor/all-doctors')
+    api.get('/doctor/all-doctors')
       .then(({ data }) => {
         if (data.success && data.data?.length) {
           setDoctors(data.data)

@@ -24,7 +24,7 @@ export default function Appointments() {
 
   const fetch = async () => {
     try {
-      const { data } = await api.get('/api/admin/appointments', { headers: { atoken: aToken } })
+      const { data } = await api.get('/admin/appointments', { headers: { atoken: aToken } })
       if (data.success) setApts(data.appointments)
     } catch (e) { console.error(e) }
     finally { setLoading(false) }
@@ -35,7 +35,7 @@ export default function Appointments() {
   const handleCancel = async () => {
     setCancelling(true)
     try {
-      const { data } = await api.post('/api/admin/cancel', { appointmentId: cancelId }, { headers: { atoken: aToken } })
+      const { data } = await api.post('/admin/cancel', { appointmentId: cancelId }, { headers: { atoken: aToken } })
       if (data.success) { setCancelId(null); fetch() }
     } catch (e) { console.error(e) }
     finally { setCancelling(false) }

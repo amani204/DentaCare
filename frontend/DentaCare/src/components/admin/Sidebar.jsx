@@ -4,10 +4,10 @@ import useAdminStore from '../../store/adminStore';
 import useT from '../../hooks/useT';
 
 const NAV = [
-  { path: '/',             icon: LayoutDashboard, key: 'dashboard' },
-  { path: '/doctors',      icon: Stethoscope,     key: 'doctors' },
-  { path: '/add-doctor',   icon: UserPlus,        key: 'addDoctor' },
-  { path: '/appointments', icon: Calendar,        key: 'appointments' },
+  { path: '/admin',             icon: LayoutDashboard, key: 'dashboard' },
+  { path: '/admin/doctors',      icon: Stethoscope,     key: 'doctors' },
+  { path: '/admin/add-doctor',   icon: UserPlus,        key: 'addDoctor' },
+  { path: '/admin/appointments', icon: Calendar,        key: 'appointments' },
 ];
 
 export default function Sidebar() {

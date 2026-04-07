@@ -14,11 +14,11 @@ export default function DoctorLogin() {
   const { setAuth, lang, toggleLang } = useDoctorStore();
   const t = useDT();
 
-  const handleSubmit = async (email, password) => {
+  const handleSubmit = async ({ email, password }) => {
     setLoading(true);
     setError('');
     try {
-      const { data } = await api.post('/api/doctor/login', { email, password });
+      const { data } = await api.post('/doctor/login', { email, password });
       if (data.success) {
         setAuth(data.dtoken, data.doctor);
         navigate('/doctor/dashboard');
@@ -50,13 +50,13 @@ export default function DoctorLogin() {
 
         {/* Login Card */}
         <LoginCard
-          heading={t('welcomeDoctor') || "Welcome Doctor"}
-          buttonText={t('signIn')}
-          isLoading={loading}
-          error={error}
-          onSubmit={handleSubmit}
-          role="doctor"
-        />
+  role="doctor"
+  simple={true}
+  buttonText={t('signIn')}
+  isLoading={loading}
+  error={error}
+  onSubmit={handleSubmit}
+/>
       </div>
     </DualGradientBg>
   );

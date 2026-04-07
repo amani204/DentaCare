@@ -23,7 +23,7 @@ export default function DoctorsList() {
 
   const fetch = async () => {
     try {
-      const { data } = await api.get('/api/admin/doctors', { headers: { atoken: aToken } })
+      const { data } = await api.get('/admin/doctors', { headers: { atoken: aToken } })
       if (data.success) setDoctors(data.doctors)
     } catch(e) { console.error(e) }
     finally { setLoading(false) }
@@ -31,7 +31,7 @@ export default function DoctorsList() {
 
   const handleToggle = async (docId) => {
     try {
-      const { data } = await api.put(`/api/admin/doctors/${docId}`, {}, { headers: { atoken: aToken } })
+      const { data } = await api.put(`/admin/doctors/${docId}`, {}, { headers: { atoken: aToken } })
       if (data.success) fetch()
     } catch(e) { console.error(e) }
   }
@@ -39,7 +39,7 @@ export default function DoctorsList() {
   const handleDelete = async () => {
     setDeleting(true)
     try {
-      await api.delete(`/api/admin/doctors/${deleteId}`, { headers: { atoken: aToken } })
+      await api.delete(`/admin/doctors/${deleteId}`, { headers: { atoken: aToken } })
       setDeleteId(null); fetch()
     } catch(e) { console.error(e) }
     finally { setDeleting(false) }
@@ -68,7 +68,7 @@ export default function DoctorsList() {
           <h2 className="page-title">{t('allDoctors')}</h2>
           <p className="sub-text">{doctors.length} {t('registered')}</p>
         </div>
-        <button onClick={() => navigate('/add-doctor')} className="btn btn-primary flex items-center gap-2">
+        <button onClick={() => navigate('admin/add-doctor')} className="btn btn-primary flex items-center gap-2">
           <Plus size={16} />
           {t('addDoctor')}
         </button>

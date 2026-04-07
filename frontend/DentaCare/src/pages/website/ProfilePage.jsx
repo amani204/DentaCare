@@ -92,7 +92,7 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const { data } = await api.get('/api/user/profile', {
+        const { data } = await api.get('/user/profile', {
           headers: { token }
         })
         if (data.success) {
@@ -120,7 +120,7 @@ export default function ProfilePage() {
   // Fetch user appointments
   const fetchAppointments = async () => {
     try {
-      const { data } = await api.get('/api/appointment/list', {
+      const { data } = await api.get('/appointment/list', {
         headers: { token }
       })
       if (data.success) {
@@ -160,7 +160,7 @@ export default function ProfilePage() {
       if (profileData.gender) formData.append('gender', profileData.gender)
       if (imageFile) formData.append('image', imageFile)
 
-      const { data } = await api.put('/api/user/update-profile', formData, {
+      const { data } = await api.put('/user/update-profile', formData, {
         headers: { token, 'Content-Type': 'multipart/form-data' }
       })
       
@@ -189,7 +189,7 @@ export default function ProfilePage() {
     
     setCancellingId(selectedAppointment._id)
     try {
-      const { data } = await api.post('/api/appointment/cancel', 
+      const { data } = await api.post('/appointment/cancel', 
         { appointmentId: selectedAppointment._id },
         { headers: { token } }
       )
@@ -249,7 +249,7 @@ export default function ProfilePage() {
     
     setProcessingPayment(paymentAppointment._id)
     try {
-      const { data } = await api.post('/api/payment/stripe-checkout', 
+      const { data } = await api.post('/payment/stripe-checkout', 
         { 
           appointmentId: paymentAppointment._id,
           amount: paymentAppointment.amount,
@@ -285,7 +285,7 @@ export default function ProfilePage() {
     
     setProcessingPayment(paymentAppointment._id)
     try {
-      const { data } = await api.post('/api/payment/chargily-checkout', 
+      const { data } = await api.post('/payment/chargily-checkout', 
         { 
           appointmentId: paymentAppointment._id,
           amount: paymentAppointment.amount,
@@ -318,8 +318,8 @@ export default function ProfilePage() {
   const verifyPaymentStatus = async (appointmentId, paymentMethod) => {
     try {
       const endpoint = paymentMethod === 'stripe' 
-        ? '/api/payment/stripe-verify' 
-        : '/api/payment/chargily-verify'
+        ? '/payment/stripe-verify' 
+        : '/payment/chargily-verify'
       
       const { data } = await api.post(endpoint, 
         { appointmentId },

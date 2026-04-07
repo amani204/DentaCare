@@ -26,7 +26,7 @@ export default function Doctors() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    api.get('/api/doctor/all-doctors')
+    api.get('/doctor/all-doctors')
       .then(({ data }) => {
          console.log('API Response:', data);
         if (data.success && data.data && data.data.length) {

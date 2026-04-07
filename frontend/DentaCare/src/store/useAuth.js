@@ -16,8 +16,11 @@ const useAuthStore = create(
       logout: () => set({ 
         token: null, user: null, role: null, isAuthenticated: false 
       }),
+      
     }),
     { name: 'auth-storage' } 
+    
   )
+  
 )
 export default useAuthStore;

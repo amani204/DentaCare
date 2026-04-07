@@ -70,7 +70,7 @@ export default function DoctorProfile() {
       if (image) fd.append('image', image)
 
       // Only send editable fields to backend
-      const { data } = await api.put('/api/doctor/update-profile', fd, { headers: { dtoken: dToken } })
+      const { data } = await api.put('/doctor/update-profile', fd, { headers: { dtoken: dToken } })
       if (data.success) {
         setDoctor(data.doctor || { ...doctor, ...form, image: preview || doctor?.image })
         setSuccess(true)

@@ -24,8 +24,8 @@ export default function DoctorDashboard() {
   const fetchAll = async () => {
     try {
       const [dashRes, aptsRes] = await Promise.all([
-        api.get('/api/doctor/dashboard', { headers: { dtoken: dToken } }),
-        api.get('/api/doctor/appointments', { headers: { dtoken: dToken } }),
+        api.get('/doctor/dashboard', { headers: { dtoken: dToken } }),
+        api.get('/doctor/appointments', { headers: { dtoken: dToken } }),
       ])
       if (dashRes.data.success) setDashboard(dashRes.data.dashboard)
       if (aptsRes.data.success) {

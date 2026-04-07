@@ -69,7 +69,7 @@ export default function App() {
   useEffect(() => {
     console.log('App initialized')
   }, [])
-
+  console.log('Current aToken:', aToken);
   return (
     <BrowserRouter
       future={{
@@ -105,9 +105,13 @@ export default function App() {
           } />
 
           {/* ── ADMIN ROUTES ── */}
-          <Route path="/admin" element={
-            aToken ? <AdminShell><Dashboard /></AdminShell> : <AdminLogin />
+          <Route path="/admin/login" element={
+            aToken ? <Navigate to="/admin" /> : <AdminLogin />
           } />
+          
+           <Route path="/admin" element={
+            aToken ? <AdminShell><Dashboard /></AdminShell> : <Navigate to="/admin/login" />
+           } />
           <Route path="/admin/doctors" element={
             aToken ? <AdminShell><DoctorsList /></AdminShell> : <Navigate to="/admin" />
           } />

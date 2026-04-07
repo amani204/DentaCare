@@ -96,12 +96,12 @@ export default function AddDoctor() {
       }).forEach(([k,v]) => fd.append(k, v))
       fd.append('address', JSON.stringify({ line1: form.line1, line2: form.line2 }))
       fd.append('image', image)
-      const { data } = await api.post('/api/admin/add-doctor', fd, { 
+      const { data } = await api.post('/admin/add-doctor', fd, { 
         headers: { atoken: aToken, 'Content-Type': 'multipart/form-data' } 
       })
       if (data.success) { 
         setSuccess(true)
-        setTimeout(() => navigate('/doctors'), 1500)
+        setTimeout(() => navigate('/admin/doctors'), 1500)
       } else setApiErr(data.message)
     } catch { setApiErr(t('error')) }
     finally { setLoading(false) }
@@ -271,7 +271,7 @@ export default function AddDoctor() {
         <div className="flex gap-3 pb-6">
           <button 
             type="button" 
-            onClick={() => navigate('/doctors')} 
+            onClick={() => navigate('/admin/doctors')}
             className="btn btn-ghost flex items-center gap-2"
           >
             <X size={16} /> {t('cancel')}

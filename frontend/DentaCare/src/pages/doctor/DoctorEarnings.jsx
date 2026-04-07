@@ -18,7 +18,7 @@ export default function DoctorEarnings() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    api.get('/api/doctor/appointments', { headers: { dtoken: dToken } })
+    api.get('/doctor/appointments', { headers: { dtoken: dToken } })
       .then(({ data }) => { if (data.success) setApts(data.appointments) })
       .catch(console.error)
       .finally(() => setLoading(false))

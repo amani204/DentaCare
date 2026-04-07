@@ -14,14 +14,14 @@ export default function AdminLogin() {
   const { setAToken, lang, toggleLang } = useAdminStore();
   const t = useT();
 
-  const handleSubmit = async (email, password) => {
+  const handleSubmit = async  ({ email, password }) => {
     setLoading(true);
     setError('');
     try {
-      const { data } = await api.post('/api/admin/login', { email, password });
+      const { data } = await api.post('/admin/login', { email, password });
       if (data.success) {
         setAToken(data.token);
-        navigate('/admin');
+        navigate('/');
       } else {
         setError(data.message || t('error'));
       }
@@ -50,13 +50,12 @@ export default function AdminLogin() {
 
         {/* Login Card */}
         <LoginCard
-          heading={t('welcomeAdmin') || "Welcome Admin"}
-          buttonText={t('signIn')}
-          isLoading={loading}
-          error={error}
-          onSubmit={handleSubmit}
-          role="admin"
-        />
+        role="admin"
+        simple={true}
+        buttonText={t('signIn')}
+        isLoading={loading}
+        error={error}
+        onSubmit={handleSubmit} />
       </div>
     </DualGradientBg>
   );
