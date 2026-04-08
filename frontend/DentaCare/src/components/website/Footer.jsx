@@ -1,43 +1,59 @@
-import { useRef, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { MapPin, Phone, Mail, Instagram, Facebook, Twitter } from 'lucide-react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import useT from '../../hooks/useT'
-
-gsap.registerPlugin(ScrollTrigger)
+import { useRef } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { MapPin, Phone, Mail, Instagram, Facebook, Twitter } from 'lucide-react';
+import { useGsap } from '../../hooks/useGSAP';
+import useT from '../../hooks/useT';
 
 export default function Footer() {
-  const t = useT()
-  const footerRef = useRef(null)
+  const t = useT();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const footerRef = useRef(null);
 
-  useEffect(() => {
-    if (!footerRef.current) return
-    const cols = footerRef.current.querySelectorAll('.footer-col')
-    gsap.fromTo(cols,
-      { opacity: 0, y: 30 },
-      { 
-        opacity: 1, y: 0, duration: 0.7, stagger: 0.1, ease: 'power3.out',
-        scrollTrigger: { trigger: footerRef.current, start: 'top 90%', toggleActions: 'play none none none' } 
+  useGsap({
+    footerCols: {
+      selector: '.footer-col',
+      from: { opacity: 0, y: 30 },
+      to: { opacity: 1, y: 0, duration: 0.7, stagger: 0.1, ease: 'power3.out' },
+      scrollTrigger: { trigger: '#footer-container', start: 'top 90%' },
+    },
+  }, []);
+
+  const handleNavigation = (e, path, isHash = false, sectionId = null) => {
+    e.preventDefault();
+    if (isHash && sectionId) {
+      if (location.pathname !== '/') {
+        navigate('/');
+        setTimeout(() => {
+          const el = document.getElementById(sectionId);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      } else {
+        const el = document.getElementById(sectionId);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
       }
-    )
-    return () => ScrollTrigger.getAll().forEach(t => t.kill())
-  }, [])
+    } else {
+      navigate(path);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
-  // 1. Define the specific paths for your main navigation
   const quickLinks = [
-    { name: 'home', path: '/' },
-    { name: 'about', path: '/about' },
-    { name: 'services', path: '/#services' },
-    { name: 'doctors', path: '/doctors' },
-    { name: 'contact', path: '/#contact' }
-  ]
+    { name: 'home', path: '/', isHash: false },
+    { name: 'about', path: '/about', isHash: false },
+    { name: 'services', path: '/#services', isHash: true, sectionId: 'services' },
+    { name: 'doctors', path: '/doctors', isHash: false },
+    { name: 'contact', path: '/#contact', isHash: true, sectionId: 'contact' },
+  ];
 
   return (
     <footer className="bg-bg text-text/70">
       <div className="max-w-7xl mx-auto px-6 py-12 lg:py-16">
-        <div ref={footerRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-10">
-          
+        <div
+          ref={footerRef}
+          id="footer-container"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-10"
+        >
           {/* Brand Column */}
           <div className="footer-col opacity-0 lg:col-span-2">
             <div className="flex items-center gap-2 mb-4">
@@ -80,7 +96,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Quick Links - UPDATED LOGIC */}
+          {/* Quick Links */}
           <div className="footer-col opacity-0">
             <h4 className="text-text font-semibold text-sm uppercase tracking-wider mb-4">
               {t('footerQuickLinks')}
@@ -88,37 +104,49 @@ export default function Footer() {
             <ul className="space-y-2">
               {quickLinks.map((item) => (
                 <li key={item.name}>
-                  <Link
-                    to={item.path}
-                    className="text-sm text-text/50 hover:text-text transition-colors duration-200"
-                  >
-                    {t(`nav${item.name.charAt(0).toUpperCase() + item.name.slice(1)}`)}
-                  </Link>
+                  {item.isHash ? (
+                    <a
+                      href={item.path}
+                      onClick={(e) => handleNavigation(e, item.path, true, item.sectionId)}
+                      className="text-sm text-text/50 hover:text-text transition-colors duration-200 cursor-pointer"
+                    >
+                      {t(`nav${item.name.charAt(0).toUpperCase() + item.name.slice(1)}`)}
+                    </a>
+                  ) : (
+                    <Link
+                      to={item.path}
+                      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                      className="text-sm text-text/50 hover:text-text transition-colors duration-200"
+                    >
+                      {t(`nav${item.name.charAt(0).toUpperCase() + item.name.slice(1)}`)}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Services - Fixed to always point to home sections */}
+          {/* Services */}
           <div className="footer-col opacity-0">
             <h4 className="text-text font-semibold text-sm uppercase tracking-wider mb-4">
               {t('footerServices')}
             </h4>
             <ul className="space-y-2">
               {[
-                'generalDentistry',
-                'cosmeticDentistry',
-                'orthodontics',
-                'oralSurgery',
-                'pediatricDentistry',
+                { key: 'generalDentistry', label: 'serviceGeneralDentistry' },
+                { key: 'cosmeticDentistry', label: 'serviceCosmeticDentistry' },
+                { key: 'orthodontics', label: 'serviceOrthodontics' },
+                { key: 'oralSurgery', label: 'serviceOralSurgery' },
+                { key: 'pediatricDentistry', label: 'servicePediatricDentistry' },
               ].map((service) => (
-                <li key={service}>
-                  <Link
-                    to="/#services"
-                    className="text-sm text-text/50 hover:text-text transition-colors duration-200"
+                <li key={service.key}>
+                  <a
+                    href="/#services"
+                    onClick={(e) => handleNavigation(e, '/#services', true, 'services')}
+                    className="text-sm text-text/50 hover:text-text transition-colors duration-200 cursor-pointer"
                   >
-                    {t(`service${service.charAt(0).toUpperCase() + service.slice(1)}`)}
-                  </Link>
+                    {t(service.label)}
+                  </a>
                 </li>
               ))}
             </ul>
@@ -131,18 +159,29 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2">
               {[
-                { key: 'bookAppointment', link: '/doctors' },
-                { key: 'patientPortal', link: '/login' },
-                { key: 'privacyPolicy', link: '/privacy' },
-                { key: 'termsOfService', link: '/terms' },
-              ].map(({ key, link }) => (
+                { key: 'bookAppointment', link: '/doctors', isHash: false },
+                { key: 'patientPortal', link: '/login', isHash: false },
+                { key: 'privacyPolicy', link: '/privacy', isHash: false },
+                { key: 'termsOfService', link: '/terms', isHash: false },
+              ].map(({ key, link, isHash }) => (
                 <li key={key}>
-                  <Link
-                    to={link}
-                    className="text-sm text-text/50 hover:text-text transition-colors duration-200"
-                  >
-                    {t(key)}
-                  </Link>
+                  {isHash ? (
+                    <a
+                      href={link}
+                      onClick={(e) => handleNavigation(e, link, true, 'contact')}
+                      className="text-sm text-text/50 hover:text-text transition-colors duration-200 cursor-pointer"
+                    >
+                      {t(key)}
+                    </a>
+                  ) : (
+                    <Link
+                      to={link}
+                      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                      className="text-sm text-text/50 hover:text-text transition-colors duration-200"
+                    >
+                      {t(key)}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -153,12 +192,18 @@ export default function Footer() {
         <div className="pt-6 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-text/40">
           <p>© 2026 DentaCare. {t('footerRights')}</p>
           <div className="flex gap-4">
-            <Link to="/privacy" className="hover:text-accent-soft transition-colors">{t('privacyPolicy')}</Link>
-            <Link to="/terms" className="hover:text-accent-soft transition-colors">{t('termsOfService')}</Link>
-            <Link to="/cookies" className="hover:text-accent-soft transition-colors">{t('cookiePolicy')}</Link>
+            <Link to="/privacy" className="hover:text-accent-soft transition-colors">
+              {t('privacyPolicy')}
+            </Link>
+            <Link to="/terms" className="hover:text-accent-soft transition-colors">
+              {t('termsOfService')}
+            </Link>
+            <Link to="/cookies" className="hover:text-accent-soft transition-colors">
+              {t('cookiePolicy')}
+            </Link>
           </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }

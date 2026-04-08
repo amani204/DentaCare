@@ -1,11 +1,7 @@
-
-import { useRef, useEffect } from 'react'
-import { Stethoscope, Sparkles, Wrench, Building, Leaf, Baby } from 'lucide-react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import useT from '../../hooks/useT'
-
-gsap.registerPlugin(ScrollTrigger)
+import { useRef } from 'react';
+import { Stethoscope, Sparkles, Wrench, Building, Leaf, Baby } from 'lucide-react';
+import { useGsap } from '../../hooks/useGSAP';
+import useT from '../../hooks/useT';
 
 const SERVICES = [
   {
@@ -62,44 +58,37 @@ const SERVICES = [
     textColor: 'text-[#5B21B6]',
     featuresKeys: ['service6Feature1', 'service6Feature2', 'service6Feature3'],
   },
-]
+];
 
 export default function Services() {
-  const t = useT()
-  const sectionRef = useRef(null)
-  const headerRef = useRef(null)
-  const gridRef = useRef(null)
+  const t = useT();
+  const headerRef = useRef(null);
+  const gridRef = useRef(null);
 
-  useEffect(() => {
-    if (!sectionRef.current) return
-
-    // Header
-    gsap.fromTo(headerRef.current,
-      { opacity: 0, y: 30 },
-      { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out',
-        scrollTrigger: { trigger: headerRef.current, start: 'top 85%', toggleActions: 'play none none none' } }
-    )
-
-    // Cards staggered
-    if (gridRef.current) {
-      const cards = gridRef.current.querySelectorAll('.service-card')
-      gsap.fromTo(cards,
-        { opacity: 0, y: 50, scale: 0.96 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.7, stagger: 0.1, ease: 'power3.out',
-          scrollTrigger: { trigger: gridRef.current, start: 'top 80%', toggleActions: 'play none none none' } }
-      )
-    }
-
-    return () => {
-      ScrollTrigger.getAll().forEach(t => t.kill())
-    }
-  }, [])
+  useGsap({
+    header: {
+      ref: headerRef,
+      from: { opacity: 0, y: 30 },
+      to: { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' },
+      scrollTrigger: { trigger: '#services-header', start: 'top 85%' },
+    },
+    cards: {
+      selector: '.service-card',
+      from: { opacity: 0, y: 50, scale: 0.96 },
+      to: { opacity: 1, y: 0, scale: 1, duration: 0.7, stagger: 0.1, ease: 'power3.out' },
+      scrollTrigger: { trigger: '#services-grid', start: 'top 80%' },
+    },
+  }, []);
 
   return (
-    <section id="services" ref={sectionRef} className="py-20 bg-bg overflow-hidden">
+    <section id="services" className="py-20 bg-bg overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
-        {/* Header */}
-        <div ref={headerRef} className="text-center mb-16 opacity-0">
+
+        <div
+          ref={headerRef}
+          id="services-header"
+          className="text-center mb-16 opacity-0"
+        >
           <div className="flex justify-center mb-4">
             <span className="text-xs font-semibold text-accent-soft uppercase tracking-wider bg-accent-soft/10 px-3 py-1 rounded-full">
               {t('servicesTag')}
@@ -107,49 +96,46 @@ export default function Services() {
           </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text mb-4 max-w-2xl mx-auto">
             {t('servicesHeading1')}{' '}
-            <span className=" text-primary-deep">{t('servicesHeading2')}</span>
+            <span className="text-primary-deep">{t('servicesHeading2')}</span>
           </h2>
           <p className="text-lg text-sub max-w-xl mx-auto">
             {t('servicesSub')}
           </p>
         </div>
 
-        {/* Grid */}
-        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {SERVICES.map(({ icon: Icon, number, titleKey, descKey, color, textColor, featuresKeys }) => (
-            <div
-              key={titleKey}
-              className="service-card opacity-0 bg-white border border-border rounded-[10px] p-6 relative overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-primary group"
-            >
-              {/* Number watermark */}
-              <span className="absolute top-4 right-5 text-5xl font-bold opacity-20 pointer-events-none">
-                {number}
-              </span>
-
-              {/* Icon */}
-              <div className={`w-14 h-14 rounded-xl ${color} flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110`}>
-                <Icon size={24} className={textColor} />
+        <div
+          ref={gridRef}
+          id="services-grid"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+        >
+          {SERVICES.map((service) => {
+            const { icon: Icon, number, titleKey, descKey, color, textColor, featuresKeys } = service;
+            return (
+              <div
+                key={titleKey}
+                className="service-card opacity-0 bg-white border border-border rounded-[10px] p-6 relative overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-primary group"
+              >
+                <span className="absolute top-4 right-5 text-5xl font-bold opacity-20 pointer-events-none">
+                  {number}
+                </span>
+                <div className={`w-14 h-14 rounded-xl ${color} flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110`}>
+                  <Icon size={24} className={textColor} />
+                </div>
+                <h3 className="text-xl font-semibold text-text mb-2">{t(titleKey)}</h3>
+                <p className="text-sm text-sub leading-relaxed mb-4">{t(descKey)}</p>
+                <div className="flex flex-col gap-1.5 mb-4">
+                  {featuresKeys.map((featureKey) => (
+                    <div key={featureKey} className="flex items-center gap-2">
+                      <div className={`w-1.5 h-1.5 rounded-full ${textColor}`} />
+                      <span className="text-xs text-sub">{t(featureKey)}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-
-              {/* Title */}
-              <h3 className="text-xl font-semibold text-text mb-2">{t(titleKey)}</h3>
-
-              {/* Description */}
-              <p className="text-sm text-sub leading-relaxed mb-4">{t(descKey)}</p>
-
-              {/* Features */}
-              <div className="flex flex-col gap-1.5 mb-4">
-                {featuresKeys.map((featureKey) => (
-                  <div key={featureKey} className="flex items-center gap-2">
-                    <div className={`w-1.5 h-1.5 rounded-full ${textColor}`} />
-                    <span className="text-xs text-sub">{t(featureKey)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
-  )
+  );
 }

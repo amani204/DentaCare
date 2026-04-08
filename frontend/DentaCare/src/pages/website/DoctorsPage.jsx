@@ -1,44 +1,28 @@
-// src/pages/website/DoctorsPage.jsx
 import { useState, useEffect, useRef } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { 
-  Search, SlidersHorizontal, X, ArrowLeft, Stethoscope, ChevronDown,
-  Star, GraduationCap, MapPin, Calendar, Clock, User, DollarSign, CheckCircle
+import { useParams, useNavigate } from 'react-router-dom'
+import { Calendar, Clock, User, Stethoscope, GraduationCap, 
+  MapPin, DollarSign, ArrowLeft, CheckCircle,
+  ChevronLeft, ChevronRight, X, Award, Briefcase, Heart
 } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import useT from '../../hooks/useT'
+import { useGsap } from '../../hooks/useGSAP'     
+import useAuthStore from '../../store/useAuth'
 import api from '../../lib/axios'
 import Navbar from '../../components/website/Navbar'
 import Footer from '../../components/website/Footer'
+import { toast } from 'react-hot-toast'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const SPECIALITIES = [
-  'All Specialities',
-  'General Dentist',
-  'Orthodontist',
-  'Endodontist',
-  'Periodontist',
-  'Oral Surgeon',
-  'Pediatric Dentist',
-  'Prosthodontist',
-]
-
 const TIME_SLOTS = [
   '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-  '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
+  '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'
 ]
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-
-const FALLBACK_DOCTORS = [
-  { _id: '1', name: 'Dr. Samir Khelifi', speciality: 'Orthodontist', fees: 80, experience: '8 years', available: true, degree: 'DDS, MS', about: 'Orthodontics specialist', address: { line1: '123 Rue Didouche' }, slots_booked: {} },
-  { _id: '2', name: 'Dr. Fatima Zohra', speciality: 'General Dentist', fees: 50, experience: '12 years', available: true, degree: 'BDS', about: 'General dentistry', address: { line1: '45 Boulevard Zirout' }, slots_booked: {} },
-  { _id: '3', name: 'Dr. Karim Benali', speciality: 'Oral Surgeon', fees: 120, experience: '15 years', available: true, degree: 'DDS, OMFS', about: 'Oral surgery expert', address: { line1: '78 Rue Khemisti' }, slots_booked: {} },
-  { _id: '4', name: 'Dr. Nadia Messaoud', speciality: 'Pediatric Dentist', fees: 60, experience: '6 years', available: true, degree: 'DDS', about: 'Pediatric specialist', address: { line1: '12 Rue Ben Mehidi' }, slots_booked: {} },
-]
 
 function fmtDate(d) {
   return `${d.getDate()}_${d.getMonth() + 1}_${d.getFullYear()}`
@@ -46,10 +30,6 @@ function fmtDate(d) {
 
 function fmtDisplay(d) {
   return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`
-}
-
-function initials(name) {
-  return name?.split(' ').slice(0, 2).map(w => w[0]).join('') || 'DR'
 }
 
 function getWeekDates(baseDate) {
@@ -62,124 +42,359 @@ function getWeekDates(baseDate) {
   return dates
 }
 
-function DoctorCard({ doctor, onClick, index }) {
+function BookingModal({ doctor, onClose }) {
   const t = useT()
-  const cardRef = useRef(null)
-
+  const { token, isAuthenticated } = useAuthStore()
+  const navigate = useNavigate()
+  const modalRef = useRef(null)
+  const [weekBase, setWeekBase] = useState(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d })
+  const [selectedDate, setSelectedDate] = useState(null)
+  const [selectedTime, setSelectedTime] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [step, setStep] = useState(1)
+  const [error, setError] = useState('')
+ 
+  // GSAP Modal Animation (unchanged)
   useEffect(() => {
-    if (!cardRef.current) return
-    gsap.fromTo(cardRef.current,
-      { opacity: 0, y: 40 },
-      { opacity: 1, y: 0, duration: 0.6, delay: index * 0.08, ease: 'power3.out',
-        scrollTrigger: { trigger: cardRef.current, start: 'top 88%', toggleActions: 'play none none none' }
-      }
-    )
-    return () => ScrollTrigger.getAll().forEach(t => t.kill())
-  }, [index])
+    if (modalRef.current) {
+      gsap.fromTo(modalRef.current,
+        { opacity: 0, scale: 0.9, y: 20 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: 'back.out(0.4)' }
+      )
+    }
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [])
 
+  const weekDates = getWeekDates(weekBase)
+  const today = new Date(); today.setHours(0, 0, 0, 0)
+
+  const isBooked = (date, time) => {
+    const key = fmtDate(date)
+    return doctor.slots_booked?.[key]?.includes(time)
+  }
+
+  const prevWeek = () => {
+    const d = new Date(weekBase)
+    d.setDate(d.getDate() - 7)
+    if (d >= today) setWeekBase(d)
+  }
+
+  const nextWeek = () => {
+    const d = new Date(weekBase)
+    d.setDate(d.getDate() + 7)
+    setWeekBase(d)
+  }
+
+  const handleBook = async () => {
+    if (!token) {
+      onClose()
+      toast.error('Please login to book an appointment')
+      navigate('/auth', { state: { from: `/doctors/${doctor._id}` } })
+      return
+    }
+
+    if (!selectedDate || !selectedTime) return
+
+    setLoading(true)
+    setError('')
+
+    try {
+      const { data } = await api.post('/appointment/book', {
+        docId: doctor._id,
+        slotDate: fmtDate(selectedDate),
+        slotTime: selectedTime,
+      }, { headers: { token } })
+
+      if (data.success) {
+        setStep(3)
+        toast.success('Appointment booked successfully!')
+      } else {
+        setError(data.message || 'Booking failed. Please try again.')
+      }
+    } catch (err) {
+      setError('Connection error. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  
   return (
-    <div
-      ref={cardRef}
-      onClick={() => onClick(doctor._id)}
-      className="bg-white border border-border rounded-[10px] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-primary/50 flex flex-col opacity-0 cursor-pointer"
-    >
-      <div className="h-80 relative bg-linear-to-br from-primary-soft/20 to-primary-soft/5 flex items-center justify-center">
-        {doctor.image ? (
-          <img src={doctor.image} alt={doctor.name} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
-        ) : (
-          <div className="w-18 h-18 rounded-full bg-linear-to-br from-primary-deep to-primary flex items-center justify-center text-2xl font-bold text-white font-serif">
-            {initials(doctor.name)}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div onClick={onClose} className="absolute inset-0 bg-primary-deep/40 backdrop-blur-sm" />
+      
+      <div ref={modalRef} className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl">
+        <div className="sticky top-0 bg-white z-10 px-5 py-4 border-b border-border flex items-start justify-between rounded-t-2xl">
+          <div className="flex items-center gap-3">
+            {doctor.image ? (
+              <img src={doctor.image} alt="" className="w-11 h-11 rounded-full object-cover border-2 border-primary-soft" />
+            ) : (
+              <div className="w-11 h-11 rounded-full bg-linear-to-br from-primary-deep to-primary flex items-center justify-center text-base font-bold text-white">
+                {doctor.name?.charAt(0) || 'D'}
+              </div>
+            )}
+            <div>
+              <h3 className="font-bold text-text">{doctor.name}</h3>
+              <p className="text-xs text-primary font-medium">{doctor.speciality} · {doctor.fees}DA/{t('session')}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-gray-50 border border-border flex items-center justify-center hover:bg-gray-100 transition">
+            <X size={15} className="text-muted" />
+          </button>
+        </div>
+
+        {step < 3 && (
+          <div className="px-5 py-3 flex items-center gap-2 border-b border-border">
+            {[
+              { step: 1, label: t('selectDateTime') },
+              { step: 2, label: t('confirmBooking') }
+            ].map((s, i) => (
+              <div key={s.label} className="flex items-center gap-2">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                  step === s.step ? 'bg-primary-deep text-white' : step > s.step ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-muted'
+                }`}>
+                  {step > s.step ? '✓' : s.step}
+                </div>
+                <span className={`text-xs ${step === s.step ? 'font-semibold text-text' : 'text-muted'}`}>{s.label}</span>
+                {i === 0 && <div className="w-8 h-px bg-border" />}
+              </div>
+            ))}
           </div>
         )}
-        <div className={`absolute top-3 right-3 flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-semibold backdrop-blur-sm ${
-          doctor.available ? 'bg-white/95 text-emerald-600' : 'bg-white/80 text-red-500'
-        }`}>
-          <div className={`w-1.5 h-1.5 rounded-full ${doctor.available ? 'bg-emerald-500' : 'bg-red-500'}`} />
-          {doctor.available ? t('available') : t('unavailable')}
-        </div>
-        <div className="absolute bottom-3 left-3 bg-primary-deep/85 backdrop-blur-sm rounded-lg px-2.5 py-1 text-sm font-bold text-white">
-          {doctor.fees}DA<span className="text-xs font-normal opacity-80">/{t('session')}</span>
-        </div>
-      </div>
 
-      <div className="p-4 flex-1 flex flex-col gap-2">
-        <div>
-          <h3 className="text-lg font-bold text-text font-serif">{doctor.name}</h3>
-          <p className="text-sm font-medium text-primary">{doctor.speciality}</p>
+        <div className="p-5">
+          {step === 1 && (
+            <div className="space-y-5">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-semibold text-text flex items-center gap-1.5">
+                    <Calendar size={14} className="text-primary" /> {t('selectDate')}
+                  </h4>
+                  <div className="flex items-center gap-1">
+                    <button onClick={prevWeek} className="w-7 h-7 rounded-lg border border-border flex items-center justify-center hover:bg-gray-50 transition">
+                      <ChevronLeft size={13} className="text-muted" />
+                    </button>
+                    <span className="text-xs text-sub font-medium w-20 text-center">
+                      {MONTHS[weekBase.getMonth()].slice(0, 3)} {weekBase.getFullYear()}
+                    </span>
+                    <button onClick={nextWeek} className="w-7 h-7 rounded-lg border border-border flex items-center justify-center hover:bg-gray-50 transition">
+                      <ChevronRight size={13} className="text-muted" />
+                    </button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-7 gap-1.5">
+                  {weekDates.map((date, i) => {
+                    const isPast = date < today
+                    const isSelected = selectedDate && date.toDateString() === selectedDate.toDateString()
+                    const isToday = date.toDateString() === today.toDateString()
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => { if (!isPast) { setSelectedDate(date); setSelectedTime(null) } }}
+                        disabled={isPast}
+                        className={`flex flex-col items-center py-2 rounded-xl transition-all ${
+                          isSelected ? 'bg-accent text-white' : isToday ? 'bg-primary-soft/30' : 'hover:bg-gray-50'
+                        } ${isPast ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
+                      >
+                        <span className="text-[10px] font-medium">{DAYS[date.getDay()]}</span>
+                        <span className={`text-sm font-bold ${isSelected ? 'text-white' : 'text-text'}`}>{date.getDate()}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {selectedDate && (
+                <div>
+                  <h4 className="text-sm font-semibold text-text flex items-center gap-1.5 mb-3">
+                    <Clock size={14} className="text-primary" /> {t('selectTime')}
+                    <span className="text-xs text-muted font-normal">— {fmtDisplay(selectedDate)}</span>
+                  </h4>
+                  <div className="grid grid-cols-4 gap-2">
+                    {TIME_SLOTS.map(time => {
+                      const booked = isBooked(selectedDate, time)
+                      const isSelected = selectedTime === time
+                      return (
+                        <button
+                          key={time}
+                          onClick={() => { if (!booked) setSelectedTime(time) }}
+                          disabled={booked}
+                          className={`py-2 rounded-lg text-sm font-medium transition-all ${
+                            isSelected ? 'bg-accent text-white' : booked ? 'bg-gray-100 text-muted line-through cursor-not-allowed' : 'hover:bg-gray-50'
+                          }`}
+                        >
+                          {time}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              <button
+                onClick={() => setStep(2)}
+                disabled={!selectedDate || !selectedTime}
+                className="w-full py-3 rounded-xl text-white font-semibold bg-linear-to-r from-primary-deep to-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                {t('continue')} →
+              </button>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="space-y-4">
+              <h4 className="font-semibold text-text">{t('confirmDetails')}</h4>
+              
+              <div className="bg-gray-50 rounded-xl p-4 space-y-3 border border-border">
+                {[
+                  { icon: User, label: t('doctor'), value: doctor.name },
+                  { icon: Stethoscope, label: t('speciality'), value: doctor.speciality },
+                  { icon: Calendar, label: t('date'), value: fmtDisplay(selectedDate) },
+                  { icon: Clock, label: t('time'), value: selectedTime },
+                  { icon: DollarSign, label: t('fee'), value: `${doctor.fees}DA` },
+                ].map(({ icon: Icon, label, value }) => (
+                  <div key={label} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-primary-soft/50 flex items-center justify-center">
+                        <Icon size={12} className="text-primary-deep" />
+                      </div>
+                      <span className="text-xs text-sub">{label}</span>
+                    </div>
+                    <span className="text-sm font-medium text-text">{value}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="bg-primary-soft/20 rounded-xl p-3 text-xs text-primary-deep leading-relaxed border border-primary/20">
+                💡 {t('bookingNotice')}
+              </div>
+
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-500">
+                  {error}
+                </div>
+              )}
+
+              <div className="flex gap-3">
+                <button onClick={() => { setStep(1); setError('') }} className="flex-1 py-3 rounded-xl border border-border text-sub font-medium hover:bg-gray-50 transition">
+                  <ArrowLeft size={14} className="inline mr-1" /> {t('back')}
+                </button>
+                <button onClick={handleBook} disabled={loading} className="flex-1 py-3 rounded-xl bg-linear-to-r from-primary-deep to-primary text-white font-semibold disabled:opacity-50 transition-all">
+                  {loading ? t('booking') : t('confirmBooking')}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="text-center py-4 space-y-4">
+              <div className="w-16 h-16 mx-auto rounded-full bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center">
+                <CheckCircle size={32} className="text-emerald-500" />
+              </div>
+              <h3 className="text-xl font-bold text-text font-serif">{t('bookingSuccess')}</h3>
+              <p className="text-sm text-sub">
+                {t('bookingSuccessMsg', { name: doctor.name, date: fmtDisplay(selectedDate), time: selectedTime })}
+              </p>
+              <div className="bg-primary-soft/20 rounded-xl p-3 text-xs text-primary-deep leading-relaxed border border-primary/20">
+                {t('bookingConfirmationNote')}
+              </div>
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => navigate('/profile')} 
+                  className="flex-1 py-3 rounded-xl border border-primary text-primary font-medium hover:bg-primary/5 transition"
+                >
+                  {t('viewMyAppointments')}
+                </button>
+                <button 
+                  onClick={onClose} 
+                  className="flex-1 py-3 rounded-xl bg-linear-to-r from-primary-deep to-primary text-white font-semibold transition-all"
+                >
+                  {t('close')}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
   )
 }
 
-
-export default function DoctorsPage() {
+export default function DoctorDetailsPage() {
+  const { docId } = useParams()
   const t = useT()
   const navigate = useNavigate()
-  const [doctors, setDoctors] = useState([])
+  const { isAuthenticated } = useAuthStore()
+  const [doctor, setDoctor] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState('')
-  const [specialty, setSpecialty] = useState('All Specialities')
-  const [showFilter, setShowFilter] = useState(false)
-  const [sortBy, setSortBy] = useState('name')
-  const [onlyAvail, setOnlyAvail] = useState(false)
-  const [bookingDoctor, setBookingDoctor] = useState(null)
-  const headerRef = useRef(null)
+  const [showBookingModal, setShowBookingModal] = useState(false)
+  
+  // Refs for GSAP animations
   const pageRef = useRef(null)
+  const backBtnRef = useRef(null)
+  const profileCardRef = useRef(null)
+  const detailsRef = useRef(null)
+  const aboutRef = useRef(null)
+  const credentialsRef = useRef(null)
+  const addressRef = useRef(null)
 
   useEffect(() => {
-    api.get('/doctor/all-doctors')
+    window.scrollTo(0, 0)
+    
+    api.get(`/doctor/${docId}`)
       .then(({ data }) => {
-        if (data.success && data.data?.length) {
-          setDoctors(data.data)
+        if (data.success && data.data) {
+          setDoctor(data.data)
         } else {
-          setDoctors(FALLBACK_DOCTORS)
+          navigate('/doctors')
         }
       })
-      .catch(() => setDoctors(FALLBACK_DOCTORS))
+      .catch(() => navigate('/doctors'))
       .finally(() => setLoading(false))
-  }, [])
+  }, [docId, navigate])
 
-  useEffect(() => {
-    if (!headerRef.current) return
-    gsap.fromTo(headerRef.current,
-      { opacity: 0, y: 30 },
-      { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out', delay: 0.1 }
-    )
-  }, [])
+  useGsap({
+    backButton: {
+      ref: backBtnRef,
+      from: { opacity: 0, x: -20 },
+      to: { opacity: 1, x: 0, duration: 0.5, ease: 'power2.out' },
+    },
+    profileCard: {
+      ref: profileCardRef,
+      from: { opacity: 0, x: -40 },
+      to: { opacity: 1, x: 0, duration: 0.7, delay: 0.2, ease: 'power3.out' },
+    },
+    about: {
+      ref: aboutRef,
+      from: { opacity: 0, y: 30 },
+      to: { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' },
+      scrollTrigger: { trigger: detailsRef.current, start: 'top 85%' },
+    },
+    credentials: {
+      ref: credentialsRef,
+      from: { opacity: 0, y: 30 },
+      to: { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' },
+      scrollTrigger: { trigger: detailsRef.current, start: 'top 85%' },
+    },
+    address: {
+      ref: addressRef,
+      from: { opacity: 0, y: 30 },
+      to: { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' },
+      scrollTrigger: { trigger: detailsRef.current, start: 'top 85%' },
+    },
+  }, [loading, doctor])
 
-  const handleDoctorClick = (doctorId) => {
-    // Animate before navigation
-    gsap.to(pageRef.current, {
-      opacity: 0,
-      y: 20,
-      duration: 0.3,
-      ease: 'power2.in',
-      onComplete: () => {
-        navigate(`/doctors/${doctorId}`)
-      }
-    })
+  const handleBookClick = () => {
+    if (!isAuthenticated) {
+      toast.error(t('pleaseLoginToBook'))
+      navigate('/auth', { state: { from: `/doctors/${docId}`, message: 'Please login to book an appointment' } })
+      return
+    }
+    setShowBookingModal(true)
   }
-
-  const filtered = doctors
-    .filter(d => {
-      const matchSearch = d.name.toLowerCase().includes(search.toLowerCase()) || d.speciality.toLowerCase().includes(search.toLowerCase())
-      const matchSpecialty = specialty === 'All Specialities' || d.speciality === specialty
-      const matchAvail = !onlyAvail || d.available
-      return matchSearch && matchSpecialty && matchAvail
-    })
-    .sort((a, b) => {
-      if (sortBy === 'fees-asc') return a.fees - b.fees
-      if (sortBy === 'fees-desc') return b.fees - a.fees
-      if (sortBy === 'experience') return parseInt(b.experience) - parseInt(a.experience)
-      return a.name.localeCompare(b.name)
-    })
-
-  const activeFilters = [
-    specialty !== 'All Specialities' && specialty,
-    onlyAvail && 'Available only',
-    sortBy !== 'name' && `Sort: ${sortBy === 'fees-asc' ? 'Price Low-High' : sortBy === 'fees-desc' ? 'Price High-Low' : 'Most Experienced'}`,
-  ].filter(Boolean)
 
   if (loading) {
     return (
@@ -193,172 +408,137 @@ export default function DoctorsPage() {
     )
   }
 
+  if (!doctor) return null
+
   return (
-    <div ref={pageRef}>
+    <>
       <Navbar />
-      <div className="min-h-screen bg- font-sans">
-        {/* Hero Section */}
-        <div className="relative overflow-hidden bg-linear-to-r from-primary-deep via-primary-deep/90 to-primary pt-28 pb-16">
-        <div style={{
-          position: 'absolute', inset: 0, zIndex: 0,
-          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)',
-          backgroundSize: '28px 28px',
-        }} />
-          <div ref={headerRef} className="relative z-10 max-w-7xl mx-auto px-6 opacity-0">
-            <div className="flex items-center gap-2 mb-4">
-              <Link to="/" className="text-sm text-white/60 hover:text-primary-soft transition flex items-center gap-1">
-                <ArrowLeft size={13} /> {t('home')}
-              </Link>
-              <span className="text-white/40 text-sm">/</span>
-              <span className="text-sm text-white/80">{t('doctors')}</span>
-            </div>
+      <div ref={pageRef} className="min-h-screen bg-bg pt-28 pb-16">
+        <div className="max-w-7xl mx-auto px-6">
+          {/* Back button */}
+          <button
+            ref={backBtnRef}
+            onClick={() => navigate('/doctors')}
+            className="flex items-center gap-2 text-sub hover:text-primary transition mb-6 group opacity-0"
+          >
+            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> 
+            {t('backToDoctors')}
+          </button>
 
-
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-3 font-serif">
-              {t('doctorsHeroTitle')}{' '}
-              <span className=" text-accent-soft">{t('doctorsHeroHighlight')}</span>
-            </h1>
-            <p className="text-white/70 text-lg max-w-xl mb-8">
-              {t('doctorsHeroSub')}
-            </p>
-
-            <div className="flex flex-wrap gap-3 max-w-2xl">
-              <div className="flex-1 relative min-w-60">
-                <Search size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
-                <input
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  placeholder={t('searchDoctorsPlaceholder')}
-                  className="w-full pl-10 pr-10 py-3 rounded-xl border-2 border-white/20 bg-white/95 text-text placeholder:text-muted focus:outline-none focus:border-white/60 transition-all shadow-md"
-                />
-                {search && (
-                  <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-text">
-                    <X size={15} />
+          {/* Doctor Profile */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Image & Basic Info */}
+            <div ref={profileCardRef} className="lg:col-span-1 opacity-0">
+              <div className="bg-white rounded-2xl overflow-hidden shadow-lg border border-border sticky top-28">
+                <div className="aspect-square overflow-hidden">
+                  {doctor.image ? (
+                    <img 
+                      src={doctor.image} 
+                      alt={doctor.name} 
+                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-linear-to-br from-primary-soft to-primary flex items-center justify-center text-6xl font-bold text-white">
+                      {doctor.name?.charAt(0) || 'D'}
+                    </div>
+                  )}
+                </div>
+                <div className="p-6">
+                  <h1 className="text-2xl font-bold text-text mb-1">{doctor.name}</h1>
+                  <p className="text-primary font-medium mb-4">{doctor.speciality}</p>
+                  
+                  <button
+                    onClick={handleBookClick}
+                    className={`w-full py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
+                      doctor.available
+                        ? 'btn-primary text-white shadow-md hover:shadow-lg hover:-translate-y-0.5'
+                        : 'bg-gray-100 text-muted cursor-not-allowed'
+                    }`}
+                  >
+                    {doctor.available ? t('bookAppointment') : t('unavailable')}
                   </button>
-                )}
+                  
+                  {!isAuthenticated && doctor.available && (
+                    <p className="text-xs text-center text-muted mt-3 animate-pulse">
+                      {t('loginToBookHint')}
+                    </p>
+                  )}
+                </div>
               </div>
-              <button
-                onClick={() => setShowFilter(!showFilter)}
-                className="flex items-center gap-2 px-5 py-3 rounded-xl border-2 border-white/30 bg-white/10 text-white font-medium hover:bg-white/20 transition whitespace-nowrap"
-              >
-                <SlidersHorizontal size={17} />
-                {t('filters')} {activeFilters.length > 0 && `(${activeFilters.length})`}
-              </button>
             </div>
-          </div>
-        </div>
 
-        {/* Filter Panel */}
-        {showFilter && (
-          <div className="bg-white border-b border-border shadow-sm">
-            <div className="max-w-7xl mx-auto px-6 py-5 flex flex-wrap gap-5 items-end">
-              <div className="min-w-45">
-                <label className="text-xs font-semibold text-muted uppercase tracking-wide">{t('speciality')}</label>
-                <div className="relative mt-1">
-                  <select value={specialty} onChange={e => setSpecialty(e.target.value)} className="w-full appearance-none px-3 py-2 pr-8 rounded-lg border border-border bg-white text-text text-sm cursor-pointer focus:outline-none focus:border-primary">
-                    {SPECIALITIES.map(s => <option key={s} value={s}>{t(s.toLowerCase().replace(/ /g, '')) || s}</option>)}
-                  </select>
-                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
-                </div>
+            {/* Details */}
+            <div ref={detailsRef} className="lg:col-span-2 space-y-6">
+              {/* About */}
+              <div ref={aboutRef} className="bg-white rounded-2xl p-6 shadow-sm border border-border opacity-0">
+                <h2 className="text-xl font-bold text-text mb-3 flex items-center gap-2">
+                  <Heart size={20} className="text-primary" /> {t('aboutDoctor')}
+                </h2>
+                <p className="text-sub leading-relaxed">
+                  {doctor.about || t('noBio')}
+                </p>
               </div>
 
-              <div className="min-w-40">
-                <label className="text-xs font-semibold text-muted uppercase tracking-wide">{t('sortBy')}</label>
-                <div className="relative mt-1">
-                  <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="w-full appearance-none px-3 py-2 pr-8 rounded-lg border border-border bg-white text-text text-sm cursor-pointer focus:outline-none focus:border-primary">
-                    <option value="name">{t('sortName')}</option>
-                    <option value="fees-asc">{t('sortFeesLow')}</option>
-                    <option value="fees-desc">{t('sortFeesHigh')}</option>
-                    <option value="experience">{t('sortExperience')}</option>
-                  </select>
-                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
-                </div>
-              </div>
-
-              <div>
-                <label className="text-xs font-semibold text-muted uppercase tracking-wide block mb-1">{t('availability')}</label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <div className="relative w-9 h-5">
-                    <input type="checkbox" checked={onlyAvail} onChange={e => setOnlyAvail(e.target.checked)} className="sr-only" />
-                    <div onClick={() => setOnlyAvail(!onlyAvail)} className={`absolute inset-0 rounded-full transition-colors ${onlyAvail ? 'bg-primary' : 'bg-border'}`}>
-                      <div className={`absolute w-4 h-4 rounded-full bg-white top-0.5 transition-all ${onlyAvail ? 'left-4' : 'left-0.5'}`} />
+              {/* Education & Credentials */}
+              <div ref={credentialsRef} className="bg-white rounded-2xl p-6 shadow-sm border border-border opacity-0">
+                <h2 className="text-xl font-bold text-text mb-4 flex items-center gap-2">
+                  <Award size={20} className="text-primary" /> {t('credentials')}
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {doctor.degree && (
+                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-primary-soft/20 transition-all duration-300 hover:translate-x-1">
+                      <GraduationCap size={18} className="text-primary" />
+                      <div>
+                        <p className="text-xs text-muted">{t('degree')}</p>
+                        <p className="font-medium text-text">{doctor.degree}</p>
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-primary-soft/20 transition-all duration-300 hover:translate-x-1">
+                    <Briefcase size={18} className="text-primary" />
+                    <div>
+                      <p className="text-xs text-muted">{t('experience')}</p>
+                      <p className="font-medium text-text">{doctor.experience} {t('years')}</p>
                     </div>
                   </div>
-                  <span className="text-sm text-sub">{t('availableOnly')}</span>
-                </label>
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-primary-soft/20 transition-all duration-300 hover:translate-x-1">
+                    <Stethoscope size={18} className="text-primary" />
+                    <div>
+                      <p className="text-xs text-muted">{t('speciality')}</p>
+                      <p className="font-medium text-text">{doctor.speciality}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-primary-soft/20 transition-all duration-300 hover:translate-x-1">
+                    <DollarSign size={18} className="text-primary" />
+                    <div>
+                      <p className="text-xs text-muted">{t('feePerSession')}</p>
+                      <p className="font-medium text-text">{doctor.fees}DA</p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {activeFilters.length > 0 && (
-                <button onClick={() => { setSpecialty('All Specialities'); setSortBy('name'); setOnlyAvail(false) }} className="text-red-500 text-sm font-medium hover:underline ml-auto">
-                  {t('clearFilters')}
-                </button>
+              {/* Address */}
+              {doctor.address && (doctor.address.line1 || doctor.address.line2) && (
+                <div ref={addressRef} className="bg-white rounded-2xl p-6 shadow-sm border border-border opacity-0">
+                  <h2 className="text-xl font-bold text-text mb-3 flex items-center gap-2">
+                    <MapPin size={20} className="text-primary" /> {t('location')}
+                  </h2>
+                  <p className="text-sub">
+                    {doctor.address.line1}
+                    {doctor.address.line2 && <>, {doctor.address.line2}</>}
+                  </p>
+                </div>
               )}
             </div>
-
-            {activeFilters.length > 0 && (
-              <div className="px-40 pb-4 flex flex-wrap gap-2 border-t border-border pt-3">
-                {activeFilters.map(f => (
-                  <span key={f} className="text-xs font-medium px-2.5 py-1 rounded-full bg-accent/30 text-primary-deep border border-primary/20">
-                    {f}
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
-        )}
-
-        {/* Quick Specialty Pills */}
-        <div className="border-b border-border bg-white">
-          <div className="max-w-7xl mx-auto px-6 py-3 flex gap-2 overflow-x-auto scrollbar-hide">
-            {SPECIALITIES.map(s => (
-              <button
-                key={s}
-                onClick={() => setSpecialty(s)}
-                className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
-                  specialty === s ? 'bg-primary-deep text-white shadow-md' : 'bg-gray-100 text-sub hover:bg-gray-200'
-                }`}
-              >
-                {t(s.toLowerCase().replace(/ /g, '')) || s}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Results */}
-        <div className="max-w-7xl mx-auto px-6 py-10">
-          <div className="flex justify-between items-center mb-6 flex-wrap gap-3">
-            <p className="text-sm text-sub">
-              {t('showing')} <strong className="text-text">{filtered.length}</strong> {t('of')} {doctors.length} {t('doctors')}
-              {search && <> {t('matching')} <em className="text-primary">"{search}"</em></>}
-            </p>
-            {search && (
-              <button onClick={() => setSearch('')} className="text-sm text-primary hover:underline flex items-center gap-1">
-                <X size={13} /> {t('clearSearch')}
-              </button>
-            )}
-          </div>
-
-          {filtered.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="w-20 h-20 mx-auto rounded-2xl bg-primary-soft/30 flex items-center justify-center mb-4">
-                <Stethoscope size={32} className="text-primary" />
-              </div>
-              <h3 className="text-xl font-bold text-text mb-2">{t('noDoctorsFound')}</h3>
-              <p className="text-sub max-w-md mx-auto mb-6">{t('noDoctorsFoundMsg')}</p>
-              <button onClick={() => { setSearch(''); setSpecialty('All Specialities'); setOnlyAvail(false) }} className="px-5 py-2 rounded-full bg-primary-deep text-white font-medium hover:bg-primary-deep/90 transition">
-                {t('clearAllFilters')}
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filtered.map((doctor, idx) => (
-                <DoctorCard key={doctor._id} doctor={doctor} onClick={handleDoctorClick} index={idx} />
-              ))}
-            </div>
-          )}
         </div>
       </div>
       <Footer />
-    </div>
+
+      {showBookingModal && (
+        <BookingModal doctor={doctor} onClose={() => setShowBookingModal(false)} />
+      )}
+    </>
   )
 }

@@ -1,79 +1,74 @@
-
-import { useRef, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { ArrowRight, Phone, Calendar, CreditCard } from 'lucide-react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import useT from '../../hooks/useT'
-
-gsap.registerPlugin(ScrollTrigger)
+import { useRef } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Phone, Calendar, CreditCard } from 'lucide-react';
+import { useGsap } from '../../hooks/useGSAP';
+import useT from '../../hooks/useT';
 
 const STEPS = [
   { icon: Calendar, step: '01', titleKey: 'step1Title', descKey: 'step1Desc' },
   { icon: Phone, step: '02', titleKey: 'step2Title', descKey: 'step2Desc' },
   { icon: CreditCard, step: '03', titleKey: 'step3Title', descKey: 'step3Desc' },
-]
+];
 
 export default function BookingCTA() {
-  const t = useT()
-  const sectionRef = useRef(null)
-  const bgRef = useRef(null)
-  const contentRef = useRef(null)
-  const stepsRef = useRef(null)
+  const t = useT();
+  const contentRef = useRef(null);
+  const stepsRef = useRef(null);
+  const bgRef = useRef(null);
 
-  useEffect(() => {
-    if (!sectionRef.current) return
-
-    // Parallax background
-    gsap.to(bgRef.current, {
-      yPercent: 20,
-      ease: 'none',
+  // Parallax background (continuous scrub)
+  useGsap({
+    parallax: {
+      ref: bgRef,
+      from: { yPercent: 0 },
+      to: { yPercent: 20 },
       scrollTrigger: {
-        trigger: sectionRef.current,
+        trigger: '#contact',
         start: 'top bottom',
         end: 'bottom top',
         scrub: true,
-      }
-    })
+      },
+    },
+  }, []);
 
-    // Content entrance
-    gsap.fromTo(contentRef.current,
-      { opacity: 0, y: 40 },
-      { opacity: 1, y: 0, duration: 1, ease: 'power3.out',
-        scrollTrigger: { trigger: contentRef.current, start: 'top 80%', toggleActions: 'play none none none' } }
-    )
-
-    // Steps stagger
-    if (stepsRef.current) {
-      const steps = stepsRef.current.querySelectorAll('.step-item')
-      gsap.fromTo(steps,
-        { opacity: 0, y: 40 },
-        { opacity: 1, y: 0, duration: 0.7, stagger: 0.15, ease: 'power3.out',
-          scrollTrigger: { trigger: stepsRef.current, start: 'top 80%', toggleActions: 'play none none none' } }
-      )
-    }
-
-    return () => ScrollTrigger.getAll().forEach(t => t.kill())
-  }, [])
+  // Entrance animations for steps and content
+  useGsap({
+    content: {
+      ref: contentRef,
+      from: { opacity: 0, y: 40 },
+      to: { opacity: 1, y: 0, duration: 1, ease: 'power3.out' },
+      scrollTrigger: { trigger: '#cta-content', start: 'top 80%' },
+    },
+    steps: {
+      selector: '.step-item',
+      from: { opacity: 0, y: 40 },
+      to: { opacity: 1, y: 0, duration: 0.7, stagger: 0.15, ease: 'power3.out' },
+      scrollTrigger: { trigger: '#steps-container', start: 'top 80%' },
+    },
+  }, []);
 
   return (
     <>
       {/* How it works */}
-      <section className="py-20 bg-bg">
+      <section  className="py-20 bg-bg">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
             <div className="flex justify-center mb-4">
-              <span className="text-xs font-semibold text-accent-soft uppercase tracking-wider bg-accent-soft/10  px-3 py-1 rounded-full">
+              <span className="text-xs font-semibold text-accent-soft uppercase tracking-wider bg-accent-soft/10 px-3 py-1 rounded-full">
                 {t('bookingTag')}
               </span>
             </div>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text">
               {t('bookingHeading1')}{' '}
-              <span className=" text-primary-deep">{t('bookingHeading2')}</span>
+              <span className="text-primary-deep">{t('bookingHeading2')}</span>
             </h2>
           </div>
 
-          <div ref={stepsRef} className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+          <div
+            ref={stepsRef}
+            id="steps-container"
+            className="grid grid-cols-1 md:grid-cols-3 gap-8 relative"
+          >
             {/* Connecting line - hidden on mobile */}
             <div className="hidden md:block absolute top-12 left-[16%] right-[16%] h-px bg-linear-to-r from-primary-soft via-primary to-primary-soft" />
 
@@ -93,42 +88,40 @@ export default function BookingCTA() {
         </div>
       </section>
 
-      {/* Big CTA banner - accent-soft theme */}
-      <section id="contact" ref={sectionRef}
-        className="section-padding"
-        style={{
-          position: 'relative', overflow: 'hidden',
-          background: 'var(--color-primary-deep)',
-        }}>
-
-        {/* Dot grid overlay */}
-        <div style={{
-          position: 'absolute', inset: 0, zIndex: 0,
-          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)',
-          backgroundSize: '28px 28px',
-        }} />
-        <div ref={contentRef} className="relative z-10 max-w-7xl mx-auto px-6 opacity-0">
+      {/* Big CTA banner */}
+      <section
+        id='contact'
+        className="relative overflow-hidden bg-primary-deep py-16 md:py-20"
+      >
+        {/* Parallax background grid */}
+        <div
+          ref={bgRef}
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)',
+            backgroundSize: '28px 28px',
+          }}
+        />
+        <div
+          ref={contentRef}
+          id="cta-content"
+          className="relative z-10 max-w-7xl mx-auto px-6 opacity-0"
+        >
           <div className="max-w-2xl mx-auto text-center">
-            {/* Badge */}
             <span className="inline-flex items-center gap-2 text-accent-soft uppercase tracking-wider bg-accent-soft/10 backdrop-blur-sm border border-white/30 rounded-full px-4 py-1.5 text-sm font-semibold mb-6">
               ✦ {t('ctaBadge')}
             </span>
-
-            {/* Heading */}
-            <h2 className="heading-lg  text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
+            <h2 className="heading-lg text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
               {t('ctaHeading1')}{' '}
-              <span className=" text-white">{t('ctaHeading2')}</span>
+              <span className="text-white">{t('ctaHeading2')}</span>
             </h2>
-
             <p className="text-base md:text-lg text-white/70 leading-relaxed mb-8">
               {t('ctaText')}
             </p>
-
-            {/* Buttons */}
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
                 to="/doctors"
-                className="btn-primary inline-flex items-center gap-2  text-white font-semibold px-8 py-3 rounded-[10px] transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="inline-flex items-center gap-2 font-semibold px-8 py-3 btn-primary"
               >
                 {t('bookAppointment')} <ArrowRight size={18} />
               </Link>
@@ -143,5 +136,5 @@ export default function BookingCTA() {
         </div>
       </section>
     </>
-  )
+  );
 }

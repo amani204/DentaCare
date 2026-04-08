@@ -1,13 +1,12 @@
-
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'  
-
 import { DualGradientBg } from '../../components/ui/backgrounds'
 import LoginCard from '../../components/ui/loginCard'
+import LanguageToggle from '../../components/ui/LanguageToggle'
+import { useGsap } from '../../hooks/useGSAP'
 import api from '../../lib/axios'
 import useT from '../../hooks/useT'
 import useAuthStore from '../../store/useAuth'
-import useAdminStore from '../../store/adminStore'
 import { toast } from 'react-hot-toast'
 
 export default function Auth() {
@@ -15,7 +14,6 @@ export default function Auth() {
   const location = useLocation()  
   const t = useT()
   const { login } = useAuthStore()
-  const { lang, toggleLang } = useAdminStore()
   
   const [mode, setMode] = useState('login')
   const [loading, setLoading] = useState(false)
@@ -23,8 +21,20 @@ export default function Auth() {
   const [resetToken, setResetToken] = useState('')
   const [tempEmail, setTempEmail] = useState('')
 
+  // Ref for GSAP animation
+  const cardContainerRef = useRef(null)
+
   // Get the page user was trying to visit before login
   const from = location.state?.from || '/profile'
+
+  // Entrance animation
+  useGsap({
+    card: {
+      ref: cardContainerRef,
+      from: { opacity: 0, y: 30, scale: 0.96 },
+      to: { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'power3.out' },
+    },
+  }, [])
 
   // Listen for mode switches from LoginCard
   useEffect(() => {
@@ -53,15 +63,13 @@ export default function Auth() {
     setLoading(true)
     setError('')
     try {
-      const { data } = await api.post('/api/user/login', {
+      const { data } = await api.post('/user/login', {
         email: formData.email,
         password: formData.password,
       })
       if (data.success) {
         login(data.token, data.user, 'patient')
         toast.success(t('loginSuccess') || 'Login successful!')
-        
-        // ✅ Redirect to the page user came from, or profile
         navigate(from)
       } else {
         setError(data.message || t('invalidCredentials'))
@@ -84,7 +92,7 @@ export default function Auth() {
     }
     
     try {
-      const { data } = await api.post('/api/user/register', {
+      const { data } = await api.post('/user/register', {
         name: formData.name,
         email: formData.email,
         password: formData.password,
@@ -107,7 +115,7 @@ export default function Auth() {
     setLoading(true)
     setError('')
     try {
-      const { data } = await api.post('/api/user/send-reset-otp', { email: formData.email })
+      const { data } = await api.post('/user/send-reset-otp', { email: formData.email })
       if (data.success) {
         setTempEmail(formData.email)
         setMode('verify-otp')
@@ -126,7 +134,7 @@ export default function Auth() {
     setLoading(true)
     setError('')
     try {
-      const { data } = await api.post('/api/user/verify-reset-otp', {
+      const { data } = await api.post('/user/verify-reset-otp', {
         email: formData.email,
         otp: formData.otp,
       })
@@ -155,7 +163,7 @@ export default function Auth() {
     }
     
     try {
-        const { data } = await api.post('/api/user/reset-password', {
+        const { data } = await api.post('/user/reset-password', {
             email: tempEmail,
             otp: formData.otp,
             newPassword: formData.newPassword,
@@ -180,29 +188,25 @@ export default function Auth() {
         
         {/* Language Switcher */}
         <div className="absolute top-6 right-6">
-          <button
-            onClick={toggleLang}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-sub hover:text-primary hover:bg-primary/5 rounded-lg transition-all bg-white/50 backdrop-blur-sm"
-            title="Toggle language"
-          >
-            <span>{lang === 'en' ? '🇬🇧' : '🇫🇷'}</span>
-            <span>{lang === 'en' ? 'English' : 'Français'}</span>
-          </button>
+          <LanguageToggle />
         </div>
 
-        <LoginCard
-          mode={mode}
-          isLoading={loading}
-          error={error}
-          buttonText={t('signIn')}
-          onSubmit={
-            mode === 'login' ? handleLogin :
-            mode === 'signup' ? handleRegister :
-            mode === 'forgot' ? handleForgotPassword :
-            mode === 'verify-otp' ? handleVerifyOTP :
-            handleResetPassword
-          }
-        />
+        {/* Animated card container */}
+        <div ref={cardContainerRef} className="opacity-0">
+          <LoginCard
+            mode={mode}
+            isLoading={loading}
+            error={error}
+            buttonText={t('signIn')}
+            onSubmit={
+              mode === 'login' ? handleLogin :
+              mode === 'signup' ? handleRegister :
+              mode === 'forgot' ? handleForgotPassword :
+              mode === 'verify-otp' ? handleVerifyOTP :
+              handleResetPassword
+            }
+          />
+        </div>
       </div>
     </DualGradientBg>
   )

@@ -100,9 +100,6 @@ export default function DoctorsList() {
     />
   </div>
 
-
-
-
   {/* The actual controls */}
   <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between pt-4 border-t border-dashed border-border">
     
@@ -156,7 +153,6 @@ export default function DoctorsList() {
     </div>
   </div>
 </div>
-
       {/* Cards grid */}
       {filtered.length === 0
         ? <EmptyState message={t('noDoctors')}

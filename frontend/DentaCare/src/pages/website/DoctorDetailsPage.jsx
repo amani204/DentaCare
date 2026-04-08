@@ -54,7 +54,7 @@ function BookingModal({ doctor, onClose }) {
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState(1)
   const [error, setError] = useState('')
-
+ 
   // GSAP Modal Animation
   useEffect(() => {
     if (modalRef.current) {
@@ -103,7 +103,7 @@ function BookingModal({ doctor, onClose }) {
     setError('')
 
     try {
-      const { data } = await api.post('/api/appointment/book', {
+      const { data } = await api.post('/appointment/book', {
         docId: doctor._id,
         slotDate: fmtDate(selectedDate),
         slotTime: selectedTime,
@@ -122,6 +122,7 @@ function BookingModal({ doctor, onClose }) {
     }
   }
 
+  
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div onClick={onClose} className="absolute inset-0 bg-primary-deep/40 backdrop-blur-sm" />
@@ -132,7 +133,7 @@ function BookingModal({ doctor, onClose }) {
             {doctor.image ? (
               <img src={doctor.image} alt="" className="w-11 h-11 rounded-full object-cover border-2 border-primary-soft" />
             ) : (
-              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-primary-deep to-primary flex items-center justify-center text-base font-bold text-white">
+              <div className="w-11 h-11 rounded-full bg-linear-to-br from-primary-deep to-primary flex items-center justify-center text-base font-bold text-white">
                 {doctor.name?.charAt(0) || 'D'}
               </div>
             )}
@@ -237,7 +238,7 @@ function BookingModal({ doctor, onClose }) {
               <button
                 onClick={() => setStep(2)}
                 disabled={!selectedDate || !selectedTime}
-                className="w-full py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-primary-deep to-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="w-full py-3 rounded-xl text-white font-semibold bg-linear-to-r from-primary-deep to-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 {t('continue')} →
               </button>
@@ -282,7 +283,7 @@ function BookingModal({ doctor, onClose }) {
                 <button onClick={() => { setStep(1); setError('') }} className="flex-1 py-3 rounded-xl border border-border text-sub font-medium hover:bg-gray-50 transition">
                   <ArrowLeft size={14} className="inline mr-1" /> {t('back')}
                 </button>
-                <button onClick={handleBook} disabled={loading} className="flex-1 py-3 rounded-xl bg-gradient-to-r from-primary-deep to-primary text-white font-semibold disabled:opacity-50 transition-all">
+                <button onClick={handleBook} disabled={loading} className="flex-1 py-3 rounded-xl bg-linear-to-r from-primary-deep to-primary text-white font-semibold disabled:opacity-50 transition-all">
                   {loading ? t('booking') : t('confirmBooking')}
                 </button>
               </div>
@@ -310,7 +311,7 @@ function BookingModal({ doctor, onClose }) {
                 </button>
                 <button 
                   onClick={onClose} 
-                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-primary-deep to-primary text-white font-semibold transition-all"
+                  className="flex-1 py-3 rounded-xl bg-linear-to-r from-primary-deep to-primary text-white font-semibold transition-all"
                 >
                   {t('close')}
                 </button>
@@ -344,7 +345,7 @@ export default function DoctorDetailsPage() {
   useEffect(() => {
     window.scrollTo(0, 0)
     
-    api.get(`/api/doctor/${docId}`)
+    api.get(`/doctor/${docId}`)
       .then(({ data }) => {
         if (data.success && data.data) {
           setDoctor(data.data)
@@ -446,7 +447,7 @@ export default function DoctorDetailsPage() {
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-primary-soft to-primary flex items-center justify-center text-6xl font-bold text-white">
+                    <div className="w-full h-full bg-linear-to-br from-primary-soft to-primary flex items-center justify-center text-6xl font-bold text-white">
                       {doctor.name?.charAt(0) || 'D'}
                     </div>
                   )}

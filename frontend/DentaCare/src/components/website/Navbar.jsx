@@ -1,16 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { Menu, X, ChevronRight, Globe, User, LogOut } from 'lucide-react'
-import gsap from 'gsap'
-import useAdminStore from '../../store/adminStore'
+import { Menu, X, ChevronRight, User, LogOut } from 'lucide-react'
 import useAuthStore from '../../store/useAuth'
 import useT from '../../hooks/useT'
+import { useGsap } from '../../hooks/useGSAP' 
+import LanguageToggle from '../ui/LanguageToggle'
 
 const NAV_LINKS = [
   { label: 'Home', href: '/', isHash: false },
   { label: 'About', href: '/about', isHash: false },
   { label: 'Services', href: '/#services', isHash: true, sectionId: 'services' },
-  { label: 'Doctors', href: '/#doctors',  isHash: true, sectionId: 'doctors'},
+  { label: 'Doctors', href: '/doctors', isHash: false },
   { label: 'Contact', href: '/#contact', isHash: true, sectionId: 'contact' },
 ]
 
@@ -22,39 +22,32 @@ export default function Navbar() {
   const dropdownRef = useRef(null)
   const navigate = useNavigate()
   const location = useLocation()
-  const { lang, toggleLang } = useAdminStore()
   const { user, isAuthenticated, logout, role } = useAuthStore()
   const t = useT()
 
-  // Scroll detection
+  useGsap({
+    nav: {
+      ref: navRef,
+      from: { opacity: 0, y: -20 },
+      to: { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: 0.2 },
+    },
+  }, [])
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Entrance animation
-  useEffect(() => {
-    if (!navRef.current) return
-    gsap.fromTo(navRef.current,
-      { opacity: 0, y: -20 },
-      { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: 0.2 }
-    )
-  }, [])
-
-  // Prevent body scroll when menu is open
   useEffect(() => {
     if (menuOpen) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = 'unset'
     }
-    return () => {
-      document.body.style.overflow = 'unset'
-    }
+    return () => { document.body.style.overflow = 'unset' }
   }, [menuOpen])
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -70,19 +63,29 @@ export default function Navbar() {
     setMenuOpen(false)
 
     if (link.isHash) {
+      const targetId = link.sectionId
       if (location.pathname !== '/') {
+        
         navigate('/')
-        setTimeout(() => {
-          const el = document.getElementById(link.sectionId)
-          if (el) el.scrollIntoView({ behavior: 'smooth' })
+        const checkElement = setInterval(() => {
+          const el = document.getElementById(targetId)
+          if (el) {
+            clearInterval(checkElement)
+            el.scrollIntoView({ behavior: 'smooth' })
+          }
         }, 100)
+      
+        setTimeout(() => clearInterval(checkElement), 2000)
       } else {
-        const el = document.getElementById(link.sectionId)
-        if (el) el.scrollIntoView({ behavior: 'smooth' })
+        const el = document.getElementById(targetId)
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' })
+        }
       }
     } else {
+    
       navigate(link.href)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100)
     }
   }
 
@@ -92,9 +95,7 @@ export default function Navbar() {
     setShowDropdown(false)
   }
 
-  const getInitials = (name) => {
-    return name?.split(' ').slice(0, 2).map(w => w[0]).join('') || 'U'
-  }
+  const getInitials = (name) => name?.split(' ').slice(0, 2).map(w => w[0]).join('') || 'U'
 
   return (
     <>
@@ -110,9 +111,8 @@ export default function Navbar() {
         style={{ opacity: 0 }}
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          {/* Logo */}
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="flex items-center gap-2 group"
           >
@@ -121,7 +121,6 @@ export default function Navbar() {
             </span>
           </Link>
 
-          {/* Desktop nav links */}
           <div className="hidden md:flex items-center gap-1">
             {NAV_LINKS.map((link) => (
               <a
@@ -136,34 +135,20 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Right section - Language + Auth */}
           <div className="hidden md:flex items-center gap-3">
-            {/* Language Toggle */}
-            <button
-              onClick={toggleLang}
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-sub hover:text-primary transition-all duration-200"
-              title="Toggle language"
-            >
-              <Globe size={16} />
-              <span>{lang === 'en' ? 'English' : 'Français'}</span>
-              <span className="text-xs text-muted">({lang === 'en' ? 'EN' : 'FR'})</span>
-            </button>
-
-            {/* Divider */}
+            <LanguageToggle />
             <div className="w-px h-6 bg-border" />
 
-            {/* Conditional Auth Section */}
             {isAuthenticated && role === 'patient' ? (
-              // Logged in - Show Profile Dropdown
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setShowDropdown(!showDropdown)}
                   className="flex items-center gap-2 focus:outline-none"
                 >
                   {user?.image ? (
-                    <img 
-                      src={user.image} 
-                      alt={user.name} 
+                    <img
+                      src={user.image}
+                      alt={user.name}
                       className="w-9 h-9 rounded-full object-cover border-2 border-primary-soft"
                     />
                   ) : (
@@ -176,7 +161,6 @@ export default function Navbar() {
                   </span>
                 </button>
 
-                {/* Dropdown Menu */}
                 {showDropdown && (
                   <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-border overflow-hidden z-50 animate-fade-in">
                     <div className="p-3 border-b border-border bg-gray-50">
@@ -202,14 +186,12 @@ export default function Navbar() {
                 )}
               </div>
             ) : (
-              // Not logged in - Show Sign In button
               <Link to="/Auth" className="btn-primary">
                 {t('signIn')}
               </Link>
             )}
           </div>
 
-          {/* Mobile hamburger */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="md:hidden text-text p-2 rounded-lg hover:bg-primary/5 transition-all duration-200"
@@ -219,23 +201,17 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Bottom Sheet Mobile Menu */}
       {menuOpen && (
         <>
-          {/* Backdrop */}
-          <div 
+          <div
             className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm animate-fade-in"
             onClick={() => setMenuOpen(false)}
           />
-          
-          {/* Menu Panel */}
           <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-[10px] shadow-2xl animate-slide-up">
-            {/* Drag Handle */}
             <div className="flex justify-center pt-3 pb-1">
               <div className="w-12 h-1 bg-border rounded-full" />
             </div>
 
-            {/* Header with User Info if logged in */}
             <div className="px-6 pt-4 pb-2 border-b border-border">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -250,8 +226,7 @@ export default function Navbar() {
                   <X size={18} />
                 </button>
               </div>
-              
-              {/* Mobile User Info when logged in */}
+
               {isAuthenticated && role === 'patient' && (
                 <div className="flex items-center gap-3 mt-4 p-3 bg-gray-50 rounded-xl">
                   {user?.image ? (
@@ -269,7 +244,6 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Navigation Links */}
             <div className="px-6 py-4">
               {NAV_LINKS.map((link) => (
                 <a
@@ -284,20 +258,12 @@ export default function Navbar() {
               ))}
             </div>
 
-            {/* Actions */}
             <div className="px-6 py-4 border-t border-border space-y-3">
-              {/* Language Toggle */}
-              <button
-                onClick={() => { toggleLang(); setMenuOpen(false) }}
-                className="flex items-center justify-center gap-2 w-full py-3 text-sm font-medium text-sub hover:text-primary transition-all duration-200"
-              >
-                <Globe size={16} />
-                <span>{lang === 'en' ? 'English' : 'Français'}</span>
-                <span className="text-xs text-muted">({lang === 'en' ? 'EN' : 'FR'})</span>
-              </button>
+              <div onClick={() => setMenuOpen(false)}>
+                <LanguageToggle />
+              </div>
 
               {isAuthenticated && role === 'patient' ? (
-                // Mobile - Logged in actions
                 <>
                   <Link
                     to="/profile"
@@ -314,7 +280,6 @@ export default function Navbar() {
                   </button>
                 </>
               ) : (
-                // Mobile - Not logged in
                 <Link
                   to="/Auth"
                   onClick={() => setMenuOpen(false)}
