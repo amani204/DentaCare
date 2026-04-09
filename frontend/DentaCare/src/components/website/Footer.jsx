@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { MapPin, Phone, Mail, Instagram, Facebook, Twitter } from 'lucide-react';
-import { useGsap } from '../../hooks/useGSAP';
+import { useScrollFade } from '../../hooks/gsap';
 import useT from '../../hooks/useT';
 
 export default function Footer() {
@@ -10,31 +10,34 @@ export default function Footer() {
   const location = useLocation();
   const footerRef = useRef(null);
 
-  useGsap({
-    footerCols: {
-      selector: '.footer-col',
-      from: { opacity: 0, y: 30 },
-      to: { opacity: 1, y: 0, duration: 0.7, stagger: 0.1, ease: 'power3.out' },
-      scrollTrigger: { trigger: '#footer-container', start: 'top 90%' },
-    },
-  }, []);
+  useScrollFade(footerRef, {
+    selector: '.footer-col',
+    y: 30,
+    stagger: 0.1,
+    start: 'top 90%',
+  });
 
   const handleNavigation = (e, path, isHash = false, sectionId = null) => {
     e.preventDefault();
+
     if (isHash && sectionId) {
       if (location.pathname !== '/') {
         navigate('/');
-        setTimeout(() => {
+        const checkElement = setInterval(() => {
           const el = document.getElementById(sectionId);
-          if (el) el.scrollIntoView({ behavior: 'smooth' });
+          if (el) {
+            clearInterval(checkElement);
+            el.scrollIntoView({ behavior: 'smooth' });
+          }
         }, 100);
+        setTimeout(() => clearInterval(checkElement), 2000);
       } else {
         const el = document.getElementById(sectionId);
         if (el) el.scrollIntoView({ behavior: 'smooth' });
       }
     } else {
       navigate(path);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
     }
   };
 
@@ -52,7 +55,7 @@ export default function Footer() {
         <div
           ref={footerRef}
           id="footer-container"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-10"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10"
         >
           {/* Brand Column */}
           <div className="footer-col opacity-0 lg:col-span-2">
@@ -147,41 +150,6 @@ export default function Footer() {
                   >
                     {t(service.label)}
                   </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Patient Info */}
-          <div className="footer-col opacity-0">
-            <h4 className="text-text font-semibold text-sm uppercase tracking-wider mb-4">
-              {t('footerPatient')}
-            </h4>
-            <ul className="space-y-2">
-              {[
-                { key: 'bookAppointment', link: '/doctors', isHash: false },
-                { key: 'patientPortal', link: '/login', isHash: false },
-                { key: 'privacyPolicy', link: '/privacy', isHash: false },
-                { key: 'termsOfService', link: '/terms', isHash: false },
-              ].map(({ key, link, isHash }) => (
-                <li key={key}>
-                  {isHash ? (
-                    <a
-                      href={link}
-                      onClick={(e) => handleNavigation(e, link, true, 'contact')}
-                      className="text-sm text-text/50 hover:text-text transition-colors duration-200 cursor-pointer"
-                    >
-                      {t(key)}
-                    </a>
-                  ) : (
-                    <Link
-                      to={link}
-                      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                      className="text-sm text-text/50 hover:text-text transition-colors duration-200"
-                    >
-                      {t(key)}
-                    </Link>
-                  )}
                 </li>
               ))}
             </ul>

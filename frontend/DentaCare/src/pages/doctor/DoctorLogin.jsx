@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import useDoctorStore from '../../store/doctorStore';
 import useDT from '../../hooks/useDT';
 import api from '../../lib/axios';
-import { DualGradientBg } from '../../components/ui/backgrounds';
 import LoginCard from '../../components/ui/loginCard';
 
 export default function DoctorLogin() {
@@ -33,7 +32,7 @@ export default function DoctorLogin() {
   };
 
   return (
-    <DualGradientBg>
+    
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
         
         {/* Language Switcher */}
@@ -58,6 +57,6 @@ export default function DoctorLogin() {
   onSubmit={handleSubmit}
 />
       </div>
-    </DualGradientBg>
+  
   );
 }

@@ -1,8 +1,12 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Phone, Calendar, CreditCard } from 'lucide-react';
-import { useGsap } from '../../hooks/useGSAP';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useScrollFade } from '../../hooks/gsap';
 import useT from '../../hooks/useT';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const STEPS = [
   { icon: Calendar, step: '01', titleKey: 'step1Title', descKey: 'step1Desc' },
@@ -16,41 +20,29 @@ export default function BookingCTA() {
   const stepsRef = useRef(null);
   const bgRef = useRef(null);
 
-  // Parallax background (continuous scrub)
-  useGsap({
-    parallax: {
-      ref: bgRef,
-      from: { yPercent: 0 },
-      to: { yPercent: 20 },
+  // Parallax background (scrub)
+  useEffect(() => {
+    if (!bgRef.current) return;
+    gsap.to(bgRef.current, {
+      yPercent: 20,
+      ease: 'none',
       scrollTrigger: {
         trigger: '#contact',
         start: 'top bottom',
         end: 'bottom top',
         scrub: true,
       },
-    },
+    });
   }, []);
 
-  // Entrance animations for steps and content
-  useGsap({
-    content: {
-      ref: contentRef,
-      from: { opacity: 0, y: 40 },
-      to: { opacity: 1, y: 0, duration: 1, ease: 'power3.out' },
-      scrollTrigger: { trigger: '#cta-content', start: 'top 80%' },
-    },
-    steps: {
-      selector: '.step-item',
-      from: { opacity: 0, y: 40 },
-      to: { opacity: 1, y: 0, duration: 0.7, stagger: 0.15, ease: 'power3.out' },
-      scrollTrigger: { trigger: '#steps-container', start: 'top 80%' },
-    },
-  }, []);
+  // Scroll‑triggered fade‑up for content and steps
+  useScrollFade(contentRef, { y: 40, duration: 1, start: 'top 80%' });
+  useScrollFade(stepsRef, { selector: '.step-item', y: 40, stagger: 0.15, start: 'top 80%' });
 
   return (
     <>
       {/* How it works */}
-      <section  className="py-20 bg-bg">
+      <section id="contact" className="py-20 bg-bg">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
             <div className="flex justify-center mb-4">
@@ -69,7 +61,6 @@ export default function BookingCTA() {
             id="steps-container"
             className="grid grid-cols-1 md:grid-cols-3 gap-8 relative"
           >
-            {/* Connecting line - hidden on mobile */}
             <div className="hidden md:block absolute top-12 left-[16%] right-[16%] h-px bg-linear-to-r from-primary-soft via-primary to-primary-soft" />
 
             {STEPS.map(({ icon: Icon, step, titleKey, descKey }) => (
@@ -89,11 +80,7 @@ export default function BookingCTA() {
       </section>
 
       {/* Big CTA banner */}
-      <section
-        id='contact'
-        className="relative overflow-hidden bg-primary-deep py-16 md:py-20"
-      >
-        {/* Parallax background grid */}
+      <section className="relative overflow-hidden bg-primary-deep py-16 md:py-20">
         <div
           ref={bgRef}
           className="absolute inset-0 z-0"

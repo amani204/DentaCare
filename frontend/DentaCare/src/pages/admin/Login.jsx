@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import useAdminStore from '../../store/adminStore';
 import useT from '../../hooks/useT';
 import api from '../../lib/axios';
-import { DualGradientBg } from '../../components/ui/backgrounds';
 import LoginCard from '../../components/ui/loginCard';
 
 export default function AdminLogin() {
@@ -33,7 +32,6 @@ export default function AdminLogin() {
   };
 
   return (
-    <DualGradientBg>
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
         
         {/* Language Switcher */}
@@ -57,6 +55,6 @@ export default function AdminLogin() {
         error={error}
         onSubmit={handleSubmit} />
       </div>
-    </DualGradientBg>
+  
   );
 }

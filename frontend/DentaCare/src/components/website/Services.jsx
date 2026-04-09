@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { Stethoscope, Sparkles, Wrench, Building, Leaf, Baby } from 'lucide-react';
-import { useGsap } from '../../hooks/useGSAP';
+import { useFadeIn, useScrollFade } from '../../hooks/gsap';
 import useT from '../../hooks/useT';
 
 const SERVICES = [
@@ -65,20 +65,8 @@ export default function Services() {
   const headerRef = useRef(null);
   const gridRef = useRef(null);
 
-  useGsap({
-    header: {
-      ref: headerRef,
-      from: { opacity: 0, y: 30 },
-      to: { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' },
-      scrollTrigger: { trigger: '#services-header', start: 'top 85%' },
-    },
-    cards: {
-      selector: '.service-card',
-      from: { opacity: 0, y: 50, scale: 0.96 },
-      to: { opacity: 1, y: 0, scale: 1, duration: 0.7, stagger: 0.1, ease: 'power3.out' },
-      scrollTrigger: { trigger: '#services-grid', start: 'top 80%' },
-    },
-  }, []);
+  useFadeIn(headerRef, { y: 30, duration: 0.8 });
+  useScrollFade(gridRef, { selector: '.service-card', y: 50, stagger: 0.1, start: 'top 80%', scale: 0.96 });
 
   return (
     <section id="services" className="py-20 bg-bg overflow-hidden">

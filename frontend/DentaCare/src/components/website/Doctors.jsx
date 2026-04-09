@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { useGsap } from '../../hooks/useGSAP'; 
+import { useFadeIn, useScrollFade } from '../../hooks/gsap';
 import useT from '../../hooks/useT';
 import api from '../../lib/axios';
 import { DoctorCardSkeleton } from '../ui/Skeleton';
@@ -22,57 +22,45 @@ export default function Doctors() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-  api.get('/doctor/all-doctors')
-    .then(({ data }) => {
-      if (data.success && data.data && data.data.length) {
-        setDoctors(data.data.slice(0, 6));  
-      } else {
-        setDoctors(FALLBACK_DOCTORS.slice(0, 6));
-      }
-    })
-    .catch(() => setDoctors(FALLBACK_DOCTORS.slice(0, 6)))
-    .finally(() => setLoading(false));
-}, []);
+    api.get('/doctor/all-doctors')
+      .then(({ data }) => {
+        if (data.success && data.data && data.data.length) {
+          setDoctors(data.data.slice(0, 6));
+        } else {
+          setDoctors(FALLBACK_DOCTORS.slice(0, 6));
+        }
+      })
+      .catch(() => setDoctors(FALLBACK_DOCTORS.slice(0, 6)))
+      .finally(() => setLoading(false));
+  }, []);
 
-  useGsap({
-    header: {
-      ref: headerRef,
-      from: { opacity: 0, y: 30 },
-      to: { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' },
-      scrollTrigger: { trigger: '#doctors-header', start: 'top 85%' }, 
-    },
-    cards: {
-      selector: '.doctor-card',
-      from: { opacity: 0, y: 50 },
-      to: { opacity: 1, y: 0, duration: 0.7, stagger: 0.12, ease: 'power3.out' },
-      scrollTrigger: { trigger: '#doctors-grid', start: 'top 80%' },
-    },
-  }, [loading]);
+  // Entrance animations using the new hooks
+  useFadeIn(headerRef, { y: 30, duration: 0.8 });
+  useScrollFade(gridRef, { selector: '.doctor-card', y: 50, stagger: 0.12, start: 'top 80%' });
 
   const initials = (name) => name?.split(' ').slice(0, 2).map(w => w[0]).join('') || 'DR';
 
   if (loading) {
-  return (
-    <section id="doctors" className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <DoctorCardSkeleton key={i} />
-          ))}
+    return (
+      <section id="doctors" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <DoctorCardSkeleton key={i} />
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
-  );
-}
+      </section>
+    );
+  }
 
   return (
     <section id="doctors" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-6">
-        {/* ✅ added ID for ScrollTrigger */}
         <div
           ref={headerRef}
           id="doctors-header"
-          className="flex justify-between items-end flex-wrap gap-6 mb-14 opacity-0"
+          className="flex justify-between items-end flex-wrap gap-6 mb-14 "
         >
           <div>
             <div className="mb-4">
@@ -96,7 +84,6 @@ export default function Doctors() {
           </div>
         </div>
 
-        {/* ✅ added ID for ScrollTrigger */}
         <div
           ref={gridRef}
           id="doctors-grid"
@@ -106,7 +93,7 @@ export default function Doctors() {
             <div
               key={doc._id}
               onClick={() => navigate(`/doctors/${doc._id}`)}
-              className="doctor-card opacity-0 bg-white border border-border rounded-[10px] overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-primary group cursor-pointer"
+              className="doctor-card  bg-white border border-border rounded-[10px] overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-primary group cursor-pointer"
             >
               <div className="h-80 relative bg-linear-to-br from-accent-soft/20 to-accent-soft/5 flex items-center justify-center">
                 {doc.image ? (

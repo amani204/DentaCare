@@ -1,21 +1,16 @@
-
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { 
-  Star, Calendar, Clock, User, Stethoscope, GraduationCap, 
+import { Calendar, Clock, User, Stethoscope, GraduationCap, 
   MapPin, DollarSign, ArrowLeft, CheckCircle,
   ChevronLeft, ChevronRight, X, Award, Briefcase, Heart
 } from 'lucide-react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useFadeIn, useScrollFade, usePageLeave } from '../../hooks/gsap'
 import useT from '../../hooks/useT'
 import useAuthStore from '../../store/useAuth'
 import api from '../../lib/axios'
 import Navbar from '../../components/website/Navbar'
 import Footer from '../../components/website/Footer'
 import { toast } from 'react-hot-toast'
-
-gsap.registerPlugin(ScrollTrigger)
 
 const TIME_SLOTS = [
   '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
@@ -54,19 +49,13 @@ function BookingModal({ doctor, onClose }) {
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState(1)
   const [error, setError] = useState('')
- 
-  // GSAP Modal Animation
+
+  // Modal entrance animation
+  useFadeIn(modalRef, { y: 20, scale: 0.9, duration: 0.4, ease: 'back.out(0.4)' });
+
   useEffect(() => {
-    if (modalRef.current) {
-      gsap.fromTo(modalRef.current,
-        { opacity: 0, scale: 0.9, y: 20 },
-        { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: 'back.out(0.4)' }
-      )
-    }
     document.body.style.overflow = 'hidden'
-    return () => {
-      document.body.style.overflow = 'unset'
-    }
+    return () => { document.body.style.overflow = 'unset' }
   }, [])
 
   const weekDates = getWeekDates(weekBase)
@@ -93,7 +82,7 @@ function BookingModal({ doctor, onClose }) {
     if (!token) {
       onClose()
       toast.error('Please login to book an appointment')
-      navigate('/auth', { state: { from: `/doctors/${doctor._id}` } })
+      navigate('/auth', { state: { from: `/doctor/${doctor._id}` } })
       return
     }
 
@@ -122,11 +111,9 @@ function BookingModal({ doctor, onClose }) {
     }
   }
 
-  
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div onClick={onClose} className="absolute inset-0 bg-primary-deep/40 backdrop-blur-sm" />
-      
       <div ref={modalRef} className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl">
         <div className="sticky top-0 bg-white z-10 px-5 py-4 border-b border-border flex items-start justify-between rounded-t-2xl">
           <div className="flex items-center gap-3">
@@ -248,7 +235,6 @@ function BookingModal({ doctor, onClose }) {
           {step === 2 && (
             <div className="space-y-4">
               <h4 className="font-semibold text-text">{t('confirmDetails')}</h4>
-              
               <div className="bg-gray-50 rounded-xl p-4 space-y-3 border border-border">
                 {[
                   { icon: User, label: t('doctor'), value: doctor.name },
@@ -268,17 +254,14 @@ function BookingModal({ doctor, onClose }) {
                   </div>
                 ))}
               </div>
-
               <div className="bg-primary-soft/20 rounded-xl p-3 text-xs text-primary-deep leading-relaxed border border-primary/20">
                 💡 {t('bookingNotice')}
               </div>
-
               {error && (
                 <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-500">
                   {error}
                 </div>
               )}
-
               <div className="flex gap-3">
                 <button onClick={() => { setStep(1); setError('') }} className="flex-1 py-3 rounded-xl border border-border text-sub font-medium hover:bg-gray-50 transition">
                   <ArrowLeft size={14} className="inline mr-1" /> {t('back')}
@@ -296,23 +279,14 @@ function BookingModal({ doctor, onClose }) {
                 <CheckCircle size={32} className="text-emerald-500" />
               </div>
               <h3 className="text-xl font-bold text-text font-serif">{t('bookingSuccess')}</h3>
-              <p className="text-sm text-sub">
-                {t('bookingSuccessMsg', { name: doctor.name, date: fmtDisplay(selectedDate), time: selectedTime })}
-              </p>
               <div className="bg-primary-soft/20 rounded-xl p-3 text-xs text-primary-deep leading-relaxed border border-primary/20">
                 {t('bookingConfirmationNote')}
               </div>
               <div className="flex gap-3">
-                <button 
-                  onClick={() => navigate('/profile')} 
-                  className="flex-1 py-3 rounded-xl border border-primary text-primary font-medium hover:bg-primary/5 transition"
-                >
+                <button onClick={() => navigate('/profile')} className="flex-1 py-3 rounded-xl border border-primary text-primary font-medium hover:bg-primary/5 transition">
                   {t('viewMyAppointments')}
                 </button>
-                <button 
-                  onClick={onClose} 
-                  className="flex-1 py-3 rounded-xl bg-linear-to-r from-primary-deep to-primary text-white font-semibold transition-all"
-                >
+                <button onClick={onClose} className="flex-1 py-3 rounded-xl bg-linear-to-r from-primary-deep to-primary text-white font-semibold transition-all">
                   {t('close')}
                 </button>
               </div>
@@ -332,69 +306,37 @@ export default function DoctorDetailsPage() {
   const [doctor, setDoctor] = useState(null)
   const [loading, setLoading] = useState(true)
   const [showBookingModal, setShowBookingModal] = useState(false)
-  
-  // Refs for GSAP animations
+
   const pageRef = useRef(null)
   const backBtnRef = useRef(null)
   const profileCardRef = useRef(null)
-  const detailsRef = useRef(null)
   const aboutRef = useRef(null)
   const credentialsRef = useRef(null)
   const addressRef = useRef(null)
 
   useEffect(() => {
     window.scrollTo(0, 0)
-    
     api.get(`/doctor/${docId}`)
       .then(({ data }) => {
-        if (data.success && data.data) {
-          setDoctor(data.data)
-        } else {
-          navigate('/doctors')
-        }
+        if (data.success && data.data) setDoctor(data.data)
+        else navigate('/doctors')
       })
       .catch(() => navigate('/doctors'))
       .finally(() => setLoading(false))
   }, [docId, navigate])
 
-  // GSAP Page Animations
-  useEffect(() => {
-    if (!loading && doctor) {
-      const ctx = gsap.context(() => {
-        // Back button animation
-        gsap.fromTo(backBtnRef.current,
-          { opacity: 0, x: -20 },
-          { opacity: 1, x: 0, duration: 0.5, ease: 'power2.out' }
-        )
+  // Page exit animation (using usePageLeave)
+  const { leaveAndGo } = usePageLeave(pageRef)
+  const handleBack = () => {
+    leaveAndGo(() => navigate('/doctors'))
+  }
 
-        // Profile card animation
-        gsap.fromTo(profileCardRef.current,
-          { opacity: 0, x: -40 },
-          { opacity: 1, x: 0, duration: 0.7, delay: 0.2, ease: 'power3.out' }
-        )
-
-        // Details sections staggered
-        gsap.fromTo([aboutRef.current, credentialsRef.current, addressRef.current],
-          { opacity: 0, y: 30 },
-          { 
-            opacity: 1, 
-            y: 0, 
-            duration: 0.6, 
-            stagger: 0.15, 
-            delay: 0.3,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: detailsRef.current,
-              start: 'top 85%',
-              toggleActions: 'play none none none'
-            }
-          }
-        )
-      }, pageRef)
-
-      return () => ctx.revert()
-    }
-  }, [loading, doctor])
+  // Entrance animations
+  useFadeIn(backBtnRef, { x: -20, duration: 0.5, delay: 0 })
+  useFadeIn(profileCardRef, { x: -40, duration: 0.7, delay: 0.2 })
+  useScrollFade(aboutRef, { y: 30, duration: 0.6, start: 'top 85%' })
+  useScrollFade(credentialsRef, { y: 30, duration: 0.6, start: 'top 85%' })
+  useScrollFade(addressRef, { y: 30, duration: 0.6, start: 'top 85%' })
 
   const handleBookClick = () => {
     if (!isAuthenticated) {
@@ -424,28 +366,21 @@ export default function DoctorDetailsPage() {
       <Navbar />
       <div ref={pageRef} className="min-h-screen bg-bg pt-28 pb-16">
         <div className="max-w-7xl mx-auto px-6">
-          {/* Back button */}
           <button
             ref={backBtnRef}
-            onClick={() => navigate('/doctors')}
-            className="flex items-center gap-2 text-sub hover:text-primary transition mb-6 group opacity-0"
+            onClick={handleBack}
+            className="flex items-center gap-2 text-sub hover:text-primary transition mb-6 group "
           >
             <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> 
             {t('backToDoctors')}
           </button>
 
-          {/* Doctor Profile */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Image & Basic Info */}
-            <div ref={profileCardRef} className="lg:col-span-1 opacity-0">
+            <div ref={profileCardRef} className="lg:col-span-1 ">
               <div className="bg-white rounded-2xl overflow-hidden shadow-lg border border-border sticky top-28">
                 <div className="aspect-square overflow-hidden">
                   {doctor.image ? (
-                    <img 
-                      src={doctor.image} 
-                      alt={doctor.name} 
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                    />
+                    <img src={doctor.image} alt={doctor.name} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
                   ) : (
                     <div className="w-full h-full bg-linear-to-br from-primary-soft to-primary flex items-center justify-center text-6xl font-bold text-white">
                       {doctor.name?.charAt(0) || 'D'}
@@ -455,7 +390,6 @@ export default function DoctorDetailsPage() {
                 <div className="p-6">
                   <h1 className="text-2xl font-bold text-text mb-1">{doctor.name}</h1>
                   <p className="text-primary font-medium mb-4">{doctor.speciality}</p>
-                  
                   <button
                     onClick={handleBookClick}
                     className={`w-full py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
@@ -466,7 +400,6 @@ export default function DoctorDetailsPage() {
                   >
                     {doctor.available ? t('bookAppointment') : t('unavailable')}
                   </button>
-                  
                   {!isAuthenticated && doctor.available && (
                     <p className="text-xs text-center text-muted mt-3 animate-pulse">
                       {t('loginToBookHint')}
@@ -476,20 +409,15 @@ export default function DoctorDetailsPage() {
               </div>
             </div>
 
-            {/* Details */}
-            <div ref={detailsRef} className="lg:col-span-2 space-y-6">
-              {/* About */}
-              <div ref={aboutRef} className="bg-white rounded-2xl p-6 shadow-sm border border-border opacity-0">
+            <div className="lg:col-span-2 space-y-6">
+              <div ref={aboutRef} className="bg-white rounded-2xl p-6 shadow-sm border border-border ">
                 <h2 className="text-xl font-bold text-text mb-3 flex items-center gap-2">
                   <Heart size={20} className="text-primary" /> {t('aboutDoctor')}
                 </h2>
-                <p className="text-sub leading-relaxed">
-                  {doctor.about || t('noBio')}
-                </p>
+                <p className="text-sub leading-relaxed">{doctor.about || t('noBio')}</p>
               </div>
 
-              {/* Education & Credentials */}
-              <div ref={credentialsRef} className="bg-white rounded-2xl p-6 shadow-sm border border-border opacity-0">
+              <div ref={credentialsRef} className="bg-white rounded-2xl p-6 shadow-sm border border-border ">
                 <h2 className="text-xl font-bold text-text mb-4 flex items-center gap-2">
                   <Award size={20} className="text-primary" /> {t('credentials')}
                 </h2>
@@ -527,16 +455,12 @@ export default function DoctorDetailsPage() {
                 </div>
               </div>
 
-              {/* Address */}
               {doctor.address && (doctor.address.line1 || doctor.address.line2) && (
-                <div ref={addressRef} className="bg-white rounded-2xl p-6 shadow-sm border border-border opacity-0">
+                <div ref={addressRef} className="bg-white rounded-2xl p-6 shadow-sm border border-border">
                   <h2 className="text-xl font-bold text-text mb-3 flex items-center gap-2">
                     <MapPin size={20} className="text-primary" /> {t('location')}
                   </h2>
-                  <p className="text-sub">
-                    {doctor.address.line1}
-                    {doctor.address.line2 && <>, {doctor.address.line2}</>}
-                  </p>
+                  <p className="text-sub">{doctor.address.line1}{doctor.address.line2 && `, ${doctor.address.line2}`}</p>
                 </div>
               )}
             </div>
@@ -544,10 +468,7 @@ export default function DoctorDetailsPage() {
         </div>
       </div>
       <Footer />
-
-      {showBookingModal && (
-        <BookingModal doctor={doctor} onClose={() => setShowBookingModal(false)} />
-      )}
+      {showBookingModal && <BookingModal doctor={doctor} onClose={() => setShowBookingModal(false)} />}
     </>
   )
 }

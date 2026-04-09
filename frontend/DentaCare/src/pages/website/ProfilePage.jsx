@@ -9,14 +9,15 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { getStripe } from '../../lib/stripe';        
-import { useGsap } from '../../hooks/useGSAP';       
+import { getStripe } from '../../lib/stripe';
+import { useFadeIn, useScrollFade } from '../../hooks/gsap';
 import useAuthStore from '../../store/useAuth';
 import useT from '../../hooks/useT';
 import api from '../../lib/axios';
 import Navbar from '../../components/website/Navbar';
 import Footer from '../../components/website/Footer';
 
+// Ensure ScrollTrigger is registered once (if not already in useScrollFade)
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
@@ -26,11 +27,11 @@ export default function ProfilePage() {
   const t = useT();
   const navigate = useNavigate();
 
-  // Refs
+  // Refs for main sections
   const pageRef = useRef(null);
+  const titleRef = useRef(null);
   const profileCardRef = useRef(null);
   const appointmentsRef = useRef(null);
-  const titleRef = useRef(null);
 
   // Profile state
   const [editing, setEditing] = useState(false);
@@ -53,33 +54,29 @@ export default function ProfilePage() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentAppointment, setPaymentAppointment] = useState(null);
 
-  // Entrance animations
-  useGsap({
-    title: {
-      ref: titleRef,
-      from: { opacity: 0, y: -30 },
-      to: { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' },
-    },
-    profileCard: {
-      ref: profileCardRef,
-      from: { opacity: 0, x: -30 },
-      to: { opacity: 1, x: 0, duration: 0.7, delay: 0.2, ease: 'power3.out' },
-    },
-    appointments: {
-      ref: appointmentsRef,
-      from: { opacity: 0, x: 30 },
-      to: { opacity: 1, x: 0, duration: 0.7, delay: 0.3, ease: 'power3.out' },
-    },
-  }, []);
+  // ----- Entrance animations (simple fade‑up) -----
+  useFadeIn(titleRef, { y: -30, duration: 0.6 });
+  useFadeIn(profileCardRef, { x: -30, duration: 0.7, delay: 0.2 });
+  useFadeIn(appointmentsRef, { x: 30, duration: 0.7, delay: 0.3 });
 
-  // Animate appointment items after they load
+  // ----- Appointment items animate when scrolled into view (after loading) -----
+  // We use useScrollFade on the container, but it must re‑run when items are added.
+  // To achieve that, we call useScrollFade inside a useEffect that depends on loadingAppointments.
   useEffect(() => {
     if (!loadingAppointments && appointmentsRef.current) {
+      // Kill any previous ScrollTriggers to avoid duplicates
+      ScrollTrigger.getAll().forEach(st => st.kill());
+      // Apply scroll‑triggered fade‑up to each appointment item
       const items = appointmentsRef.current.querySelectorAll('.appointment-item');
       gsap.fromTo(items,
         { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.5, stagger: 0.1, ease: 'power3.out',
-          scrollTrigger: { trigger: appointmentsRef.current, start: 'top 85%', toggleActions: 'play none none none' }
+        {
+          opacity: 1, y: 0, duration: 0.5, stagger: 0.1, ease: 'power3.out',
+          scrollTrigger: {
+            trigger: appointmentsRef.current,
+            start: 'top 85%',
+            toggleActions: 'play none none none'
+          }
         }
       );
     }
@@ -125,6 +122,7 @@ export default function ProfilePage() {
   };
   useEffect(() => { fetchAppointments(); }, [token]);
 
+  // ----- User actions (inline animations) -----
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -203,7 +201,7 @@ export default function ProfilePage() {
     setShowPaymentModal(true);
   };
 
-  // ✅ Stripe payment – using the custom getStripe helper
+  // Stripe payment – using the custom getStripe helper
   const handleStripePayment = async () => {
     if (!paymentAppointment) return;
     setProcessingPayment(paymentAppointment._id);
@@ -216,10 +214,8 @@ export default function ProfilePage() {
         slotTime: paymentAppointment.slotTime
       }, { headers: { token } });
       if (data.success && data.sessionUrl) {
-        // Standard redirect – no Stripe SDK needed
         window.location.href = data.sessionUrl;
       } else if (data.id) {
-        // Fallback: use Stripe SDK if sessionId is returned (unlikely with your backend)
         const stripe = await getStripe();
         await stripe.redirectToCheckout({ sessionId: data.id });
       } else {
@@ -295,8 +291,6 @@ export default function ProfilePage() {
       toast.info('Payment was cancelled');
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (sessionId) {
-      // Stripe redirect with session_id – you may need to call a different verify endpoint
-      // For simplicity, we ignore auto‑verification here; rely on webhook or manual refresh.
       console.log('Stripe session ID:', sessionId);
       window.history.replaceState({}, document.title, window.location.pathname);
     }
@@ -315,6 +309,8 @@ export default function ProfilePage() {
     <>
       <Navbar />
       <div ref={pageRef} className="min-h-screen bg-gray-50 pt-24 pb-12">
+        <div className="absolute top-[-10%] right-[-5%] w-125 h-125 bg-[#CDE9FF]/40 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-100 h-100 bg-[#CDE9FF]/5 rounded-full blur-[100px]" />
         <div className="max-w-7xl mx-auto px-6">
           <h1 ref={titleRef} className="text-3xl font-bold text-text mb-8 opacity-0">
             {t('myProfile')}

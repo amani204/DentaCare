@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'  
-import { DualGradientBg } from '../../components/ui/backgrounds'
 import LoginCard from '../../components/ui/loginCard'
 import LanguageToggle from '../../components/ui/LanguageToggle'
-import { useGsap } from '../../hooks/useGSAP'
+import { useFadeIn } from '../../hooks/gsap'
 import api from '../../lib/axios'
 import useT from '../../hooks/useT'
 import useAuthStore from '../../store/useAuth'
@@ -21,22 +20,11 @@ export default function Auth() {
   const [resetToken, setResetToken] = useState('')
   const [tempEmail, setTempEmail] = useState('')
 
-  // Ref for GSAP animation
   const cardContainerRef = useRef(null)
-
-  // Get the page user was trying to visit before login
   const from = location.state?.from || '/profile'
 
-  // Entrance animation
-  useGsap({
-    card: {
-      ref: cardContainerRef,
-      from: { opacity: 0, y: 30, scale: 0.96 },
-      to: { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'power3.out' },
-    },
-  }, [])
+  useFadeIn(cardContainerRef, { y: 30, scale: 0.96, duration: 0.6 })
 
-  // Listen for mode switches from LoginCard
   useEffect(() => {
     const handleSwitchAuthMode = () => {
       setMode(mode === 'login' ? 'signup' : 'login')
@@ -183,15 +171,12 @@ export default function Auth() {
   }
 
   return (
-    <DualGradientBg>
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
-        
-        {/* Language Switcher */}
+         <div className="absolute top-[-10%] right-[-5%] w-125 h-125 bg-[#CDE9FF]/40 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-100 h-100 bg-[#CDE9FF]/5 rounded-full blur-[100px]" />
         <div className="absolute top-6 right-6">
           <LanguageToggle />
         </div>
-
-        {/* Animated card container */}
         <div ref={cardContainerRef} className="opacity-0">
           <LoginCard
             mode={mode}
@@ -208,6 +193,5 @@ export default function Auth() {
           />
         </div>
       </div>
-    </DualGradientBg>
   )
 }

@@ -14,7 +14,7 @@ export default function Navbar() {
     '/add-doctor': t('addDoctor'),
     '/appointments': t('appointments'),
   };
-
+  
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-6 bg-white backdrop-blur-sm border border-primary/20 ">
       {/* Page Title */}

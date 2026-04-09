@@ -1,7 +1,8 @@
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Star, Shield, Clock } from 'lucide-react'
-import { useGsap } from '../../hooks/useGSAP'
+import gsap from 'gsap'
+import { useFadeIn, useFloating } from '../../hooks/gsap'
 import useT from '../../hooks/useT'
 import heroImage from '../../assets/hero-dentist.jpg'
 
@@ -17,71 +18,35 @@ export default function Hero() {
   const floatRef2 = useRef(null)
   const bgRef = useRef(null)
 
-  useGsap({
-    bg: {
-      ref: bgRef,
-      from: { opacity: 0, scale: 1.05 },
-      to: { opacity: 1, scale: 1, duration: 1.2 },
-    },
-    tag: {
-      ref: tagRef,
-      from: { opacity: 0, y: -12 },
-      to: { opacity: 1, y: 0, duration: 0.6 },
-    },
-    heading: {
-      ref: headingRef,
-      from: { opacity: 0, y: 30 },
-      to: { opacity: 1, y: 0, duration: 0.8 },
-    },
-    sub: {
-      ref: subRef,
-      from: { opacity: 0, y: 20 },
-      to: { opacity: 1, y: 0, duration: 0.7 },
-    },
-    buttons: {
-      selector: '.btn-hero',
-      from: { opacity: 0, y: 16 },
-      to: { opacity: 1, y: 0, duration: 0.6, stagger: 0.1 },
-    },
-    stats: {
-      selector: '.stat-item',
-      from: { opacity: 0, y: 20 },
-      to: { opacity: 1, y: 0, duration: 0.6, stagger: 0.08 },
-    },
-    image: {
-      ref: imageRef,
-      from: { opacity: 0, x: 60, scale: 0.95 },
-      to: { opacity: 1, x: 0, scale: 1, duration: 1.0 },
-    },
-    float1: {
-      ref: floatRef1,
-      from: { opacity: 0, y: 20, x: -20 },
-      to: { opacity: 1, y: 0, x: 0, duration: 0.7 },
-    },
-    float2: {
-      ref: floatRef2,
-      from: { opacity: 0, y: -20, x: 20 },
-      to: { opacity: 1, y: 0, x: 0, duration: 0.7 },
-    },
-    floatLoop1: {
-      ref: floatRef1,
-      from: { y: 0 },
-      to: { y: -10, duration: 2.5, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 1.5 },
-      loop: true,
-    },
-    floatLoop2: {
-      ref: floatRef2,
-      from: { y: 0 },
-      to: { y: 8, duration: 3.0, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 2.0 },
-      loop: true,
-    },
-  }, [t])
+  // Background scale & fade (not part of the standard hooks)
+  useEffect(() => {
+    if (bgRef.current) {
+      gsap.fromTo(bgRef.current,
+        { opacity: 0, scale: 1.05 },
+        { opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out' }
+      )
+    }
+  }, [])
+
+  // Entrance animations
+  useFadeIn(tagRef, { y: -12, duration: 0.6, delay: 0.3 })
+  useFadeIn(headingRef, { y: 30, duration: 0.8, delay: 0.5 })
+  useFadeIn(subRef, { y: 20, duration: 0.7, delay: 0.9 })
+  useFadeIn(buttonsRef, { y: 16, duration: 0.6, stagger: 0.1, delay: 1.1 })
+  useFadeIn(statsRef, { y: 20, duration: 0.6, stagger: 0.08, delay: 1.2 })
+  useFadeIn(imageRef, { x: 60, y: 0, duration: 1.0, delay: 0.4 }) // horizontal slide
+  useFadeIn(floatRef1, { y: 20, x: -20, duration: 0.7, delay: 1.0 })
+  useFadeIn(floatRef2, { y: -20, x: 20, duration: 0.7, delay: 1.1 })
+
+  // Floating loop animations
+  useFloating(floatRef1, { distance: 10, duration: 2.5, delay: 1.5 })
+  useFloating(floatRef2, { distance: 8, duration: 3.0, delay: 2.0 })
 
   return (
-    <section className="min-h-screen pt-20 flex items-center relative overflow-hidden bg-bg">
+    <section className="min-h-screen pt-24 flex items-center relative overflow-hidden bg-bg">
       <div ref={bgRef} className="absolute inset-0 pointer-events-none overflow-hidden opacity-0">
         <div className="absolute top-[-10%] right-[-5%] w-125 h-125 bg-[#CDE9FF]/40 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] left-[-5%] w-100 h-100 bg-[#2C2C2A]/5 rounded-full blur-[100px]" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-100 h-100 bg-[#CDE9FF]/5 rounded-full blur-[100px]" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-8 w-full">

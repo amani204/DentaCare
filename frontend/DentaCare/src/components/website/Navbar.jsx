@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Menu, X, ChevronRight, User, LogOut } from 'lucide-react'
 import useAuthStore from '../../store/useAuth'
 import useT from '../../hooks/useT'
-import { useGsap } from '../../hooks/useGSAP' 
+import { useFadeIn } from '../../hooks/gsap'
 import LanguageToggle from '../ui/LanguageToggle'
 
 const NAV_LINKS = [
@@ -25,13 +25,7 @@ export default function Navbar() {
   const { user, isAuthenticated, logout, role } = useAuthStore()
   const t = useT()
 
-  useGsap({
-    nav: {
-      ref: navRef,
-      from: { opacity: 0, y: -20 },
-      to: { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: 0.2 },
-    },
-  }, [])
+  useFadeIn(navRef, { y: -20, duration: 0.8, delay: 0.2 })
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -65,7 +59,6 @@ export default function Navbar() {
     if (link.isHash) {
       const targetId = link.sectionId
       if (location.pathname !== '/') {
-        
         navigate('/')
         const checkElement = setInterval(() => {
           const el = document.getElementById(targetId)
@@ -74,16 +67,12 @@ export default function Navbar() {
             el.scrollIntoView({ behavior: 'smooth' })
           }
         }, 100)
-      
         setTimeout(() => clearInterval(checkElement), 2000)
       } else {
         const el = document.getElementById(targetId)
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth' })
-        }
+        if (el) el.scrollIntoView({ behavior: 'smooth' })
       }
     } else {
-    
       navigate(link.href)
       setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100)
     }

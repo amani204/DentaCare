@@ -1,29 +1,145 @@
+// src/components/ui/Skeleton.jsx
+
+// ── Base shimmer ──────────────────────────────────────────────────────────────
+// Animated shimmer effect — more alive than plain animate-pulse
+const shimmer = {
+  background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
+  backgroundSize: '200% 100%',
+  animation: 'shimmer 1.5s infinite',
+}
+
+// Inject keyframes once
+if (typeof document !== 'undefined' && !document.getElementById('skeleton-style')) {
+  const style = document.createElement('style')
+  style.id = 'skeleton-style'
+  style.textContent = `
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  `
+  document.head.appendChild(style)
+}
 
 export const Skeleton = ({ className = '' }) => (
-  <div className={`animate-pulse bg-gray-200 rounded ${className}`} />
-);
+  <div className={`rounded ${className}`} style={shimmer} />
+)
 
-// Doctor card skeleton
+// ── Doctor Card Skeleton ──────────────────────────────────────────────────────
 export const DoctorCardSkeleton = () => (
   <div className="bg-white border border-border rounded-[10px] overflow-hidden">
-    <div className="h-80 bg-gray-200 animate-pulse" />
-    <div className="p-5">
-      <div className="h-5 bg-gray-200 rounded w-3/4 mb-2 animate-pulse" />
-      <div className="h-4 bg-gray-200 rounded w-1/2 mb-3 animate-pulse" />
+
+    {/* Image area */}
+    <div className="h-80 relative" style={shimmer}>
+      {/* Availability badge placeholder */}
+      <div
+        className="absolute top-3 right-3 w-20 h-6 rounded-full"
+        style={{ background: 'rgba(255,255,255,0.5)' }}
+      />
+      {/* Price badge placeholder */}
+      <div
+        className="absolute bottom-3 left-3 w-16 h-7 rounded-lg"
+        style={{ background: 'rgba(255,255,255,0.4)' }}
+      />
+    </div>
+
+    {/* Content */}
+    <div className="p-4 space-y-2.5">
+      {/* Name */}
+      <div className="h-5 rounded-md w-3/4" style={shimmer} />
+      {/* Speciality */}
+      <div className="h-4 rounded-md w-1/2" style={shimmer} />
     </div>
   </div>
-);
-//skeleton for the detail view
+)
+
+// ── Doctor Detail Skeleton ────────────────────────────────────────────────────
 export const DoctorDetailSkeleton = () => (
   <div className="max-w-7xl mx-auto px-6 py-10">
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+
+      {/* Left — text content */}
       <div className="space-y-4">
-        <div className="h-8 bg-gray-200 rounded w-3/4 animate-pulse" />
-        <div className="h-4 bg-gray-200 rounded w-full animate-pulse" />
-        <div className="h-4 bg-gray-200 rounded w-5/6 animate-pulse" />
-        <div className="h-32 bg-gray-200 rounded animate-pulse" />
+        {/* Name */}
+        <div className="h-9 rounded-lg w-2/3" style={shimmer} />
+        {/* Speciality badge */}
+        <div className="h-6 rounded-full w-32" style={shimmer} />
+        {/* Tags row */}
+        <div className="flex gap-2">
+          <div className="h-7 rounded-full w-20" style={shimmer} />
+          <div className="h-7 rounded-full w-24" style={shimmer} />
+          <div className="h-7 rounded-full w-16" style={shimmer} />
+        </div>
+        {/* Bio lines */}
+        <div className="space-y-2 pt-2">
+          <div className="h-4 rounded w-full" style={shimmer} />
+          <div className="h-4 rounded w-full" style={shimmer} />
+          <div className="h-4 rounded w-4/5" style={shimmer} />
+        </div>
+        {/* Stats row */}
+        <div className="flex gap-6 pt-4">
+          {[1,2,3].map(i => (
+            <div key={i} className="space-y-1.5">
+              <div className="h-7 w-14 rounded" style={shimmer} />
+              <div className="h-3 w-16 rounded" style={shimmer} />
+            </div>
+          ))}
+        </div>
+        {/* Button */}
+        <div className="h-12 rounded-xl w-48 mt-4" style={shimmer} />
       </div>
-      <div className="h-96 bg-gray-200 rounded animate-pulse" />
+
+      {/* Right — image */}
+      <div className="h-96 rounded-2xl" style={shimmer} />
     </div>
   </div>
-);
+)
+
+// ── Page Loader ───────────────────────────────────────────────────────────────
+// Simple but cool full-page loader — use it while fetching critical data
+// Usage: {loading && <PageLoader />}
+export const PageLoader = () => (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
+    <div className="flex flex-col items-center gap-4">
+
+      {/* Animated logo mark */}
+      <div className="relative w-12 h-12">
+        <div
+          className="absolute inset-0 rounded-xl border-2 border-primary/20"
+          style={{ animation: 'spin 2s linear infinite' }}
+        />
+        <div
+          className="absolute inset-1 rounded-lg border-2 border-t-primary border-r-primary border-b-transparent border-l-transparent"
+          style={{ animation: 'spin 1s linear infinite' }}
+        />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-primary font-bold text-sm">D</span>
+        </div>
+      </div>
+
+      {/* Dot pulse row */}
+      <div className="flex gap-1.5">
+        {[0, 1, 2].map(i => (
+          <div
+            key={i}
+            className="w-1.5 h-1.5 rounded-full bg-primary"
+            style={{
+              animation: 'dotPulse 1.2s ease-in-out infinite',
+              animationDelay: `${i * 0.2}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      <style>{`
+        @keyframes dotPulse {
+          0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
+          40%            { transform: scale(1);   opacity: 1;   }
+        }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
+    </div>
+  </div>
+)

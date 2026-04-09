@@ -28,7 +28,6 @@ import Auth from './pages/website/Auth'
 import DoctorsPage from './pages/website/DoctorsPage'
 import DoctorDetailsPage from './pages/website/DoctorDetailsPage'
 // Background Component
-import { DualGradientBg } from './components/ui/backgrounds'
 import ProfilePage from './pages/website/profilepage'
 
 
@@ -77,7 +76,6 @@ export default function App() {
         v7_relativeSplatPath: true,
       }}
     >
-      <DualGradientBg>
         <Routes>
           {/* ── WEBSITE PUBLIC ROUTES ── */}
           <Route path="/" element={<HomePage />} />
@@ -125,7 +123,6 @@ export default function App() {
           {/* Catch all → home */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
-      </DualGradientBg>
     </BrowserRouter>
   )
 }
