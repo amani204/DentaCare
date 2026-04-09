@@ -1,11 +1,11 @@
 // src/pages/doctor/DoctorProfile.jsx
 import { useEffect, useState } from 'react'
-import { Camera, Save, User, Mail, Stethoscope, GraduationCap, Clock, DollarSign, FileText, MapPin, ToggleLeft, ToggleRight, X, Check, Edit2 } from 'lucide-react'
-import {  Loader } from '../../components/common/components'
+import { Camera, Save, User, Mail, Stethoscope, GraduationCap, Clock, DollarSign, FileText, MapPin, Check, Edit2 } from 'lucide-react'
 import useDoctorStore from '../../store/doctorStore'
 
 import api from '../../lib/axios'
 import useDT from '../../hooks/useDT'
+import { PageLoader } from '../../components/ui/Skeleton'
 
 function Field({ label, icon: Icon, children, error }) {
   return (
@@ -81,7 +81,7 @@ export default function DoctorProfile() {
     finally { setLoading(false) }
   }
 
-  if (!doctor) return <Loader fullScreen />
+  if (!doctor) return <PageLoader />;
 
   return (
     <div className="flex flex-col gap-5 animate-fade-in">

@@ -33,7 +33,8 @@ export default function AdminLogin() {
 
   return (
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
-        
+      <div className="absolute top-[-10%] right-[-5%] w-125 h-125 bg-[#CDE9FF]/40 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-100 h-100 bg-[#CDE9FF]/5 rounded-full blur-[100px]" />
         {/* Language Switcher */}
         <div className="absolute top-6 right-6">
           <button

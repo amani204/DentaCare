@@ -9,10 +9,10 @@ export default function Navbar() {
   const t = useT();
 
   const titles = {
-    '/': t('dashboard'),
-    '/doctors': t('doctors'),
-    '/add-doctor': t('addDoctor'),
-    '/appointments': t('appointments'),
+    '/admin': t('dashboard'),
+    '/admin/doctors': t('doctors'),
+    '/admin/add-doctor': t('addDoctor'),
+    '/admin/appointments': t('appointments'),
   };
   
   return (

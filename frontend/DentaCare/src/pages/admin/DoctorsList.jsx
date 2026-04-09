@@ -2,10 +2,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, Plus, Trash2, ToggleLeft, ToggleRight, Stethoscope, DollarSign, GraduationCap, Activity, ChevronDown, Users, Clock, Layers, CheckCircle } from 'lucide-react'
-import { Badge, Loader, EmptyState, Modal, StatCard, MiniStat } from '../../components/common/components'
+import { Badge, EmptyState, Modal, StatCard, MiniStat } from '../../components/common/components'
 import useAdminStore from '../../store/adminStore'
 import useT from '../../hooks/useT'
 import api from '../../lib/axios'
+import { PageLoader } from '../../components/ui/Skeleton'
 
 const SPECIALITIES = ['General Dentist','Orthodontist','Endodontist','Periodontist','Oral Surgeon','Pediatric Dentist','Prosthodontist']
 
@@ -57,7 +58,7 @@ export default function DoctorsList() {
     return matchSearch && matchFilter
   })
 
-  if (loading) return <Loader fullScreen />
+  if (loading) return <PageLoader />;
 
   return (
     <div className="flex flex-col gap-5 animate-fade-in">

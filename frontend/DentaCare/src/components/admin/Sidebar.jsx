@@ -35,7 +35,7 @@ export default function Sidebar() {
           <NavLink
             key={path}
             to={path}
-            end={path === '/'}
+            end={path === '/admin'}
             className={({ isActive }) => 
               isActive 
                 ? 'flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-medium bg-linear-to-r from-primary/10 to-primary/5 text-primary border-l-2 border-primary'

@@ -63,11 +63,11 @@ export default function ProfilePage() {
   // We use useScrollFade on the container, but it must re‑run when items are added.
   // To achieve that, we call useScrollFade inside a useEffect that depends on loadingAppointments.
   useEffect(() => {
-    if (!loadingAppointments && appointmentsRef.current) {
-      // Kill any previous ScrollTriggers to avoid duplicates
-      ScrollTrigger.getAll().forEach(st => st.kill());
-      // Apply scroll‑triggered fade‑up to each appointment item
-      const items = appointmentsRef.current.querySelectorAll('.appointment-item');
+  if (!loadingAppointments && appointmentsRef.current) {
+    const items = appointmentsRef.current.querySelectorAll('.appointment-item')
+    if (!items.length) return
+
+    const ctx = gsap.context(() => {
       gsap.fromTo(items,
         { opacity: 0, y: 20 },
         {
@@ -78,9 +78,12 @@ export default function ProfilePage() {
             toggleActions: 'play none none none'
           }
         }
-      );
-    }
-  }, [loadingAppointments]);
+      )
+    }, appointmentsRef)
+
+    return () => ctx.revert() // only kills its own triggers
+  }
+}, [loadingAppointments])
 
   // Fetch user profile
   useEffect(() => {
@@ -312,13 +315,13 @@ export default function ProfilePage() {
         <div className="absolute top-[-10%] right-[-5%] w-125 h-125 bg-[#CDE9FF]/40 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] left-[-5%] w-100 h-100 bg-[#CDE9FF]/5 rounded-full blur-[100px]" />
         <div className="max-w-7xl mx-auto px-6">
-          <h1 ref={titleRef} className="text-3xl font-bold text-text mb-8 opacity-0">
+          <h1 ref={titleRef} className="text-3xl font-bold text-text mb-8 ">
             {t('myProfile')}
           </h1>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Column - Profile Card */}
-            <div ref={profileCardRef} className="lg:col-span-1 opacity-0">
+            <div ref={profileCardRef} className="lg:col-span-1 ">
               <div className="bg-white rounded-2xl shadow-sm border border-border overflow-hidden sticky top-24">
                 <div className="h-24 bg-linear-to-r from-primary-deep to-primary" />
                 <div className="relative -mt-12 px-6">
@@ -398,7 +401,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Right Column - Appointments */}
-            <div ref={appointmentsRef} className="lg:col-span-2 opacity-0">
+            <div ref={appointmentsRef} className="lg:col-span-2 ">
               <div className="bg-white rounded-2xl shadow-sm border border-border overflow-hidden">
                 <div className="p-6 border-b border-border">
                   <h2 className="text-xl font-bold text-text flex items-center gap-2">
@@ -419,7 +422,7 @@ export default function ProfilePage() {
                       const status = getStatusBadge(apt);
                       const StatusIcon = status.icon;
                       return (
-                        <div key={apt._id} id={`appointment-${apt._id}`} className="appointment-item p-6 hover:bg-gray-50 transition opacity-0">
+                        <div key={apt._id} id={`appointment-${apt._id}`} className="appointment-item p-6 hover:bg-gray-50 transition ">
                           <div className="flex flex-wrap justify-between items-start gap-4">
                             <div className="flex-1">
                               <div className="flex items-center gap-3 mb-2">

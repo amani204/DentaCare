@@ -5,6 +5,7 @@ import { User, Briefcase, Upload, X, Plus, Image as ImageIcon, CheckCircle, Aler
 import useAdminStore from '../../store/adminStore'
 import useT from '../../hooks/useT'
 import api from '../../lib/axios'
+import { PageLoader } from '../../components/ui/Skeleton'
 
 const SPECIALITIES = ['General Dentist','Orthodontist','Endodontist','Periodontist','Oral Surgeon','Pediatric Dentist','Prosthodontist']
 
@@ -108,7 +109,7 @@ export default function AddDoctor() {
   }
 
   const inputClass = (key) => `input ${errors[key] ? 'border-red-500 focus:ring-red-500/20' : ''}`
-
+  if (loading) return <PageLoader />;
   return (
     <div className="max-w-2xl animate-fade-in mx-auto">
       {/* Header */}

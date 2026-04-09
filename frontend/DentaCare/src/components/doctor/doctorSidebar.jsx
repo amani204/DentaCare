@@ -6,7 +6,6 @@ import useDT from '../../hooks/useDT';
 const NAV = [
   { path: '/doctor/dashboard', icon: LayoutDashboard, key: 'dashboard' },
   { path: '/doctor/appointments', icon: CalendarDays, key: 'appointments' },
-  { path: '/doctor/earnings', icon: DollarSign, key: 'earnings' },
   { path: '/doctor/profile', icon: UserCircle, key: 'profile' },
 ];
 
@@ -21,18 +20,14 @@ export default function DoctorSidebar() {
   };
 
   return (
-    <aside className="w-64 flex flex-col bg-gradient-to-tr from-[#5b9c9e] via-[#74baaf] to-[#94d7bd] shadow-xl relative overflow-hidden">
-      {/* Decorative circles */}
-      <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-white/5 pointer-events-none" />
-      <div className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-white/5 pointer-events-none" />
-
+    <aside className="w-64 flex flex-col bg-linear-to-tr from-accent-soft via-[#6ccda8] to-[#76d1ae] shadow-xl relative overflow-hidden">
       {/* Logo */}
       <div className="px-5 py-6 border-b border-white/15">
         <div className="flex items-center gap-2">
   
           <div>
             <p className="text-xl font-bold text-white leading-tight">
-              Denta<span className="text-white/80">Care</span>
+              Denta<span className="text-text/50">Care</span>
             </p>
             <p className="text-xs text-white/70">{t('doctorPortal')}</p>
           </div>
@@ -61,22 +56,18 @@ export default function DoctorSidebar() {
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 flex flex-col gap-1 overflow-y-auto">
         {NAV.map(({ path, icon: Icon, key }) => (
-          <NavLink
-            key={path}
-            to={path}
-            end={path === '/doctor/dashboard'}
-            className={({ isActive }) =>
-              isActive
-                ? 'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-white/20 text-white border-l-2 border-white'
-                : 'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/60 hover:text-white hover:bg-white/10 transition-all duration-200'
-            }
-          >
-            <Icon size={18} className="shrink-0" />
-            <span>{t(key)}</span>
-            {({ isActive }) => isActive && (
-              <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white" />
-            )}
-          </NavLink>
+          <NavLink 
+  to={path} 
+  key={path}
+  className={({ isActive }) => 
+    isActive 
+      ? 'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-white/20 text-white border-l-2 border-white'
+      : 'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/60 hover:text-white hover:bg-white/10 transition-all duration-200'
+  }
+>
+  <Icon size={18} className="shrink-0" />
+  <span>{t(key)}</span>
+</NavLink>
         ))}
       </nav>
 

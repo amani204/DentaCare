@@ -36,8 +36,7 @@ export default function Doctors() {
 
   // Entrance animations using the new hooks
   useFadeIn(headerRef, { y: 30, duration: 0.8 });
-  useScrollFade(gridRef, { selector: '.doctor-card', y: 50, stagger: 0.12, start: 'top 80%' });
-
+  useScrollFade(gridRef, { selector: '.doctor-card', y: 50, stagger: 0.12, start: 'top 80%' }, [loading])
   const initials = (name) => name?.split(' ').slice(0, 2).map(w => w[0]).join('') || 'DR';
 
   if (loading) {
@@ -95,13 +94,17 @@ export default function Doctors() {
               onClick={() => navigate(`/doctors/${doc._id}`)}
               className="doctor-card  bg-white border border-border rounded-[10px] overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-primary group cursor-pointer"
             >
-              <div className="h-80 relative bg-linear-to-br from-accent-soft/20 to-accent-soft/5 flex items-center justify-center">
-                {doc.image ? (
-                  <img src={doc.image} alt={doc.name} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-20 h-20 rounded-full bg-linear-to-br from-accent-soft to-accent-soft/70 flex items-center justify-center text-2xl font-bold text-white">
-                    {initials(doc.name)}
-                  </div>
+              <div className="h-80 relative bg-linear-to-br from-accent-soft/20 to-accent-soft/5 flex items-center justify-center overflow-hidden">
+               {doc.image ? (
+                <img
+                src={doc.image}
+                alt={doc.name}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+               />
+              ) : (
+               <div className="w-20 h-20 rounded-full bg-linear-to-br from-accent-soft to-accent-soft/70 flex items-center justify-center text-2xl font-bold text-white">
+                {initials(doc.name)}
+                 </div>
                 )}
                 <div className={`absolute top-3 right-3 flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-semibold backdrop-blur-sm ${
                   doc.available
@@ -114,7 +117,7 @@ export default function Doctors() {
               </div>
               <div className="p-5">
                 <h3 className="text-lg font-bold text-text mb-1">{doc.name}</h3>
-                <p className="text-sm text-text/50 font-medium mb-3">{doc.speciality}</p>
+                <p className="text-sm text-text/50 font-medium mb-3">{t(doc.speciality.toLowerCase().replace(/ /g, '')) || doc.speciality}</p>
               </div>
             </div>
           ))}

@@ -122,29 +122,7 @@ export function MiniStat({ title, value, color = 'primary' }) {
     </div>
   )
 }
-/* ── LOADER ── */
-export function Loader({ fullScreen = false }) {
-  const spinner = (
-    <Loader2 size={32} className="animate-spin text-accent-soft" />
-  )
 
-  if (fullScreen) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-bg/85 backdrop-blur-sm z-50">
-        <div className="flex flex-col items-center gap-3">
-          {spinner}
-          <p className="sub-text text-sm">Loading...</p>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="flex justify-center py-12">
-      {spinner}
-    </div>
-  )
-}
 
 /* ── EMPTY STATE ── */
 export function EmptyState({ message, icon: Icon, action }) {

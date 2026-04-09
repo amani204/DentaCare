@@ -18,7 +18,6 @@ import DoctorSidebar from './components/doctor/doctorSidebar'
 import DoctorNavbar from './components/doctor/doctorNavbar'
 import DoctorDashboard from './pages/doctor/DoctorDashboard'
 import DoctorAppts from './pages/doctor/DoctorAppointments'
-import DoctorEarnings from './pages/doctor/DoctorEarnings'
 import DoctorProfile from './pages/doctor/DoctorProfile'
 
 // Website
@@ -94,9 +93,6 @@ export default function App() {
           } />
           <Route path="/doctor/appointments" element={
             dToken ? <DoctorShell><DoctorAppts /></DoctorShell> : <Navigate to="/doctor/login" />
-          } />
-          <Route path="/doctor/earnings" element={
-            dToken ? <DoctorShell><DoctorEarnings /></DoctorShell> : <Navigate to="/doctor/login" />
           } />
           <Route path="/doctor/profile" element={
             dToken ? <DoctorShell><DoctorProfile /></DoctorShell> : <Navigate to="/doctor/login" />

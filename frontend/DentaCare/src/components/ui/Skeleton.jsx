@@ -96,35 +96,23 @@ export const DoctorDetailSkeleton = () => (
 )
 
 // ── Page Loader ───────────────────────────────────────────────────────────────
-// Simple but cool full-page loader — use it while fetching critical data
-// Usage: {loading && <PageLoader />}
 export const PageLoader = () => (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm">
     <div className="flex flex-col items-center gap-4">
-
-      {/* Animated logo mark */}
-      <div className="relative w-12 h-12">
-        <div
-          className="absolute inset-0 rounded-xl border-2 border-primary/20"
-          style={{ animation: 'spin 2s linear infinite' }}
-        />
-        <div
-          className="absolute inset-1 rounded-lg border-2 border-t-primary border-r-primary border-b-transparent border-l-transparent"
-          style={{ animation: 'spin 1s linear infinite' }}
-        />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-primary font-bold text-sm">D</span>
-        </div>
+      {/* Spinner with centered D */}
+      <div className="relative w-8 h-8">
+        <div className="absolute inset-0 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+       
       </div>
 
-      {/* Dot pulse row */}
+      {/* Dot pulse */}
       <div className="flex gap-1.5">
-        {[0, 1, 2].map(i => (
+        {[0, 1, 2].map((i) => (
           <div
             key={i}
             className="w-1.5 h-1.5 rounded-full bg-primary"
             style={{
-              animation: 'dotPulse 1.2s ease-in-out infinite',
+              animation: `dotPulse 1.2s ease-in-out infinite`,
               animationDelay: `${i * 0.2}s`,
             }}
           />
@@ -134,12 +122,9 @@ export const PageLoader = () => (
       <style>{`
         @keyframes dotPulse {
           0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
-          40%            { transform: scale(1);   opacity: 1;   }
-        }
-        @keyframes spin {
-          to { transform: rotate(360deg); }
+          40% { transform: scale(1); opacity: 1; }
         }
       `}</style>
     </div>
   </div>
-)
+);

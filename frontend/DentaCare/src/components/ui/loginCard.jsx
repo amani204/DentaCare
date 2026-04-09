@@ -93,7 +93,7 @@ export const LoginCard = ({
   }
 
   // Placeholders - manual for staff, dynamic for patient
-  const emailPlaceholder = (role === 'admin' && isStaff ) ? 'admin@dentacare.com' : (role === 'doctor' && isStaff) ?  'doctor@dentacare.com' : 'patient@dentacare.com'
+  const emailPlaceholder = (role === 'admin' && isStaff ) ? 'admin@dentacare.com' : (role === 'doctor' && isStaff) ?  'doctor@dentacare.com' : 'patient@gmail.com'
   const namePlaceholder = 'Amani Adj'
 
   const getWelcomeText = () => {

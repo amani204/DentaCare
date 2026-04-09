@@ -4,10 +4,11 @@ import {
   CreditCard, Activity, XCircle, CheckCircle, Clock3, 
   Filter, Ban
 } from 'lucide-react'
-import { Badge, Loader, EmptyState, Modal, MiniStat } from '../../components/common/components'
+import { Badge, EmptyState, Modal, MiniStat } from '../../components/common/components'
 import useDoctorStore from '../../store/doctorStore'
 import api from '../../lib/axios'
 import useDT from '../../hooks/useDT'
+import { PageLoader } from '../../components/ui/Skeleton'
 
 const FILTERS = ['all', 'pending', 'completed', 'cancelled']
 
@@ -21,12 +22,20 @@ export default function DoctorAppointments() {
   const [search, setSearch] = useState('')
   const [completing, setCompleting] = useState(null)
   const [cancelling, setCancelling] = useState(null)
-  const [cancelId, setCancelId] = useState(null)  // ← ADD THIS
+  const [cancelId, setCancelId] = useState(null)
 
   const fetchApts = async () => {
     try {
       const { data } = await api.get('/doctor/appointments', { headers: { dtoken: dToken } })
-      if (data.success) setApts(data.appointments)
+      if (data.success) {
+        // Sort appointments by slotDate descending (newest first)
+        const sorted = data.appointments.sort((a, b) => {
+          const dateA = a.slotDate.split('_').reverse().join('-')
+          const dateB = b.slotDate.split('_').reverse().join('-')
+          return dateB.localeCompare(dateA)
+        })
+        setApts(sorted)
+      }
     } catch (e) { console.error(e) }
     finally { setLoading(false) }
   }
@@ -83,7 +92,7 @@ export default function DoctorAppointments() {
     { key: 'actions', icon: null, label: t('actions') },
   ]
 
-  if (loading) return <Loader fullScreen />
+  if (loading) return <PageLoader />
 
   return (
     <div className="flex flex-col gap-5 animate-fade-in">
@@ -216,7 +225,13 @@ export default function DoctorAppointments() {
                     <td className="px-4 py-3 text-sm text-sub whitespace-nowrap">{a.slotDate?.replace(/_/g, '/')}</td>
                     <td className="px-4 py-3 text-sm text-sub whitespace-nowrap">{a.slotTime}</td>
                     <td className="px-4 py-3 text-sm text-primary whitespace-nowrap">${a.amount}</td>
-                    <td className="px-4 py-3 whitespace-nowrap"><Badge status={a.isPaid ? 'paid' : 'unpaid'} /></td>
+                    
+                    {/* Payment Status – hidden if completed (completed => paid) */}
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {!a.isCompleted && <Badge status={a.isPaid ? 'paid' : 'unpaid'} />}
+                      {a.isCompleted && <span className="text-muted text-xs">—</span>}
+                    </td>
+                    
                     <td className="px-4 py-3 whitespace-nowrap"><Badge status={getStatus(a)} /></td>
 
                     {/* Actions */}

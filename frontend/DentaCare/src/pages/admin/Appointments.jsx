@@ -4,10 +4,11 @@ import {
   CreditCard, Activity, XCircle, CheckCircle, Clock3, 
   Filter, Ban
 } from 'lucide-react'
-import { Badge, Loader, EmptyState, Modal, MiniStat } from '../../components/common/components'
+import { Badge, EmptyState, Modal, MiniStat } from '../../components/common/components'
 import useAdminStore from '../../store/adminStore'
 import useT from '../../hooks/useT'
 import api from '../../lib/axios'
+import { PageLoader } from '../../components/ui/Skeleton'
 
 const FILTERS = ['all', 'pending', 'completed', 'cancelled']
 
@@ -25,7 +26,15 @@ export default function Appointments() {
   const fetch = async () => {
     try {
       const { data } = await api.get('/admin/appointments', { headers: { atoken: aToken } })
-      if (data.success) setApts(data.appointments)
+      if (data.success) {
+        // Sort appointments by slotDate descending (newest first)
+        const sorted = data.appointments.sort((a, b) => {
+          const dateA = a.slotDate.split('_').reverse().join('-')
+          const dateB = b.slotDate.split('_').reverse().join('-')
+          return dateB.localeCompare(dateA)
+        })
+        setApts(sorted)
+      }
     } catch (e) { console.error(e) }
     finally { setLoading(false) }
   }
@@ -73,7 +82,7 @@ export default function Appointments() {
     { key: 'actions', icon: null, label: t('actions') },
   ]
 
-  if (loading) return <Loader fullScreen />
+  if (loading) return <PageLoader />
 
   return (
     <div className="flex flex-col gap-5 animate-fade-in">
@@ -87,30 +96,15 @@ export default function Appointments() {
       </div>
 
       {/* Appointments Control Center */}
-  <div className="flex flex-col gap-6 bg-white p-5 rounded-2xl border border-border shadow-sm mb-2">
-      
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-    <MiniStat
-      title={t('total')}
-      value={counts.all}
-      color="success"
-    />
-    <MiniStat
-      title={t('pending')}
-     value={counts.pending}
-      color="primary"
-    />
-    <MiniStat
-      title={t('completed')}
-      value={counts.completed}
-      color="accentSoft"
-    />
-    <MiniStat
-      title={t('cancelled')}
-      value={counts.cancelled}
-      color="accent"
-    />
-  </div>
+      <div className="flex flex-col gap-6 bg-white p-5 rounded-2xl border border-border shadow-sm mb-2">
+        
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <MiniStat title={t('total')} value={counts.all} color="success" />
+          <MiniStat title={t('pending')} value={counts.pending} color="primary" />
+          <MiniStat title={t('completed')} value={counts.completed} color="accentSoft" />
+          <MiniStat title={t('cancelled')} value={counts.cancelled} color="accent" />
+        </div>
+
         {/* Tabs and Search */}
         <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between pt-4 border-t border-dashed border-border">
           
@@ -220,7 +214,13 @@ export default function Appointments() {
                     <td className="px-4 py-3 text-sm text-sub whitespace-nowrap">{a.slotDate?.replace(/_/g, '/')}</td>
                     <td className="px-4 py-3 text-sm text-sub whitespace-nowrap">{a.slotTime}</td>
                     <td className="px-4 py-3 text-sm  text-primary whitespace-nowrap">${a.amount}</td>
-                    <td className="px-4 py-3 whitespace-nowrap"><Badge status={a.isPaid ? 'paid' : 'unpaid'} /></td>
+                    
+                    {/* Payment Status – hidden if completed (completed => paid) */}
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {!a.isCompleted && <Badge status={a.isPaid ? 'paid' : 'unpaid'} />}
+                      {a.isCompleted && <span className="text-muted text-xs">—</span>}
+                    </td>
+                    
                     <td className="px-4 py-3 whitespace-nowrap"><Badge status={getStatus(a)} /></td>
 
                     {/* Actions */}

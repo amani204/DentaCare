@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { CalendarDays, CheckCircle, DollarSign, Clock, ArrowRight} from 'lucide-react'
-import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import { CalendarDays, CheckCircle, DollarSign, Clock, ArrowRight } from 'lucide-react'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import useDoctorStore from '../../store/doctorStore'
 import api from '../../lib/axios'
-import { StatCard, Badge, Loader } from '../../components/common/components'
+import { StatCard, Badge } from '../../components/common/components'
 import useDT from '../../hooks/useDT'
+import { PageLoader } from '../../components/ui/Skeleton'
 
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 const monthsFr = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
@@ -42,7 +43,7 @@ export default function DoctorDashboard() {
   const handleComplete = async (id) => {
     setCompleting(id)
     try {
-      const { data } = await api.post('/api/doctor/complete', { appointmentId: id }, { headers: { dtoken: dToken } })
+      const { data } = await api.post('/doctor/complete', { appointmentId: id }, { headers: { dtoken: dToken } })
       if (data.success) fetchAll()
     } catch (e) { console.error(e) }
     finally { setCompleting(null) }
@@ -51,7 +52,7 @@ export default function DoctorDashboard() {
   const handleCancel = async (id) => {
     setCancelling(id)
     try {
-      const { data } = await api.post('/api/doctor/cancel', { appointmentId: id }, { headers: { dtoken: dToken } })
+      const { data } = await api.post('/doctor/cancel', { appointmentId: id }, { headers: { dtoken: dToken } })
       if (data.success) fetchAll()
     } catch (e) { console.error(e) }
     finally { setCancelling(null) }
@@ -62,11 +63,7 @@ export default function DoctorDashboard() {
   const hour = new Date().getHours()
   const greeting = hour < 12 ? t('goodMorning') : hour < 18 ? t('goodAfternoon') : t('goodEvening')
 
-  const mNames = lang === 'fr' ? monthsFr : months
-  const revenueData = dashboard?.stats?.monthlyEarnings && dashboard.stats.monthlyEarnings.length > 0
-    ? dashboard.stats.monthlyEarnings.map((v, i) => ({ month: mNames[i], revenue: v }))
-    : mNames.slice(0, 6).map((m) => ({ month: m, revenue: 0 }))
-
+  // Appointment status data for bar chart
   const apptData = lang === 'fr'
     ? [
         { name: 'Terminés', value: dashboard?.stats?.completedAppointments ?? 0, color: '#10B981' },
@@ -84,7 +81,8 @@ export default function DoctorDashboard() {
   const recentApts = allApts.slice(0, 5)
   const d = dashboard?.stats
 
-  if (loading) return <Loader fullScreen />
+  if (loading) return <PageLoader />
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between mt-8">
@@ -107,8 +105,6 @@ export default function DoctorDashboard() {
             <p className="text-xs text-sub">{t('done')}</p>
           </div>
         </div>
-
-        
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -118,32 +114,7 @@ export default function DoctorDashboard() {
         <StatCard title={t('totalEarnings')} value={`$${(d?.totalEarnings ?? 0).toLocaleString()}`} icon={DollarSign} trend={t('fromCompleted')} color="accentSoft" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-primary/10 shadow-lg p-5">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-text">{t('monthlyEarnings')}</h3>
-            <span className="badge badge-primary">2026</span>
-          </div>
-          <ResponsiveContainer width="100%" height={240}>
-            <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#2C2C2A" stopOpacity={0.2} />
-                  <stop offset="95%" stopColor="#2C2C2A" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E2EBEA" vertical={false} />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#5A7A75' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#5A7A75' }} axisLine={false} tickLine={false} tickFormatter={v => `$${v / 1000}k`} domain={[0, 'auto']} />
-              <Tooltip
-                contentStyle={{ backgroundColor: '#FFFFFF', border: '1px solid #E2EBEA', borderRadius: 12, padding: '8px 12px' }}
-                cursor={{ fill: 'rgba(112,151,210,0.08)' }}
-              />
-              <Area type="monotone" dataKey="revenue" stroke="#2C2C2A" strokeWidth={2.5} fill="url(#revenueGradient)" dot={{ fill: '#2C2C2A', strokeWidth: 0, r: 3.5 }} />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-5">
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-primary/10 shadow-lg p-5">
           <h3 className="text-lg font-semibold text-text mb-4">{t('aptStats')}</h3>
           <ResponsiveContainer width="100%" height={240}>
@@ -240,7 +211,7 @@ export default function DoctorDashboard() {
                           </div>
                           <span className="text-sm font-medium text-text">{a.userData?.name || '—'}</span>
                         </div>
-                       </td>
+                      </td>
                       <td className="px-3 py-2.5 text-sm text-sub">{a.slotDate?.replace(/_/g, '/')}</td>
                       <td className="px-3 py-2.5 text-sm text-sub">{a.slotTime}</td>
                       <td className="px-3 py-2.5 text-sm font-semibold text-primary">${a.amount}</td>

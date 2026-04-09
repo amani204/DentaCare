@@ -9,7 +9,7 @@ import api from '../../lib/axios';
 import Navbar from '../../components/website/Navbar';
 import Footer from '../../components/website/Footer';
 import { DoctorCardSkeleton } from '../../components/ui/Skeleton';
-import gsap from 'gsap';
+
 
 const SPECIALITIES = [
   'All Specialities',
@@ -65,7 +65,7 @@ function DoctorCard({ doctor, onClick }) {
       <div className="p-4 flex-1 flex flex-col gap-2">
         <div>
           <h3 className="text-lg font-bold text-text font-serif">{doctor.name}</h3>
-          <p className="text-sm font-medium text-primary">{doctor.speciality}</p>
+          <p className="text-sm font-medium text-primary">{t(doctor.speciality.toLowerCase().replace(/ /g, '')) || doctor.speciality}</p>
         </div>
       </div>
     </div>
@@ -82,9 +82,12 @@ export default function DoctorsPage() {
   const [showFilter, setShowFilter] = useState(false);
   const [sortBy, setSortBy] = useState('name');
   const [onlyAvail, setOnlyAvail] = useState(false);
-  const headerRef = useRef(null);
   const gridRef = useRef(null);
   const pageRef = useRef(null);
+  const breadcrumbRef = useRef(null)
+  const titleRef      = useRef(null)
+  const subtitleRef   = useRef(null)
+  const searchRef     = useRef(null)
 
   // Fetch doctors
   useEffect(() => {
@@ -101,13 +104,11 @@ export default function DoctorsPage() {
   }, []);
 
   // Entrance animations
-  useFadeIn(headerRef, { y: 30, duration: 0.8 }); // header fades in immediately on load
-  useScrollFade(gridRef, {
-  selector: '.doctor-card',
-  y: 50,
-  stagger: 0.12,
-  start: 'top 85%'
-}, [loading]);
+  useFadeIn(breadcrumbRef, { y: -10, duration: 0.5 })
+useFadeIn(titleRef,      { y: 30,  duration: 0.7, delay: 0.1 })
+useFadeIn(subtitleRef,   { y: 20,  duration: 0.6, delay: 0.25 })
+useFadeIn(searchRef,     { y: 20,  duration: 0.6, delay: 0.4 })
+useScrollFade(gridRef, { selector: '.doctor-card', y: 40, stagger: 0.08, start: 'top 85%' }, [loading])
 
   // Page exit animation
   const { leaveAndGo } = usePageLeave(pageRef);
@@ -141,10 +142,10 @@ export default function DoctorsPage() {
       <>
         <Navbar />
         <div className="min-h-screen bg-bg font-sans">
-          <div className="max-w-7xl mx-auto px-6 py-10">
+          <div className="max-w-7xl mx-auto px-6 py-24">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {[...Array(8)].map((_, i) => (
-                <DoctorCardSkeleton key={i} />
+                <DoctorCardSkeleton  key={i} />
               ))}
             </div>
           </div>
@@ -165,20 +166,20 @@ export default function DoctorsPage() {
             backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)',
             backgroundSize: '28px 28px',
           }} />
-          <div ref={headerRef} className="relative z-10 max-w-7xl mx-auto px-6 ">
-            <div className="flex items-center gap-2 mb-4">
+          <div className="relative z-10 max-w-7xl mx-auto px-6 ">
+            <div ref={breadcrumbRef} className="flex items-center gap-2 mb-4">
               <Link to="/" className="text-sm text-white/60 hover:text-primary-soft transition flex items-center gap-1">
                 <ArrowLeft size={13} /> {t('home')}
               </Link>
               <span className="text-white/40 text-sm">/</span>
               <span className="text-sm text-white/80">{t('doctors')}</span>
             </div>
-            <h1 className="heading-lg text-4xl md:text-5xl font-bold text-white mb-3 font-serif">
+            <h1 ref={titleRef} className="heading-lg text-4xl md:text-5xl font-bold text-white mb-3 font-serif">
               {t('doctorsHeroTitle')}{' '}
               <span className="text-accent-soft">{t('doctorsHeroHighlight')}</span>
             </h1>
-            <p className="text-white/70 text-lg max-w-xl mb-8">{t('doctorsHeroSub')}</p>
-            <div className="flex flex-wrap gap-3 max-w-2xl">
+            <p ref={subtitleRef} className="text-white/70 text-lg max-w-xl mb-8">{t('doctorsHeroSub')}</p>
+            <div ref={searchRef} className="flex flex-wrap gap-3 max-w-2xl">
               <div className="flex-1 relative min-w-60">
                 <Search size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
                 <input
