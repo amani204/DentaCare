@@ -9,7 +9,7 @@ import { PageLoader } from '../../components/ui/Skeleton'
 
 const SPECIALITIES = ['General Dentist','Orthodontist','Endodontist','Periodontist','Oral Surgeon','Pediatric Dentist','Prosthodontist']
 
-const INIT = { name:'', email:'', password:'', speciality:'General Dentist', degree:'', experience:'', about:'', fees:'', line1:'', line2:'' }
+const INIT = { name:'', email:'', password:'', speciality:'General Dentist', degree:'', experience:'', about:'', fees:'' }
 
 function Field({ label, error, icon: Icon, children }) {
   return (
@@ -95,7 +95,6 @@ export default function AddDoctor() {
         speciality: form.speciality, degree: form.degree, 
         experience: form.experience, about: form.about, fees: form.fees 
       }).forEach(([k,v]) => fd.append(k, v))
-      fd.append('address', JSON.stringify({ line1: form.line1, line2: form.line2 }))
       fd.append('image', image)
       const { data } = await api.post('/admin/add-doctor', fd, { 
         headers: { atoken: aToken, 'Content-Type': 'multipart/form-data' } 
@@ -109,7 +108,7 @@ export default function AddDoctor() {
   }
 
   const inputClass = (key) => `input ${errors[key] ? 'border-red-500 focus:ring-red-500/20' : ''}`
-  if (loading) return <PageLoader />;
+  //if (loading) return <PageLoader />;
   return (
     <div className="max-w-2xl animate-fade-in mx-auto">
       {/* Header */}
@@ -206,67 +205,45 @@ export default function AddDoctor() {
           </div>
         </Section>
 
-        {/* Professional Info */}
-        <Section title={t('professionalInfo')} icon={Briefcase}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-            <Field label={t('degree')} error={errors.degree} >
-              <input 
-                className={inputClass('degree')} 
-                placeholder="DDS, BDS..."
-                value={form.degree} 
-                onChange={e => setField('degree', e.target.value)} 
-              />
-            </Field>
-            <Field label={t('experienceYrs')} error={errors.experience}>
-              <input 
-                className={inputClass('experience')} 
-                placeholder="5 years"
-                value={form.experience} 
-                onChange={e => setField('experience', e.target.value)} 
-              />
-            </Field>
-            <Field label={t('feesLabel')} error={errors.fees} >
-              <input 
-                type="number"
-                className={inputClass('fees')} 
-                placeholder="50"
-                value={form.fees} 
-                onChange={e => setField('fees', e.target.value)} 
-              />
-            </Field>
-          </div>
-          <Field label={t('about')} error={errors.about} >
-            <textarea 
-              className={`${inputClass('about')} resize-none min-h-20`}
-              placeholder="Brief description about the doctor..."
-              value={form.about} 
-              onChange={e => setField('about', e.target.value)} 
-              rows={3}
-            />
-          </Field>
-        </Section>
-
-        {/* Address */}
-        <Section title={t('address')} icon={MapPin}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-            <Field label={t('addressLine1')} >
-              <input 
-                className="input" 
-                placeholder="123 Main St"
-                value={form.line1} 
-                onChange={e => setField('line1', e.target.value)} 
-              />
-            </Field>
-            <Field label={t('addressLine2')}>
-              <input 
-                className="input" 
-                placeholder="Suite 4B"
-                value={form.line2} 
-                onChange={e => setField('line2', e.target.value)} 
-              />
-            </Field>
-          </div>
-        </Section>
+      {/* Professional Info */}
+<Section title={t('professionalInfo')} icon={Briefcase}>
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+    <Field label={t('degree')} error={errors.degree} >
+      <input 
+        className={inputClass('degree')} 
+        placeholder="DDS, BDS..."
+        value={form.degree} 
+        onChange={e => setField('degree', e.target.value)} 
+      />
+    </Field>
+    <Field label={t('experienceYrs')} error={errors.experience}>
+      <input 
+        className={inputClass('experience')} 
+        placeholder="5"
+        value={form.experience} 
+        onChange={e => setField('experience', e.target.value)} 
+      />
+    </Field>
+    <Field label={t('feesLabel')} error={errors.fees} >
+      <input 
+        type="number"
+        className={inputClass('fees')} 
+        placeholder="50"
+        value={form.fees} 
+        onChange={e => setField('fees', e.target.value)} 
+      />
+    </Field>
+  </div>
+  <Field label={t('about')} error={errors.about} >
+    <textarea 
+      className={`${inputClass('about')} resize-none min-h-20`}
+      placeholder={t('des') || "Brief description about the doctor..."}
+      value={form.about} 
+      onChange={e => setField('about', e.target.value)}   
+      rows={3}
+    />
+  </Field>
+</Section>
 
         {/* Actions */}
         <div className="flex gap-3 pb-6">

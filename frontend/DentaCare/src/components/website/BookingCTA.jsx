@@ -20,7 +20,7 @@ export default function BookingCTA() {
   const stepsRef = useRef(null);
   const bgRef = useRef(null);
 
-  // Parallax background (scrub)
+  // Parallax background 
   useEffect(() => {
     if (!bgRef.current) return;
     gsap.to(bgRef.current, {
@@ -108,7 +108,7 @@ export default function BookingCTA() {
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
                 to="/doctors"
-                className="inline-flex items-center gap-2 font-semibold px-8 py-3 btn-primary"
+                className="inline-flex items-center gap-2 px-8 py-3 btn-primary"
               >
                 {t('bookAppointment')} <ArrowRight size={18} />
               </Link>

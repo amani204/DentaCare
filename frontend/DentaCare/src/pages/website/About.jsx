@@ -24,13 +24,10 @@ export default function AboutPage() {
   const cardsRef = useRef(null);
   const imageRef = useRef(null);
   
-  // useCountUp returns an object with numRefs – use it directly
+  
   const { numRefs } = useCountUp([2500, 12, 98, 15], ['+', '+', '%', '+']);
-
-  // Scroll‑triggered fade‑up for value cards
   useScrollFade(cardsRef, { selector: '.value-card', y: 30, stagger: 0.12, start: 'top 80%' });
 
-  // Custom animations for left/right slide and image clip
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.fromTo(leftRef.current,

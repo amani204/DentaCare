@@ -4,7 +4,7 @@ import {
   CreditCard, Activity, XCircle, CheckCircle, Clock3, 
   Filter, Ban
 } from 'lucide-react'
-import { Badge, EmptyState, Modal, MiniStat } from '../../components/common/components'
+import { Badge, EmptyState, Modal, MiniStat } from '../../components/ui/components'
 import useAdminStore from '../../store/adminStore'
 import useT from '../../hooks/useT'
 import api from '../../lib/axios'
@@ -213,7 +213,7 @@ export default function Appointments() {
 
                     <td className="px-4 py-3 text-sm text-sub whitespace-nowrap">{a.slotDate?.replace(/_/g, '/')}</td>
                     <td className="px-4 py-3 text-sm text-sub whitespace-nowrap">{a.slotTime}</td>
-                    <td className="px-4 py-3 text-sm  text-primary whitespace-nowrap">${a.amount}</td>
+                    <td className="px-4 py-3 text-sm  text-primary whitespace-nowrap">{a.amount}DA</td>
                     
                     {/* Payment Status – hidden if completed (completed => paid) */}
                     <td className="px-4 py-3 whitespace-nowrap">

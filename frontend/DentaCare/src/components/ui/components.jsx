@@ -16,7 +16,7 @@ const badgeMap = {
 
 export function Badge({ status }) {
   const t = useT()
-  const key = status?.toLowerCase() || 'pending'
+  const key = status?.toLowerCase() || t('pending')
   const m = badgeMap[key] || badgeMap.pending
   const Icon = m.icon
 
@@ -174,7 +174,7 @@ export function Modal({
       <div className="glass relative w-full max-w-md p-6 animate-slide-up">
         <div className="flex gap-4 mb-5">
           <div className={`
-            w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center
+            w-10 h-10 rounded-xl shrink-0 flex items-center justify-center
             ${isDanger ? 'bg-red-50 text-red-500' : 'bg-primary/10 text-primary'}
           `}>
             <IconComponent size={20} />

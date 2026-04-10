@@ -20,7 +20,6 @@ export const LoginCard = ({
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [name, setName] = useState('')
-  const [phone, setPhone] = useState('')
   
   const [otpCode, setOtpCode] = useState('')
   const [newPassword, setNewPassword] = useState('')
@@ -70,7 +69,7 @@ export const LoginCard = ({
       if (isLogin) {
         onSubmit?.({ email, password })
       } else if (isSignup) {
-        onSubmit?.({ name, email, password, phone })
+        onSubmit?.({ name, email, password })
       } else if (isForgot) {
         onSubmit?.({ email })
       } else if (isVerifyOTP) {
@@ -92,7 +91,7 @@ export const LoginCard = ({
     }
   }
 
-  // Placeholders - manual for staff, dynamic for patient
+  // Placeholders 
   const emailPlaceholder = (role === 'admin' && isStaff ) ? 'admin@dentacare.com' : (role === 'doctor' && isStaff) ?  'doctor@dentacare.com' : 'patient@gmail.com'
   const namePlaceholder = 'Amani Adj'
 
@@ -213,27 +212,6 @@ export const LoginCard = ({
               />
             </div>
           </div>
-
-          {/* Phone Field (only for patient signup) */}
-          {!simple && !isStaff && isSignup && (
-            <div className="animate-fade-in">
-              <label className="block text-sm font-medium text-text mb-1.5">
-                {t('phone') || 'Phone Number'}
-              </label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+213 5XX XX XX XX"
-                  required
-                  className="w-full pl-10 pr-3 py-2.5 bg-bg border border-border rounded-lg text-text placeholder:text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
-                />
-              </div>
-            </div>
-          )}
-
           {/* OTP Field (patient verify-otp mode) */}
           {!simple && !isStaff && isVerifyOTP && (
             <div className="animate-fade-in">

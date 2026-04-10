@@ -8,14 +8,9 @@ import Dashboard from './pages/admin/Dashboard'
 import DoctorsList from './pages/admin/DoctorsList'
 import AddDoctor from './pages/admin/AddDoctor'
 import Appointments from './pages/admin/Appointments'
-import AdminSidebar from './components/admin/Sidebar'
-import AdminNavbar from './components/admin/Navbar'
-
 // Doctor
 import useDoctorStore from './store/doctorStore'
 import DoctorLogin from './pages/doctor/DoctorLogin'
-import DoctorSidebar from './components/doctor/doctorSidebar'
-import DoctorNavbar from './components/doctor/doctorNavbar'
 import DoctorDashboard from './pages/doctor/DoctorDashboard'
 import DoctorAppts from './pages/doctor/DoctorAppointments'
 import DoctorProfile from './pages/doctor/DoctorProfile'
@@ -26,40 +21,9 @@ import About from './pages/website/About'
 import Auth from './pages/website/Auth'
 import DoctorsPage from './pages/website/DoctorsPage'
 import DoctorDetailsPage from './pages/website/DoctorDetailsPage'
-// Background Component
 import ProfilePage from './pages/website/profilepage'
-
-
-// ── Admin protected layout
-function AdminShell({ children }) {
-  return (
-    <div className="flex h-screen overflow-hidden bg-transparent">
-      <AdminSidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <AdminNavbar />
-        <main className="flex-1 overflow-y-auto p-5">
-          {children}
-        </main>
-      </div>
-    </div>
-  )
-}
-
-// ── Doctor protected layout
-function DoctorShell({ children }) {
-  return (
-    <div className="flex h-screen overflow-hidden bg-bg">
-      <DoctorSidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <DoctorNavbar />
-        <main className="flex-1 overflow-y-auto p-6">
-          {children}
-        </main>
-      </div>
-    </div>
-  )
-}
-
+import { AdminShell } from './components/layouts/AdminShell'
+import { DoctorShell } from './components/layouts/DoctorShell'
 export default function App() {
   const { aToken } = useAdminStore()
   const { dToken } = useDoctorStore()

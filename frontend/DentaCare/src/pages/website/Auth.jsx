@@ -84,7 +84,7 @@ export default function Auth() {
         name: formData.name,
         email: formData.email,
         password: formData.password,
-        phone: formData.phone,
+        
       })
       if (data.success) {
         toast.success(t('registrationSuccess') || 'Registration successful! Please login.')

@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, CalendarDays, DollarSign, UserCircle, LogOut, Stethoscope } from 'lucide-react';
+import { LayoutDashboard, CalendarDays, UserCircle, LogOut, Stethoscope } from 'lucide-react';
 import useDoctorStore from '../../store/doctorStore';
-import useDT from '../../hooks/useDT';
+import useT from '../../hooks/useT';
 
 const NAV = [
   { path: '/doctor/dashboard', icon: LayoutDashboard, key: 'dashboard' },
@@ -12,7 +12,7 @@ const NAV = [
 export default function DoctorSidebar() {
   const { logout, doctor } = useDoctorStore();
   const navigate = useNavigate();
-  const t = useDT();
+  const t = useT();
 
   const handleLogout = () => {
     logout();
@@ -36,7 +36,7 @@ export default function DoctorSidebar() {
 
       {/* Doctor Mini Profile */}
       {doctor && (
-        <div className="mx-3 mt-4 p-3 rounded-xl bg-white/15 border border-white/20 backdrop-blur-sm">
+        <div className="mx-3 mt-4 p-3 rounded-sm bg-white/15 border border-white/20 backdrop-blur-sm">
           <div className="flex items-center gap-3">
             {doctor.image ? (
               <img src={doctor.image} alt="" className="w-10 h-10 rounded-full object-cover border-2 border-white/30" />
@@ -47,7 +47,7 @@ export default function DoctorSidebar() {
             )}
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-white truncate">{doctor.name}</p>
-              <p className="text-xs text-white/70 truncate">{doctor.speciality}</p>
+              <p className="text-xs text-white/70 truncate">{t(doctor.speciality.toLowerCase().replace(/ /g, '')) || doctor.speciality}</p>
             </div>
           </div>
         </div>
@@ -61,8 +61,8 @@ export default function DoctorSidebar() {
   key={path}
   className={({ isActive }) => 
     isActive 
-      ? 'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-white/20 text-white border-l-2 border-white'
-      : 'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/60 hover:text-white hover:bg-white/10 transition-all duration-200'
+      ? 'flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-medium bg-white/20 text-white border-l-2 border-white'
+      : 'flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-medium text-white/60 hover:text-white hover:bg-white/10 transition-all duration-200'
   }
 >
   <Icon size={18} className="shrink-0" />
@@ -75,7 +75,7 @@ export default function DoctorSidebar() {
       <div className="p-3 border-t border-white/15">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/50 hover:text-red-600/80 hover:bg-red-700/10 transition-all duration-200 group"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-medium text-white/50 hover:text-red-600/80 hover:bg-red-700/10 transition-all duration-200 group"
         >
           <LogOut size={18} className="shrink-0 group-hover:rotate-12 transition-transform" />
           <span>{t('logout')}</span>

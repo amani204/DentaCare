@@ -10,14 +10,11 @@ import userRouter from './routes/userRoutes.js';
 import doctorRouter from './routes/doctorRoutes.js';
 import appointmentRouter from './routes/appointmentRoutes.js';
 import paymentRouter from './routes/paymentRoutes.js';
-import reviewRouter from './routes/reviewRoutes.js'
 //app config
 connectDB();
 connectCloudinary();
 const app = express();
 const port = process.env.PORT || 5000;
-
-
 
 //middlewares
 app.use(express.json());
@@ -33,7 +30,6 @@ app.use('/api/user', userRouter);
 app.use('/api/doctor', doctorRouter);
 app.use('/api/appointment', appointmentRouter);
 app.use('/api/payment', paymentRouter);
-app.use('/api/review', reviewRouter)
 //api endpointes
 app.get('/', (req, res) => {
     res.send('API Working');

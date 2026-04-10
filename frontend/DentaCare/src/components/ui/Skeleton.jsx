@@ -1,14 +1,11 @@
-// src/components/ui/Skeleton.jsx
 
 // ── Base shimmer ──────────────────────────────────────────────────────────────
-// Animated shimmer effect — more alive than plain animate-pulse
 const shimmer = {
   background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
   backgroundSize: '200% 100%',
   animation: 'shimmer 1.5s infinite',
 }
 
-// Inject keyframes once
 if (typeof document !== 'undefined' && !document.getElementById('skeleton-style')) {
   const style = document.createElement('style')
   style.id = 'skeleton-style'

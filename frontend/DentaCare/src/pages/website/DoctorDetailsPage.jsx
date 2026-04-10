@@ -325,7 +325,7 @@ export default function DoctorDetailsPage() {
       .finally(() => setLoading(false))
   }, [docId, navigate])
 
-  // Page exit animation (using usePageLeave)
+  // Page exit animation
   const { leaveAndGo } = usePageLeave(pageRef)
   const handleBack = () => {
     leaveAndGo(() => navigate('/doctors'))

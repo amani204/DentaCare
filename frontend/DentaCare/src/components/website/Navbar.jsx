@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { Menu, X, ChevronRight, User, LogOut } from 'lucide-react'
+import { Menu, X, ChevronRight, User, LogOut, Shield, Stethoscope } from 'lucide-react'
 import useAuthStore from '../../store/useAuth'
 import useT from '../../hooks/useT'
 import { useFadeIn } from '../../hooks/gsap'
@@ -18,8 +18,10 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [showDropdown, setShowDropdown] = useState(false)
+  const [showStaffDropdown, setShowStaffDropdown] = useState(false)
   const navRef = useRef(null)
   const dropdownRef = useRef(null)
+  const staffDropdownRef = useRef(null)
   const navigate = useNavigate()
   const location = useLocation()
   const { user, isAuthenticated, logout, role } = useAuthStore()
@@ -42,10 +44,22 @@ export default function Navbar() {
     return () => { document.body.style.overflow = 'unset' }
   }, [menuOpen])
 
+  // Close user dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Close staff dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (staffDropdownRef.current && !staffDropdownRef.current.contains(event.target)) {
+        setShowStaffDropdown(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -126,6 +140,43 @@ export default function Navbar() {
 
           <div className="hidden md:flex items-center gap-3">
             <LanguageToggle />
+            <div className="w-px h-6 bg-border" />
+
+            {/* Staff Dropdown */}
+            <div className="relative" ref={staffDropdownRef}>
+              <button
+                onClick={() => setShowStaffDropdown(!showStaffDropdown)}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-sub hover:text-primary transition-all duration-200 rounded-lg hover:bg-primary/5"
+              >
+                <Shield size={16} />
+                <span className="hidden lg:inline">{t('staff') || 'Staff'}</span>
+              </button>
+              {showStaffDropdown && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-border overflow-hidden z-50 animate-fade-in">
+                  <div className="py-2">
+                    <button
+                      onClick={() => {
+                        setShowStaffDropdown(false)
+                        navigate('/admin/login')
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-sub hover:bg-gray-50 hover:text-text transition"
+                    >
+                      <Shield size={16} /> {t('adminLogin') || 'Admin Login'}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowStaffDropdown(false)
+                        navigate('/doctor/login')
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-sub hover:bg-gray-50 hover:text-text transition"
+                    >
+                      <Stethoscope size={16} /> {t('doctorLogin') || 'Doctor Login'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="w-px h-6 bg-border" />
 
             {isAuthenticated && role === 'patient' ? (
@@ -248,8 +299,30 @@ export default function Navbar() {
             </div>
 
             <div className="px-6 py-4 border-t border-border space-y-3">
-              <div onClick={() => setMenuOpen(false)}>
-                <LanguageToggle />
+              {/* Staff login options in mobile menu */}
+              <button
+                onClick={() => {
+                  setMenuOpen(false)
+                  navigate('/admin/login')
+                }}
+                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-border text-sub font-medium hover:bg-primary/5 transition"
+              >
+                <Shield size={16} /> {t('adminLogin') || 'Admin Login'}
+              </button>
+              <button
+                onClick={() => {
+                  setMenuOpen(false)
+                  navigate('/doctor/login')
+                }}
+                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-border text-sub font-medium hover:bg-primary/5 transition"
+              >
+                <Stethoscope size={16} /> {t('doctorLogin') || 'Doctor Login'}
+              </button>
+
+              <div className="border-t border-border pt-3">
+                <div onClick={() => setMenuOpen(false)}>
+                  <LanguageToggle />
+                </div>
               </div>
 
               {isAuthenticated && role === 'patient' ? (

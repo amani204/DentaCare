@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, Plus, Trash2, ToggleLeft, ToggleRight, Stethoscope, DollarSign, GraduationCap, Activity, ChevronDown, Users, Clock, Layers, CheckCircle } from 'lucide-react'
-import { Badge, EmptyState, Modal, StatCard, MiniStat } from '../../components/common/components'
+import { Badge, EmptyState, Modal, StatCard, MiniStat } from '../../components/ui/components'
 import useAdminStore from '../../store/adminStore'
 import useT from '../../hooks/useT'
 import api from '../../lib/axios'
@@ -69,7 +69,7 @@ export default function DoctorsList() {
           <h2 className="page-title">{t('allDoctors')}</h2>
           <p className="sub-text">{doctors.length} {t('registered')}</p>
         </div>
-        <button onClick={() => navigate('admin/add-doctor')} className="btn btn-primary flex items-center gap-2">
+        <button onClick={() => navigate('/admin/add-doctor')} className="btn btn-primary flex items-center gap-2">
           <Plus size={16} />
           {t('addDoctor')}
         </button>
@@ -157,7 +157,7 @@ export default function DoctorsList() {
       {/* Cards grid */}
       {filtered.length === 0
         ? <EmptyState message={t('noDoctors')}
-            action={{ label: `+ ${t('addDoctor')}`, onClick: () => navigate('/add-doctor') }} />
+            action={{ label: `+ ${t('addDoctor')}`, onClick: () => navigate('/admin/add-doctor') }} />
         : (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-3.5">
             {filtered.map(d => (
@@ -184,7 +184,7 @@ export default function DoctorsList() {
                     <GraduationCap size={12} /> {d.degree} · {d.experience} {t('experience')}
                   </span>
                   <span className="font-bold text-sm text-primary-hov flex items-center gap-0.5">
-                    <DollarSign size={12} />{d.fees}
+                    <DollarSign size={12} />{d.fees}DA
                   </span>
                 </div>
 

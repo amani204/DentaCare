@@ -4,16 +4,15 @@ import { CalendarDays, CheckCircle, DollarSign, Clock, ArrowRight } from 'lucide
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import useDoctorStore from '../../store/doctorStore'
 import api from '../../lib/axios'
-import { StatCard, Badge } from '../../components/common/components'
-import useDT from '../../hooks/useDT'
+import { StatCard, Badge } from '../../components/ui/components'
+import useT from '../../hooks/useT'
 import { PageLoader } from '../../components/ui/Skeleton'
-
-const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-const monthsFr = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
+import useAdminStore from '../../store/adminStore'
 
 export default function DoctorDashboard() {
-  const { dToken, doctor, lang } = useDoctorStore()
-  const t = useDT()
+  const { dToken, doctor} = useDoctorStore()
+  const {  lang } = useAdminStore()
+  const t = useT()
 
   const [dashboard, setDashboard] = useState(null)
   const [allApts, setAllApts] = useState([])
@@ -66,15 +65,16 @@ export default function DoctorDashboard() {
   // Appointment status data for bar chart
   const apptData = lang === 'fr'
     ? [
-        { name: 'Terminés', value: dashboard?.stats?.completedAppointments ?? 0, color: '#10B981' },
-        { name: 'En attente', value: dashboard?.stats?.pendingAppointments ?? 0, color: '#F59E0B' },
-        { name: 'Annulés', value: dashboard?.stats?.cancelledAppointments ?? 0, color: '#EF4444' },
+        { name: 'Terminés', value: dashboard?.stats?.completedAppointments ?? 0, color: '#94d7bc' },
+        { name: 'En attente', value: dashboard?.stats?.pendingAppointments ?? 0, color: '#cde9ff' },
+        { name: 'Annulés', value: dashboard?.stats?.cancelledAppointments ?? 0, color: '#f3afb8' },
       ]
     : [
-        { name: 'Completed', value: dashboard?.stats?.completedAppointments ?? 0, color: '#10B981' },
-        { name: 'Pending', value: dashboard?.stats?.pendingAppointments ?? 0, color: '#F59E0B' },
-        { name: 'Cancelled', value: dashboard?.stats?.cancelledAppointments ?? 0, color: '#EF4444' },
+        { name: 'Completed', value: dashboard?.stats?.completedAppointments ?? 0, color: '#94d7bc' },
+        { name: 'Pending', value: dashboard?.stats?.pendingAppointments ?? 0, color: '#cde9ff' },
+        { name: 'Cancelled', value: dashboard?.stats?.cancelledAppointments ?? 0, color: '#f3afb8' },
       ]
+
 
   const getStatus = (a) => a.cancelled ? 'cancelled' : a.isCompleted ? 'completed' : a.isPaid ? 'paid' : 'pending'
 
@@ -110,12 +110,12 @@ export default function DoctorDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <StatCard title={t('totalAppointments')} value={d?.totalAppointments ?? 0} icon={CalendarDays} trend={t('allTime')} color="accent" />
         <StatCard title={t('completedApts')} value={d?.completedAppointments ?? 0} icon={CheckCircle} trend={t('fromCompleted')} color="success" />
-        <StatCard title={t('upcomingApts')} value={d?.pendingAppointments ?? 0} icon={Clock} trend={t('scheduled')} color="purple" />
+        <StatCard title={t('upcomingApts')} value={d?.pendingAppointments ?? 0} icon={Clock} trend={t('$scheduled')} color="purple" />
         <StatCard title={t('totalEarnings')} value={`$${(d?.totalEarnings ?? 0).toLocaleString()}`} icon={DollarSign} trend={t('fromCompleted')} color="accentSoft" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-5">
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-primary/10 shadow-lg p-5">
+        <div className="bg-white/80 backdrop-blur-sm rounded-[10px] border border-primary/10 shadow-lg p-5">
           <h3 className="text-lg font-semibold text-text mb-4">{t('aptStats')}</h3>
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={apptData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} barSize={50}>
@@ -135,7 +135,7 @@ export default function DoctorDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-primary/10 shadow-lg p-5">
+        <div className="bg-white/80 backdrop-blur-sm rounded-[10px] border border-primary/10 shadow-lg p-5">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-text">{t('todaySchedule')}</h3>
             <span className="text-xs font-semibold px-2 py-1 rounded-full bg-primary/10 text-primary-deep border border-primary/20">
@@ -151,14 +151,14 @@ export default function DoctorDashboard() {
           ) : (
             <div className="space-y-2">
               {todayApts.map((a) => (
-                <div key={a._id} className={`flex items-center gap-3 p-2.5 rounded-xl transition-all ${a.isCompleted ? 'bg-emerald-50 border border-emerald-200' : 'bg-bg border border-border'}`}>
+                <div key={a._id} className={`flex items-center gap-3 p-2.5 rounded-[10px] transition-all ${a.isCompleted ? 'bg-emerald-50 border border-emerald-200' : 'bg-bg border border-border'}`}>
                   <div className="text-center min-w-11.25">
                     <p className="text-sm font-bold text-primary">{a.slotTime}</p>
                   </div>
                   <div className="w-px h-7 bg-border" />
                   <div className="flex-1">
                     <p className="text-sm font-semibold text-text">{a.userData?.name}</p>
-                    <p className="text-xs text-muted">${a.amount}</p>
+                    <p className="text-xs text-muted">{a.amount}DA</p>
                   </div>
                   {a.isCompleted ? (
                     <span className="text-xs font-semibold text-emerald-600 whitespace-nowrap">✓ {t('done')}</span>
@@ -177,7 +177,7 @@ export default function DoctorDashboard() {
           )}
         </div>
 
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-primary/10 shadow-lg p-5">
+        <div className="bg-white/80 backdrop-blur-sm rounded-[10px] border border-primary/10 shadow-lg p-5">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-text">{t('recentActivity')}</h3>
             <Link to="/doctor/appointments" className="text-sm text-primary hover:underline flex items-center gap-1">

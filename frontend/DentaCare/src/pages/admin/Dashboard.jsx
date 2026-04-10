@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { User, Stethoscope, Calendar, Clock, DollarSign, Activity, Ban, ArrowRight, CalendarDays } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
-import { StatCard, Badge, EmptyState, Modal } from '../../components/common/components'
+import { StatCard, Badge, EmptyState, Modal } from '../../components/ui/components'
 import useAdminStore from '../../store/adminStore'
 import useT from '../../hooks/useT'
 import api from '../../lib/axios'
@@ -93,7 +93,7 @@ export default function Dashboard() {
         />
         <StatCard
           title={t('totalPatients')} value={s?.patients?.total ?? 0}
-          icon={User} trend="registered"
+          icon={User} trend={t('registered')}
           color="accent"
         />
         <StatCard
@@ -131,7 +131,7 @@ export default function Dashboard() {
       <div className="card overflow-hidden">
         <div className="flex justify-between items-center p-5 border-b border-border bg-white">
           <h3 className="section-title">{t('recentAppointments')}</h3>
-          <Link to="/admin/appointments" className="text-xs text-accent no-underline hover:underline flex items-center gap-1">
+          <Link to="/admin/appointments" className="text-xs text-primary no-underline hover:underline flex items-center gap-1">
             {t('viewAll')} <ArrowRight size={14} />
           </Link>
         </div>
@@ -204,7 +204,7 @@ export default function Dashboard() {
                      </td>
 
                     <td className="px-4 py-4 text-sm text-primary whitespace-nowrap">
-                      ${a.amount}
+                      {a.amount}DA
                      </td>
 
                     <td className="px-4 py-4 whitespace-nowrap">

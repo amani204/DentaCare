@@ -52,7 +52,7 @@ export default function Sidebar() {
       <div className="p-3 border-t border-primary/10">
         <button
           onClick={() => { logout(); navigate('/'); }}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-sub hover:text-red-500 hover:bg-red-500/5 transition-all duration-200 group"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-medium text-sub hover:text-red-500 hover:bg-red-500/5 transition-all duration-200 group"
         >
           <LogOut size={18} className="shrink-0 group-hover:rotate-12 transition-transform" />
           <span>{t('logout')}</span>

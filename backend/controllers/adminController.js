@@ -25,10 +25,10 @@ const adminLogin = async (req, res) => {
 //API for adding doctor
 const addDoctor = async (req, res) => {
     try {
-        const {name, email, password, speciality, degree, experience, fees, address} = req.body;
+        const {name, email, password, speciality, degree, experience, fees, about} = req.body;
         const imageFile = req.file; 
         //checking for all data to add doctor
-        if (!name || !email || !password || !speciality || !degree || !experience || !fees || !address ) {
+        if (!name || !email || !password || !speciality || !degree || !experience || !fees || !about ) {
             return res.status(400).json({ success: false, message: 'All fields are required' });
         }
         //validating email format 
@@ -46,13 +46,6 @@ const addDoctor = async (req, res) => {
         const imageUpload = await cloudinary.uploader.upload(imageFile.path, {resource_type: 'image'});
         const imageUrl = imageUpload.secure_url; 
         
-        // Parse address safely
-        let parsedAddress;
-        try {
-            parsedAddress = JSON.parse(address);
-        } catch (error) {
-            return res.status(400).json({ success: false, message: 'Invalid address format' });
-        }
         //creating doctor object to save in database
         const newDoctor = new Doctor({
             name,
@@ -62,9 +55,9 @@ const addDoctor = async (req, res) => {
             degree,
             experience,
             fees,
-            address: parsedAddress, 
             date:Date.now(),
             image: imageUrl,
+            about,
             available: true
         });
         await newDoctor.save();

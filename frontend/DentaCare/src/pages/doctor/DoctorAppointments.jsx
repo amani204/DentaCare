@@ -1,20 +1,18 @@
 import { useEffect, useState } from 'react'
-import { 
-  Search, X, User, Stethoscope, Calendar, Clock, DollarSign, 
+import { Search, X, User, Calendar, Clock, DollarSign, 
   CreditCard, Activity, XCircle, CheckCircle, Clock3, 
-  Filter, Ban
+  Filter, Ban, Phone, Mail
 } from 'lucide-react'
-import { Badge, EmptyState, Modal, MiniStat } from '../../components/common/components'
+import { Badge, EmptyState, Modal, MiniStat } from '../../components/ui/components'
 import useDoctorStore from '../../store/doctorStore'
 import api from '../../lib/axios'
-import useDT from '../../hooks/useDT'
+import useT from '../../hooks/useT'
 import { PageLoader } from '../../components/ui/Skeleton'
-
 const FILTERS = ['all', 'pending', 'completed', 'cancelled']
 
 export default function DoctorAppointments() {
   const { dToken } = useDoctorStore()
-  const t = useDT()
+  const t = useT()
 
   const [apts, setApts] = useState([])
   const [loading, setLoading] = useState(true)
@@ -28,7 +26,6 @@ export default function DoctorAppointments() {
     try {
       const { data } = await api.get('/doctor/appointments', { headers: { dtoken: dToken } })
       if (data.success) {
-        // Sort appointments by slotDate descending (newest first)
         const sorted = data.appointments.sort((a, b) => {
           const dateA = a.slotDate.split('_').reverse().join('-')
           const dateB = b.slotDate.split('_').reverse().join('-')
@@ -76,14 +73,15 @@ export default function DoctorAppointments() {
       (filter === 'pending' && !a.isCompleted && !a.cancelled)
     const matchSearch = !search ||
       a.userData?.name?.toLowerCase().includes(search.toLowerCase()) ||
-      a.docData?.name?.toLowerCase().includes(search.toLowerCase())
+      a.userData?.phone?.includes(search) ||
+      a.userData?.email?.toLowerCase().includes(search.toLowerCase())
     return matchFilter && matchSearch
   })
 
   const headers = [
     { key: '#', icon: null, label: '#' },
     { key: 'patient', icon: User, label: t('patient') },
-    { key: 'doctor', icon: Stethoscope, label: t('doctor') },
+    { key: 'contact', icon: Phone, label: t('contact') },
     { key: 'date', icon: Calendar, label: t('date') },
     { key: 'time', icon: Clock, label: t('time') },
     { key: 'amount', icon: DollarSign, label: t('amount') },
@@ -96,8 +94,6 @@ export default function DoctorAppointments() {
 
   return (
     <div className="flex flex-col gap-5 animate-fade-in">
-
-      {/* Header Section */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="page-title">{t('allAppointments')}</h2>
@@ -105,10 +101,7 @@ export default function DoctorAppointments() {
         </div>
       </div>
 
-      {/* Appointments Control Center */}
       <div className="flex flex-col gap-6 bg-white p-5 rounded-2xl border border-border shadow-sm mb-2">
-        
-        {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <MiniStat title={t('total')} value={counts.all} color="success" />
           <MiniStat title={t('pending')} value={counts.pending} color="primary" />
@@ -116,10 +109,7 @@ export default function DoctorAppointments() {
           <MiniStat title={t('cancelled')} value={counts.cancelled} color="accent" />
         </div>
 
-        {/* Tabs and Search */}
         <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between pt-4 border-t border-dashed border-border">
-          
-          {/* Segmented Filter Tabs */}
           <div className="flex bg-bg p-1 rounded-xl border border-border w-full lg:w-auto overflow-x-auto">
             {FILTERS.map(f => (
               <button
@@ -145,7 +135,6 @@ export default function DoctorAppointments() {
             ))}
           </div>
 
-          {/* Modern Search Input */}
           <div className="relative w-full lg:max-w-md">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
             <input
@@ -166,8 +155,7 @@ export default function DoctorAppointments() {
         </div>
       </div>
 
-      {/* Data Table Section */}
-      <div className="card overflow-hidden">
+      <div className="card overflow-hidden rounded-[10px]">
         {filtered.length === 0 ? (
           <div className="p-10 text-center">
             <EmptyState message={t('noAppointments')} />
@@ -194,8 +182,7 @@ export default function DoctorAppointments() {
                 {filtered.map((a, i) => (
                   <tr key={a._id || i} className="table-row border-b border-border hover:bg-bg/30 transition-colors">
                     <td className="px-4 py-3 text-xs text-muted whitespace-nowrap">{i + 1}</td>
-                    
-                    {/* Patient */}
+
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-2">
                         <div className="w-7 h-7 rounded-full bg-accent-soft flex items-center justify-center text-xs font-bold text-primary-hov shrink-0">
@@ -205,36 +192,30 @@ export default function DoctorAppointments() {
                       </div>
                     </td>
 
-                    {/* Doctor */}
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        {a.docData?.image ? (
-                          <img src={a.docData.image} alt="" className="w-7 h-7 rounded-full object-cover shrink-0" />
-                        ) : (
-                          <div className="w-7 h-7 rounded-full bg-primary-soft flex items-center justify-center text-xs font-bold text-primary-hov shrink-0">
-                            {a.docData?.name?.charAt(0) || 'D'}
-                          </div>
-                        )}
-                        <div>
-                          <p className="text-sm font-medium text-text leading-tight">{a.docData?.name}</p>
-                          <p className="text-[10px] text-muted uppercase tracking-tighter">{a.docData?.speciality}</p>
+                      <div className="flex flex-col gap-0.5">
+                        <div className="flex items-center gap-1 text-xs text-sub">
+                          <Phone size={12} className="shrink-0" />
+                          <span>{a.userData?.phone || '—'}</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-xs text-sub">
+                          <Mail size={12} className="shrink-0" />
+                          <span className="truncate max-w-37.5">{a.userData?.email || '—'}</span>
                         </div>
                       </div>
                     </td>
 
                     <td className="px-4 py-3 text-sm text-sub whitespace-nowrap">{a.slotDate?.replace(/_/g, '/')}</td>
                     <td className="px-4 py-3 text-sm text-sub whitespace-nowrap">{a.slotTime}</td>
-                    <td className="px-4 py-3 text-sm text-primary whitespace-nowrap">${a.amount}</td>
-                    
-                    {/* Payment Status – hidden if completed (completed => paid) */}
+                    <td className="px-4 py-3 text-sm text-primary whitespace-nowrap">{a.amount}DA</td>
+
                     <td className="px-4 py-3 whitespace-nowrap">
                       {!a.isCompleted && <Badge status={a.isPaid ? 'paid' : 'unpaid'} />}
                       {a.isCompleted && <span className="text-muted text-xs">—</span>}
                     </td>
-                    
+
                     <td className="px-4 py-3 whitespace-nowrap"><Badge status={getStatus(a)} /></td>
 
-                    {/* Actions */}
                     <td className="px-4 py-3 whitespace-nowrap">
                       {!a.cancelled && !a.isCompleted ? (
                         <div className="flex gap-2">
@@ -267,7 +248,6 @@ export default function DoctorAppointments() {
         )}
       </div>
 
-      {/* Cancel Modal */}
       <Modal
         isOpen={!!cancelId}
         onClose={() => setCancelId(null)}

@@ -18,7 +18,6 @@ export default function Hero() {
   const floatRef2 = useRef(null)
   const bgRef = useRef(null)
 
-  // Background scale & fade (not part of the standard hooks)
   useEffect(() => {
     if (bgRef.current) {
       gsap.fromTo(bgRef.current,
@@ -78,13 +77,10 @@ export default function Hero() {
               <Link to="/doctors" className="btn-hero inline-flex items-center gap-2 btn-primary font-medium px-6 py-3 rounded-xl shadow-md hover:shadow-lg">
                 {t('bookAppointment')} <ArrowRight size={16} />
               </Link>
-              <a
-                href="#about"
-                onClick={(e) => { e.preventDefault(); document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }) }}
-                className="btn-hero inline-flex items-center gap-2 border border-primary text-primary hover:bg-primary/5 font-medium px-6 py-3 rounded-xl"
-              >
+              <Link to="/about" className="btn-hero inline-flex items-center gap-2 border border-primary text-primary hover:bg-primary/5 font-medium px-6 py-3 rounded-xl">
                 {t('learnMore')}
-              </a>
+              </Link>
+             
             </div>
 
             <div ref={statsRef} className="flex flex-wrap gap-8 pt-2">

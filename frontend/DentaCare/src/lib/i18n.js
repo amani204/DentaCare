@@ -41,6 +41,7 @@ export const translations = {
     alreadyHaveAccount: 'Already have an account? Sign in',
     noAccount: "Don't have an account? Sign up",
     back: 'back',
+    
 
     // ========== NAVIGATION ==========
     dashboard: 'Dashboard',
@@ -50,6 +51,7 @@ export const translations = {
     logout: 'Logout',
     adminPanel: 'Admin Panel',
     doctorPortal: 'Doctor Portal',
+    des:"Brief description about the doctor...",
 
     // ========== DASHBOARD ==========
     welcome: 'Welcome back',
@@ -334,7 +336,7 @@ export const translations = {
     step2Desc: 'Pick a convenient date and time that fits your schedule.',
     step3Title: 'Pay Securely',
     step3Desc: 'Pay online with Stripe or Chargily — fast, safe, and simple.',
-
+    paidOnline: "paid online",
     // ========== WEBSITE - CTA ==========
     ctaBadge: 'Online Booking Available 24/7',
     ctaHeading1: 'Ready for a',
@@ -344,7 +346,7 @@ export const translations = {
     trustSecure: 'Secure Payment',
     trustCancel: 'Free Cancellation',
     trustConfirm: 'Instant Confirmation',
-
+    loginToBookHint:'Log in to book',
     // ========== WEBSITE - FOOTER ==========
     footerDesc: 'Algiers\' most trusted dental clinic. Modern dentistry with a personal touch since 2010.',
     footerAddress: '123 Rue Didouche Mourad, Algiers',
@@ -352,7 +354,10 @@ export const translations = {
     footerServices: 'Our Services',
     footerPatient: 'Patient Info',
     footerRights: 'All rights reserved.',
-
+    
+    staff: "Staff",
+    adminLogin: "Admin Login",
+    doctorLogin: "Doctor Login",
     navHome: 'Home',
     navAbout: 'About',
     navServices: 'Services',
@@ -532,6 +537,7 @@ export const translations = {
     invalidEmail: 'Email invalide',
     minFees: 'Doit être supérieur à 0',
     uploadImage: 'Veuillez télécharger une photo',
+    des:"Brève description du médecin...",
 
     // ========== APPOINTMENTS ==========
     allAppointments: 'Tous les rendez-vous',
@@ -559,7 +565,7 @@ export const translations = {
     allApts: 'Tous les rendez-vous',
     noApts: 'Aucun rendez-vous trouvé',
     payment: 'Paiement',
-
+    scheduled: 'scheduled',
     // ========== MODAL ==========
     cancelAppt: 'Annuler le rendez-vous',
     cancelApptMsg: 'Le créneau sera libéré. Cette action est irréversible.',
@@ -578,7 +584,7 @@ export const translations = {
     statusUnpaid: 'Non payé',
     statusActive: 'Actif',
     statusInactive: 'Inactif',
-
+ 
     // ========== TOAST ==========
     error: 'Une erreur est survenue',
     success: 'Succès !',
@@ -623,7 +629,10 @@ export const translations = {
     verifiedPatient: 'Patient vérifié',
     openHours: 'Ouvert aujourd\'hui 9h–18h',
     scroll: 'DÉFILER',
-
+    staff: "Personnel",
+    adminLogin: "Connexion Admin",
+    doctorLogin: "Connexion Médecin",
+    paidOnline: "payé en ligne",
     // ========== WEBSITE - ABOUT ==========
     aboutTag: 'À propos de DentaCare',
     aboutHeading1: 'Là où la dentisterie moderne rencontre',
@@ -816,5 +825,7 @@ export const translations = {
     appointmentCancelled: 'Rendez-vous annulé avec succès',
     confirmed: 'Confirmé',
     viewMyAppointments: 'Voir Mon Rendez-Vous',
+    scheduled:'programmé',
+    loginToBookHint:'se connecter Pour Réserver'
   },
 };

@@ -25,12 +25,12 @@ export default function Doctors() {
     api.get('/doctor/all-doctors')
       .then(({ data }) => {
         if (data.success && data.data && data.data.length) {
-          setDoctors(data.data.slice(0, 6));
+          setDoctors(data.data.slice(0, 4));
         } else {
-          setDoctors(FALLBACK_DOCTORS.slice(0, 6));
+          setDoctors(FALLBACK_DOCTORS.slice(0, 4));
         }
       })
-      .catch(() => setDoctors(FALLBACK_DOCTORS.slice(0, 6)))
+      .catch(() => setDoctors(FALLBACK_DOCTORS.slice(0, 4)))
       .finally(() => setLoading(false));
   }, []);
 

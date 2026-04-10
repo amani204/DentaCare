@@ -12,13 +12,15 @@ const getAllDoctors = async (req, res ) =>{
     } catch (error) {
        res.status(500).json({success: false, message: error.message}) 
     }
+
+    
 }
 
 //get doctor by id
 const getDoctorById = async (req, res) => {
     try {
         const { docId } = req.params;
-        const doctor = await Doctor.findById(docId).select('-password -email');
+        const doctor = await Doctor.findById(docId).select('-password');
         if (!doctor) {
             return res.status(404).json({success: false, message: 'Doctor not found'});
         }
@@ -53,6 +55,7 @@ const doctorLogin = async (req, res) => {
                 email: doctor.email,
                 speciality: doctor.speciality,
                 fees: doctor.fees,
+                about: doctor.about,
                 available: doctor.available,
                 image: doctor.image
             }
@@ -251,7 +254,7 @@ const updateDoctorProfile = async (req, res) => {
         const updatedDoctor = await Doctor.findByIdAndUpdate(
             doctorId,
             updateData,
-            { new: true, runValidators: true }
+            { returnDocument: 'after', runValidators: true } 
         ).select('-password');
         
         res.json({ success: true, message: 'Profile updated successfully', doctor: updatedDoctor });

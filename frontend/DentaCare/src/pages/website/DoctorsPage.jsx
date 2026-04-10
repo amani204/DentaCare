@@ -37,7 +37,6 @@ function DoctorCard({ doctor, onClick }) {
   const t = useT();
   const cardRef = useRef(null);
 
-  // No internal animation – handled by parent ScrollTrigger
   return (
     <div
       ref={cardRef}

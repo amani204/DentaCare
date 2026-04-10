@@ -1,17 +1,19 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useDoctorStore from '../../store/doctorStore';
-import useDT from '../../hooks/useDT';
+import useT from '../../hooks/useT';
 import api from '../../lib/axios';
 import LoginCard from '../../components/ui/loginCard';
+import useAdminStore from '../../store/adminStore';
 
 export default function DoctorLogin() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
-  const { setAuth, lang, toggleLang } = useDoctorStore();
-  const t = useDT();
+  const { setAuth } = useDoctorStore();
+  const { lang , toggleLang } = useAdminStore();
+  const t = useT();
 
   const handleSubmit = async ({ email, password }) => {
     setLoading(true);

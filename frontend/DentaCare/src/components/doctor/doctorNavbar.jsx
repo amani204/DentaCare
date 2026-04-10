@@ -1,11 +1,13 @@
 import { useLocation } from 'react-router-dom';
 import useDoctorStore from '../../store/doctorStore';
-import useDT from '../../hooks/useDT';
+import useT from '../../hooks/useT';
+import useAdminStore from '../../store/adminStore';
 
 export default function DoctorNavbar() {
   const { pathname } = useLocation();
-  const {lang, toggleLang, doctor } = useDoctorStore();
-  const t = useDT();
+  const { doctor } = useDoctorStore();
+  const {lang, toggleLang} = useAdminStore();
+  const t = useT();
 
   const titles = {
     '/doctor/dashboard': t('dashboard'),

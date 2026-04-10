@@ -11,7 +11,6 @@ const doctorSchema = new mongoose.Schema({
   about:       { type: String, default: ''    },
   available:   { type: Boolean, default: true },
   fees:        { type: Number, required: true },
-  address:     { type: Object, default: { line1:'', line2:'' } },
   date:        {type: Number, required: true},
   slots_booked:{ type: Object, default: {} }, // { "2026-04-20": ["10:00","11:00"] }
 }, { timestamps: true, // Automatically adds and manages createdAt and updatedAt fields

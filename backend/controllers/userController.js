@@ -237,9 +237,6 @@ const updateProfile = async (req, res) => {
 
     if (name) updateData.name = name
     if (phone) updateData.phone = phone
-    if (dob) updateData.dob = dob
-    if (gender) updateData.gender = gender
-    if (address) updateData.address = JSON.parse(address)
 
     if (imageFile) {
       const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
@@ -252,7 +249,7 @@ const updateProfile = async (req, res) => {
       return res.status(400).json({ success: false, message: 'No fields to update' })
     }
 
-    const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true, runValidators: true }).select('-password')
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, { returnDocument: 'after', runValidators: true }).select('-password')
     
     if (!updatedUser) {
       return res.status(404).json({ success: false, message: 'User Not Found' })
