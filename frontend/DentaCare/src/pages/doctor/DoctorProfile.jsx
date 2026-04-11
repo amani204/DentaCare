@@ -211,7 +211,7 @@ export default function DoctorProfile() {
               </div>
               <div className="col-span-2 bg-bg rounded-lg p-2 text-center border border-border">
                 <p className="text-[10px] text-muted uppercase">{lang === 'en' ? 'Fees' : 'Honoraires'}</p>
-                <p className="text-sm font-semibold text-primary">${form.fees || 0}</p>
+                <p className="text-sm font-semibold text-primary">{form.fees || 0}DA</p>
               </div>
             </div>
           </div>

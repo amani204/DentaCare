@@ -111,7 +111,7 @@ export default function DoctorDashboard() {
         <StatCard title={t('totalAppointments')} value={d?.totalAppointments ?? 0} icon={CalendarDays} trend={t('allTime')} color="accent" />
         <StatCard title={t('completedApts')} value={d?.completedAppointments ?? 0} icon={CheckCircle} trend={t('fromCompleted')} color="success" />
         <StatCard title={t('upcomingApts')} value={d?.pendingAppointments ?? 0} icon={Clock} trend={t('$scheduled')} color="purple" />
-        <StatCard title={t('totalEarnings')} value={`$${(d?.totalEarnings ?? 0).toLocaleString()}`} icon={DollarSign} trend={t('fromCompleted')} color="accentSoft" />
+        <StatCard title={t('totalEarnings')} value={`${(d?.totalEarnings ?? 0).toLocaleString()}DA`} icon={DollarSign} trend={t('fromCompleted')} color="accentSoft" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-5">
@@ -214,7 +214,7 @@ export default function DoctorDashboard() {
                       </td>
                       <td className="px-3 py-2.5 text-sm text-sub">{a.slotDate?.replace(/_/g, '/')}</td>
                       <td className="px-3 py-2.5 text-sm text-sub">{a.slotTime}</td>
-                      <td className="px-3 py-2.5 text-sm font-semibold text-primary">${a.amount}</td>
+                      <td className="px-3 py-2.5 text-sm font-semibold text-primary">{a.amount}DA</td>
                       <td className="px-3 py-2.5"><Badge status={getStatus(a)} /></td>
                       <td className="px-3 py-2.5">
                         {!a.cancelled && !a.isCompleted ? (

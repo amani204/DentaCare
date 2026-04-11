@@ -20,6 +20,7 @@ export default function DoctorLogin() {
     setError('');
     try {
       const { data } = await api.post('/doctor/login', { email, password });
+      console.log('response:', data)
       if (data.success) {
         setAuth(data.dtoken, data.doctor);
         navigate('/doctor/dashboard');

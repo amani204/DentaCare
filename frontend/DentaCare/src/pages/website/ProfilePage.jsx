@@ -75,7 +75,7 @@ export default function ProfilePage() {
     }
   }, [loadingAppointments]);
 
-  // Fetch user profile 
+  // Fetch user profile (only once)
   const fetchedRef = useRef(false);
   useEffect(() => {
     if (fetchedRef.current) return;
@@ -167,21 +167,8 @@ export default function ProfilePage() {
       const { data } = await api.post('/appointment/cancel', { appointmentId: selectedAppointment._id }, { headers: { token } });
       if (data.success) {
         toast.success(t('appointmentCancelled') || 'Appointment cancelled successfully');
-        const cancelledItem = document.getElementById(`appointment-${selectedAppointment._id}`);
-        if (cancelledItem) {
-          gsap.to(cancelledItem, {
-            opacity: 0, x: -20, duration: 0.3,
-            onComplete: () => {
-              setAppointments(appointments.map(apt =>
-                apt._id === selectedAppointment._id ? { ...apt, cancelled: true } : apt
-              ));
-            }
-          });
-        } else {
-          setAppointments(appointments.map(apt =>
-            apt._id === selectedAppointment._id ? { ...apt, cancelled: true } : apt
-          ));
-        }
+        // Refresh the appointments list immediately
+        await fetchAppointments();
         setShowCancelModal(false);
         setSelectedAppointment(null);
       } else {
@@ -200,105 +187,84 @@ export default function ProfilePage() {
     setShowPaymentModal(true);
   };
 
-  // --- Updated Stripe Handler ---
-const handleStripePayment = async () => {
-  if (!paymentAppointment) return;
-  // Use a string to differentiate which one is loading
-  setProcessingPayment('stripe'); 
-  try {
-    const { data } = await api.post('/payment/stripe-checkout', {
-      appointmentId: paymentAppointment._id,
-    }, { headers: { token } });
-
-    if (data.success && data.sessionUrl) {
-      window.location.href = data.sessionUrl;
+  const handleStripePayment = async () => {
+    if (!paymentAppointment) return;
+    setProcessingPayment('stripe');
+    try {
+      const { data } = await api.post('/payment/stripe-checkout', {
+        appointmentId: paymentAppointment._id,
+      }, { headers: { token } });
+      if (data.success && data.sessionUrl) {
+        window.location.href = data.sessionUrl;
+      }
+    } catch (error) {
+      toast.error(t('stripeError') || 'Stripe redirect failed');
+    } finally {
+      setProcessingPayment(null);
     }
-  } catch (error) {
-    toast.error('Stripe redirect failed');
-  } finally {
-    setProcessingPayment(null);
-  }
-};
+  };
 
-// --- Chargily Handler ---
-const handleChargilyPayment = async () => {
-  if (!paymentAppointment) return;
-  setProcessingPayment('chargily');
-  try {
-    const { data } = await api.post('/payment/chargily-checkout', {
-      appointmentId: paymentAppointment._id,
-    }, { headers: { token } });
-
-   
-    if (data.success && data.checkoutUrl) {
-      window.location.href = data.checkoutUrl;
-    } else {
-      toast.error(data.message || 'Chargily error');
+  const handleChargilyPayment = async () => {
+    if (!paymentAppointment) return;
+    setProcessingPayment('chargily');
+    try {
+      const { data } = await api.post('/payment/chargily-checkout', {
+        appointmentId: paymentAppointment._id,
+      }, { headers: { token } });
+      if (data.success && data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        toast.error(data.message || t('chargilyError') || 'Chargily error');
+      }
+    } catch (error) {
+      toast.error(t('chargilyError') || 'Chargily redirect failed');
+    } finally {
+      setProcessingPayment(null);
     }
-  } catch (error) {
-    console.error("Chargily Error:", error);
-    toast.error('Chargily redirect failed');
-  } finally {
-    setProcessingPayment(null);
-  }
-};
+  };
 
-  // --- Inside ProfilePage.jsx ---
-
-const verifyPaymentStatus = async (appointmentId, paymentMethod, sessionId) => {
-  try {
-    const endpoint = paymentMethod === 'stripe' ? '/payment/stripe-verify' : '/payment/chargily-verify';
-    
-    // Stripe needs the sessionId, Chargily needs the appointmentId
-    const payload = paymentMethod === 'stripe' ? { sessionId } : { appointmentId };
-
-    const { data } = await api.post(endpoint, payload, { headers: { token } });
-    
-    if (data.success) {
-      toast.success(t('paymentSuccess') || 'Payment successful!');
-      fetchAppointments(); // Refresh the list to show "Paid" status
-    } else {
-      toast.error(data.message || 'Verification failed');
+  const verifyPaymentStatus = async (appointmentId, paymentMethod, sessionId) => {
+    try {
+      const endpoint = paymentMethod === 'stripe' ? '/payment/stripe-verify' : '/payment/chargily-verify';
+      const payload = paymentMethod === 'stripe' ? { sessionId } : { appointmentId };
+      const { data } = await api.post(endpoint, payload, { headers: { token } });
+      if (data.success) {
+        toast.success(t('paymentSuccess') || 'Payment successful!');
+        await fetchAppointments(); // Refresh appointments after successful payment
+      } else {
+        toast.error(data.message || t('paymentFailed') || 'Verification failed');
+      }
+    } catch (error) {
+      console.error('Payment verification error:', error);
+      toast.error(t('paymentFailed') || 'Could not verify payment');
     }
-  } catch (error) {
-    console.error('Payment verification error:', error);
-    toast.error('Could not verify payment');
-  }
-};
+  };
 
-useEffect(() => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const paymentStatus = urlParams.get('payment_status');
-  const appointmentId = urlParams.get('appointment_id');
-  const paymentMethod = urlParams.get('payment_method');
-  const sessionId = urlParams.get('session_id'); // Only for Stripe
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment_status');
+    const appointmentId = urlParams.get('appointment_id');
+    const paymentMethod = urlParams.get('payment_method');
+    const sessionId = urlParams.get('session_id');
 
-  // Check if we just returned from a successful payment redirect
-  if (paymentStatus === 'success' && appointmentId) {
-    verifyPaymentStatus(appointmentId, paymentMethod, sessionId);
-    
-    // Clean the URL to remove sensitive IDs and prevent re-verification on refresh
-    navigate('/profile', { replace: true });
-  } else if (paymentStatus === 'cancelled') {
-    toast.error('Payment was cancelled');
-    navigate('/profile', { replace: true });
-  }
-}, [token]);
+    if (paymentStatus === 'success' && appointmentId) {
+      verifyPaymentStatus(appointmentId, paymentMethod, sessionId);
+      navigate('/profile', { replace: true });
+    } else if (paymentStatus === 'cancelled') {
+      toast.error(t('paymentCancelled') || 'Payment was cancelled');
+      navigate('/profile', { replace: true });
+    }
+  }, [token]);
 
   const getStatusBadge = (apt) => {
-  if (apt.cancelled) return { text: t('cancelled'), color: 'bg-red-100 text-red-600', icon: XCircle };
-  if (apt.isCompleted) return { text: t('completed'), color: 'bg-green-100 text-green-600', icon: CheckCircle };
-  
-  // Logic: Paid online but not yet seen by doctor
-  if (apt.isPaid) return { text: t('paidOnline'), color: 'bg-blue-100 text-blue-600', icon: CreditCard };
-  
-  // Default pending state
-  return { text: t('pending'), color: 'bg-yellow-100 text-yellow-600', icon: Clock };
-};
+    if (apt.cancelled) return { text: t('cancelled'), color: 'bg-red-100 text-red-600', icon: XCircle };
+    if (apt.isCompleted) return { text: t('completed'), color: 'bg-green-100 text-green-600', icon: CheckCircle };
+    if (apt.isPaid) return { text: t('paidOnline'), color: 'bg-blue-100 text-blue-600', icon: CreditCard };
+    return { text: t('pending'), color: 'bg-yellow-100 text-yellow-600', icon: Clock };
+  };
 
   const formatDate = (dateStr) => dateStr?.replace(/_/g, '/') || '';
 
-  // Filter appointments
   const filteredAppointments = appointments.filter(apt => {
     if (filter === 'all') return true;
     if (filter === 'pending') return !apt.isCompleted && !apt.cancelled;
@@ -439,17 +405,20 @@ useEffect(() => {
                               </div>
                             </div>
                             <div className="flex gap-2">
-                              {!apt.cancelled && !apt.isCompleted && (
+                              {!apt.cancelled && !apt.isCompleted && !apt.isPaid && (
                                 <>
-                                  {!apt.isPaid && <button onClick={() => handlePaymentClick(apt)} disabled={processingPayment === apt._id} className="payment-btn flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary text-white hover:bg-primary-deep transition text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
-                                    {processingPayment === apt._id ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <CreditCard size={14} />}
+                                  <button onClick={() => handlePaymentClick(apt)} disabled={processingPayment !== null} className="payment-btn flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary text-white hover:bg-primary-deep transition text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                                    {processingPayment !== null ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <CreditCard size={14} />}
                                     {t('payNow')}
-                                  </button>}
-                                  <button onClick={() => { setSelectedAppointment(apt); setShowCancelModal(true); }} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition text-sm font-medium"><Ban size={14} />{t('cancel')}</button>
+                                  </button>
+                                  <button onClick={() => { setSelectedAppointment(apt); setShowCancelModal(true); }} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition text-sm font-medium">
+                                    <Ban size={14} /> {t('cancel')}
+                                  </button>
                                 </>
                               )}
                               {apt.cancelled && <span className="text-xs text-muted">{t('cancelled')}</span>}
                               {apt.isCompleted && <span className="text-xs text-green-600">{t('completed')}</span>}
+                              {apt.isPaid && !apt.cancelled && !apt.isCompleted && <span className="text-xs text-blue-600">{t('paidOnline')}</span>}
                             </div>
                           </div>
                         </div>
@@ -463,38 +432,37 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* Payment Modal */}
+      {/* Payment Modal  */}
       {showPaymentModal && paymentAppointment && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowPaymentModal(false)} />
           <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-scale-up">
             <div className="text-center mb-6">
               <div className="w-16 h-16 rounded-full bg-primary-soft flex items-center justify-center mx-auto mb-4"><CreditCard size={24} className="text-primary" /></div>
-              <h3 className="text-xl font-bold text-text">Select Payment Method</h3>
-              <p className="text-sub text-sm mt-1">Pay {paymentAppointment.amount}DA for appointment with {paymentAppointment.docData?.name}</p>
+              <h3 className="text-xl font-bold text-text">{t('selectPaymentMethod')}</h3>
             </div>
             <div className="space-y-3">
               <button onClick={handleStripePayment} disabled={processingPayment !== null} className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-border hover:border-primary transition-all hover:shadow-md disabled:opacity-50">
-                <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-lg bg-[#635BFF]/10 flex items-center justify-center"><svg className="w-6 h-6 text-[#635BFF]" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 7.5h-3v6h3v-6zm-4.5 0h-3v6h3v-6zm-4.5 0H6v6h1.5v-6zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg></div><div className="text-left"><p className="font-semibold text-text">Pay with Stripe</p><p className="text-xs text-sub">Credit card, debit card, Apple Pay</p></div></div>
+                <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-lg bg-[#635BFF]/10 flex items-center justify-center"><svg className="w-6 h-6 text-[#635BFF]" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 7.5h-3v6h3v-6zm-4.5 0h-3v6h3v-6zm-4.5 0H6v6h1.5v-6zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg></div><div className="text-left"><p className="font-semibold text-text">{t('stripeLabel')}</p><p className="text-xs text-sub">{t('stripeDescription')}</p></div></div>
                 {processingPayment === 'stripe' ? <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" /> : <ChevronRight size={20} className="text-muted" />}
               </button>
               <button onClick={handleChargilyPayment} disabled={processingPayment !== null} className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-border hover:border-primary transition-all hover:shadow-md disabled:opacity-50">
-                <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center"><svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg></div><div className="text-left"><p className="font-semibold text-text">Pay with Chargily</p><p className="text-xs text-sub">CIB, CCP, EDAHABIA, Visa, Mastercard</p></div></div>
+                <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center"><svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg></div><div className="text-left"><p className="font-semibold text-text">{t('chargilyLabel')}</p><p className="text-xs text-sub">{t('chargilyDescription')}</p></div></div>
                 {processingPayment === 'chargily' ? <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" /> : <ChevronRight size={20} className="text-muted" />}
               </button>
             </div>
-            <button onClick={() => setShowPaymentModal(false)} className="w-full mt-6 py-2 text-sub hover:text-text transition">Cancel</button>
+            <button onClick={() => setShowPaymentModal(false)} className="w-full mt-6 py-2 text-sub hover:text-text transition">{t('cancel')}</button>
           </div>
         </div>
       )}
 
-      {/* Cancel Modal */}
+      {/* Cancel Modal  */}
       {showCancelModal && selectedAppointment && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowCancelModal(false)} />
           <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-scale-up">
             <div className="flex items-center gap-3 mb-4"><div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center"><AlertCircle size={20} className="text-red-500" /></div><h3 className="text-lg font-bold text-text">{t('cancelAppointment')}</h3></div>
-            <p className="text-sub mb-6">{t('cancelAppointmentConfirm', { doctor: selectedAppointment.docData?.name, date: formatDate(selectedAppointment.slotDate), time: selectedAppointment.slotTime })}</p>
+            <p className="text-sub mb-6">{t('cancelAppointmentConfirm')}</p>
             <div className="flex gap-3">
               <button onClick={() => setShowCancelModal(false)} className="flex-1 py-2 rounded-lg border border-border text-sub hover:bg-gray-50 transition">{t('no')}</button>
               <button onClick={handleCancelAppointment} disabled={cancellingId === selectedAppointment._id} className="flex-1 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition flex items-center justify-center gap-2">
