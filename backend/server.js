@@ -15,16 +15,11 @@ connectDB();
 connectCloudinary();
 const app = express();
 const port = process.env.PORT || 5000;
-const allowedOrigins = process.env.ALLOWED_ORIGINS 
-  ? process.env.ALLOWED_ORIGINS.split(',') 
-  : ['http://localhost:5173'];
-
-
 //middlewares
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: allowedOrigins || ['http://localhost:5173', 'https://denta-care-lemon.vercel.app'] ,
+  origin: ['http://localhost:5173', 'https://denta-care-lemon.vercel.app'],
   credentials: true,
 }));
 app.use(express.urlencoded({ extended: true }));
