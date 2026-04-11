@@ -21,7 +21,7 @@ import About from './pages/website/About'
 import Auth from './pages/website/Auth'
 import DoctorsPage from './pages/website/DoctorsPage'
 import DoctorDetailsPage from './pages/website/DoctorDetailsPage'
-import ProfilePage from './pages/website/profilepage'
+import ProfilePage from './pages/website/ProfilePage'
 import { AdminShell } from './components/layouts/AdminShell'
 import { DoctorShell } from './components/layouts/DoctorShell'
 export default function App() {
