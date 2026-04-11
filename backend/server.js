@@ -24,7 +24,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: allowedOrigins,
+  origin: allowedOrigins || ['http://localhost:5173', 'https://denta-care-lemon.vercel.app'] ,
   credentials: true,
 }));
 app.use(express.urlencoded({ extended: true }));
