@@ -281,7 +281,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <>
+    <main>
       <Navbar />
       <div ref={pageRef} className="min-h-screen bg-gray-50 pt-24 pb-12">
         <div className="absolute top-[-10%] right-[-5%] w-125 h-125 bg-[#CDE9FF]/40 rounded-full blur-[120px]" />
@@ -394,7 +394,7 @@ export default function ProfilePage() {
                           <div className="flex flex-wrap justify-between items-start gap-4">
                             <div className="flex-1">
                               <div className="flex items-center gap-3 mb-2">
-                                {apt.docData?.image ? <img src={apt.docData.image} alt="" className="w-10 h-10 rounded-full object-cover" /> : <div className="w-10 h-10 rounded-full bg-primary-soft flex items-center justify-center"><span className="text-sm font-bold text-primary-deep">{apt.docData?.name?.charAt(0) || 'D'}</span></div>}
+                                {apt.docData?.image ? <img src={apt.docData?.image?.replace('/upload/', '/upload/w_80,f_auto,q_auto/')} alt="" className="w-10 h-10 rounded-full object-cover" /> : <div className="w-10 h-10 rounded-full bg-primary-soft flex items-center justify-center"><span className="text-sm font-bold text-primary-deep">{apt.docData?.name?.charAt(0) || 'D'}</span></div>}
                                 <div><h3 className="font-semibold text-text">{apt.docData?.name}</h3><p className="text-xs text-sub">{apt.docData?.speciality}</p></div>
                               </div>
                               <div className="grid grid-cols-2 gap-3 mt-3">
@@ -474,6 +474,6 @@ export default function ProfilePage() {
         </div>
       )}
       <Footer />
-    </>
+    </main>
   );
 }

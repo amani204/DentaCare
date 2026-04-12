@@ -52,7 +52,7 @@ export default function AboutPage() {
   }, []);
 
   return (
-    <>
+    <main>
       <Navbar />
       <div id="about" className="py-32 bg-white relative overflow-hidden">
         <div className="absolute top-[-10%] right-[-5%] w-125 h-125 bg-[#CDE9FF]/40 rounded-full blur-[120px]" />
@@ -130,6 +130,6 @@ export default function AboutPage() {
         </div>
       </div>
       <Footer />
-    </>
+    </main>
   );
 }

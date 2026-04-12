@@ -8,13 +8,13 @@ import Footer from '../../components/website/Footer'
 
 export default function Home() {
   return (
-    <div style={{ fontFamily: 'var(--font-sans)', overflowX: 'hidden' }}>
+    <main style={{ fontFamily: 'var(--font-sans)', overflowX: 'hidden' }}>
       <Navbar />
       <Hero />
       <Services />
       <Doctors />
       <BookingCTA/>
       <Footer/>
-    </div>
+    </main>
   )
 }

@@ -235,6 +235,7 @@ export default function Navbar() {
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="md:hidden text-text p-2 rounded-lg hover:bg-primary/5 transition-all duration-200"
+            aria-label="Open navigation menu"
           >
             {menuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>

@@ -362,7 +362,7 @@ export default function DoctorDetailsPage() {
   if (!doctor) return null
 
   return (
-    <>
+    <main>
       <Navbar />
       <div ref={pageRef} className="min-h-screen bg-bg pt-28 pb-16">
         <div className="max-w-7xl mx-auto px-6">
@@ -380,7 +380,7 @@ export default function DoctorDetailsPage() {
               <div className="bg-white rounded-2xl overflow-hidden shadow-lg border border-border sticky top-28">
                 <div className="aspect-square overflow-hidden">
                   {doctor.image ? (
-                    <img src={doctor.image} alt={doctor.name} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+                    <img src={doctor.image?.replace('/upload/', '/upload/w_800,f_auto,q_auto/')} alt={doctor.name} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
                   ) : (
                     <div className="w-full h-full bg-linear-to-br from-primary-soft to-primary flex items-center justify-center text-6xl font-bold text-white">
                       {doctor.name?.charAt(0) || 'D'}
@@ -469,6 +469,6 @@ export default function DoctorDetailsPage() {
       </div>
       <Footer />
       {showBookingModal && <BookingModal doctor={doctor} onClose={() => setShowBookingModal(false)} />}
-    </>
+    </main>
   )
 }

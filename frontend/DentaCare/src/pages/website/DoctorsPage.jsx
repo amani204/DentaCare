@@ -45,7 +45,7 @@ function DoctorCard({ doctor, onClick }) {
     >
       <div className="h-80 relative bg-linear-to-br from-accent-soft/20 to-accent-soft/5 flex items-center justify-center">
         {doctor.image ? (
-          <img src={doctor.image} alt={doctor.name} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+          <img src={doctor.image?.replace('/upload/', '/upload/w_400,f_auto,q_auto/')} alt={doctor.name} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
         ) : (
           <div className="w-18 h-18 rounded-full bg-linear-to-br from-primary-deep to-primary flex items-center justify-center text-2xl font-bold text-white font-serif">
             {initials(doctor.name)}
@@ -155,7 +155,7 @@ useScrollFade(gridRef, { selector: '.doctor-card', y: 40, stagger: 0.08, start: 
   }
 
   return (
-    <div ref={pageRef}>
+    <main ref={pageRef}>
       <Navbar />
       <div className="min-h-screen bg-bg font-sans">
         {/* Hero Section */}
@@ -310,6 +310,6 @@ useScrollFade(gridRef, { selector: '.doctor-card', y: 40, stagger: 0.08, start: 
         </div>
       </div>
       <Footer />
-    </div>
+    </main>
   );
 }

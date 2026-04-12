@@ -99,7 +99,7 @@ export default function Hero() {
 
           <div className="relative">
             <div ref={imageRef} className="relative rounded-[10px] overflow-hidden aspect-4/5 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.15)] bg-gray-100">
-              <img src={heroImage} alt="Dental Care" className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all duration-700" />
+              <img src={heroImage} alt="Dental Care"  fetchPriority="high" className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all duration-700" />
               <div className="absolute inset-0 bg-linear-to-t from-[#2C2C2A]/40 to-transparent" />
             </div>
 

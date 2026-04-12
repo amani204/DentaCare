@@ -101,9 +101,9 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div className="footer-col opacity-0">
-            <h4 className="text-text font-semibold text-sm uppercase tracking-wider mb-4">
+            <h3 className="text-text font-semibold text-sm uppercase tracking-wider mb-4">
               {t('footerQuickLinks')}
-            </h4>
+            </h3>
             <ul className="space-y-2">
               {quickLinks.map((item) => (
                 <li key={item.name}>
@@ -131,9 +131,9 @@ export default function Footer() {
 
           {/* Services */}
           <div className="footer-col opacity-0">
-            <h4 className="text-text font-semibold text-sm uppercase tracking-wider mb-4">
+            <h3 className="text-text font-semibold text-sm uppercase tracking-wider mb-4">
               {t('footerServices')}
-            </h4>
+            </h3>
             <ul className="space-y-2">
               {[
                 { key: 'generalDentistry', label: 'serviceGeneralDentistry' },

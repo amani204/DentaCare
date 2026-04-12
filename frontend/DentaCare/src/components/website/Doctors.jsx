@@ -97,8 +97,7 @@ export default function Doctors() {
               <div className="h-80 relative bg-linear-to-br from-accent-soft/20 to-accent-soft/5 flex items-center justify-center overflow-hidden">
                {doc.image ? (
                 <img
-                src={doc.image}
-                alt={doc.name}
+                src={doc.image?.replace('/upload/', '/upload/w_400,f_auto,q_auto/')} alt={doc.name}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                />
               ) : (
