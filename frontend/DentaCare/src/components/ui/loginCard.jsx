@@ -109,7 +109,6 @@ export const LoginCard = ({
   const getSubText = () => {
     // For admin/doctor, no subtext
     if (role === 'admin' || role === 'doctor') return ''
-    if (isSignup) return t('createAccount') || 'Create your account'
     if (isForgot) return t('forgotPasswordDesc') || 'Enter your email to receive OTP'
     if (isVerifyOTP) return t('enterOTP') || `Enter the 6-digit code sent to ${email}`
     if (isResetPassword) return t('enterNewPassword') || 'Enter your new password'

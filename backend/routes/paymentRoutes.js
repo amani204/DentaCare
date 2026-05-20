@@ -1,6 +1,6 @@
 
 import express from 'express';
-import { createCheckoutStripeSession, verifyStripePayment, createChargilyCheckout, verifyChargilyPayment  } from '../controllers/paymentController.js';
+import { createCheckoutStripeSession, verifyStripePayment  } from '../controllers/paymentController.js';
 import { authPatient } from '../middleware/authMiddleware.js';
 
 const paymentRouter = express.Router();
