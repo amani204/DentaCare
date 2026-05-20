@@ -10,7 +10,6 @@ import Navbar from '../../components/website/Navbar';
 import Footer from '../../components/website/Footer';
 import { DoctorCardSkeleton } from '../../components/ui/Skeleton';
 
-
 const SPECIALITIES = [
   'All Specialities',
   'General Dentist',
@@ -41,7 +40,7 @@ function DoctorCard({ doctor, onClick }) {
     <div
       ref={cardRef}
       onClick={() => onClick(doctor._id)}
-      className="doctor-card  bg-white border border-border rounded-[10px] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-primary/50 flex flex-col cursor-pointer"
+      className="doctor-card bg-white border border-border rounded-[10px] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-sm hover:border-gray-500 flex flex-col cursor-pointer"
     >
       <div className="h-80 relative bg-linear-to-br from-accent-soft/20 to-accent-soft/5 flex items-center justify-center">
         {doctor.image ? (
@@ -83,12 +82,11 @@ export default function DoctorsPage() {
   const [onlyAvail, setOnlyAvail] = useState(false);
   const gridRef = useRef(null);
   const pageRef = useRef(null);
-  const breadcrumbRef = useRef(null)
-  const titleRef      = useRef(null)
-  const subtitleRef   = useRef(null)
-  const searchRef     = useRef(null)
+  const breadcrumbRef = useRef(null);
+  const titleRef      = useRef(null);
+  const subtitleRef   = useRef(null);
+  const searchRef     = useRef(null);
 
-  // Fetch doctors
   useEffect(() => {
     api.get('/doctor/all-doctors')
       .then(({ data }) => {
@@ -102,20 +100,17 @@ export default function DoctorsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Entrance animations
-  useFadeIn(breadcrumbRef, { y: -10, duration: 0.5 })
-useFadeIn(titleRef,      { y: 30,  duration: 0.7, delay: 0.1 })
-useFadeIn(subtitleRef,   { y: 20,  duration: 0.6, delay: 0.25 })
-useFadeIn(searchRef,     { y: 20,  duration: 0.6, delay: 0.4 })
-useScrollFade(gridRef, { selector: '.doctor-card', y: 40, stagger: 0.08, start: 'top 85%' }, [loading])
+  useFadeIn(breadcrumbRef, { y: -10, duration: 0.5 });
+  useFadeIn(titleRef,      { y: 30,  duration: 0.7, delay: 0.1 });
+  useFadeIn(subtitleRef,   { y: 20,  duration: 0.6, delay: 0.25 });
+  useFadeIn(searchRef,     { y: 20,  duration: 0.6, delay: 0.4 });
+  useScrollFade(gridRef, { selector: '.doctor-card', y: 40, stagger: 0.08, start: 'top 85%' }, [loading]);
 
-  // Page exit animation
   const { leaveAndGo } = usePageLeave(pageRef);
   const handleDoctorClick = (doctorId) => {
     leaveAndGo(() => navigate(`/doctors/${doctorId}`));
   };
 
-  // Filtering logic
   const filtered = doctors
     .filter(d => {
       const matchSearch = d.name.toLowerCase().includes(search.toLowerCase()) || d.speciality.toLowerCase().includes(search.toLowerCase());
@@ -144,7 +139,7 @@ useScrollFade(gridRef, { selector: '.doctor-card', y: 40, stagger: 0.08, start: 
           <div className="max-w-7xl mx-auto px-6 py-24">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {[...Array(8)].map((_, i) => (
-                <DoctorCardSkeleton  key={i} />
+                <DoctorCardSkeleton key={i} />
               ))}
             </div>
           </div>
@@ -157,27 +152,34 @@ useScrollFade(gridRef, { selector: '.doctor-card', y: 40, stagger: 0.08, start: 
   return (
     <main ref={pageRef}>
       <Navbar />
-      <div className="min-h-screen bg-bg font-sans">
-        {/* Hero Section */}
-        <div className="relative overflow-hidden bg-linear-to-r from-primary-deep via-primary-deep/90 to-primary pt-28 pb-16">
-          <div style={{
-            position: 'absolute', inset: 0, zIndex: 0,
-            backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)',
-            backgroundSize: '28px 28px',
-          }} />
-          <div className="relative z-10 max-w-7xl mx-auto px-6 ">
+      <div className="min-h-screen font-sans bg-white">
+        
+        {/* Updated Light Hero Section matching the layout structure of your main Hero component */}
+        <div className="relative overflow-hidden bg-bg pt-28 pb-16">
+          <div className="absolute top-[-10%] right-[-5%] w-125 h-125 bg-[#CDE9FF]/40 rounded-full blur-[120px] pointer-events-none" />
+          <div className="absolute bottom-[-10%] left-[-5%] w-100 h-100 bg-[#CDE9FF]/5 rounded-full blur-[100px] pointer-events-none" />
+          
+          <div className="relative z-10 max-w-7xl mx-auto px-6">
             <div ref={breadcrumbRef} className="flex items-center gap-2 mb-4">
-              <Link to="/" className="text-sm text-white/60 hover:text-primary-soft transition flex items-center gap-1">
+              <Link to="/" className="text-sm text-sub hover:text-primary transition flex items-center gap-1">
                 <ArrowLeft size={13} /> {t('home')}
               </Link>
-              <span className="text-white/40 text-sm">/</span>
-              <span className="text-sm text-white/80">{t('doctors')}</span>
+              <span className="text-muted text-sm">/</span>
+              <span className="text-sm text-text font-medium">{t('doctors')}</span>
             </div>
-            <h1 ref={titleRef} className="heading-lg text-4xl md:text-5xl font-bold text-white mb-3 font-serif">
+            
+            <h1 ref={titleRef} className="heading-lg text-4xl md:text-5xl font-black text-text mb-3 font-serif">
               {t('doctorsHeroTitle')}{' '}
-              <span className="text-accent-soft">{t('doctorsHeroHighlight')}</span>
+              <span className="relative text-[#2C2C2A]">
+                {t('doctorsHeroHighlight')}
+                <svg className="absolute -bottom-1 left-0 w-full h-2 text-[#CDE9FF]" viewBox="0 0 100 10" preserveAspectRatio="none">
+                  <path d="M0 5 Q 25 0 50 5 T 100 5" stroke="currentColor" strokeWidth="4" fill="transparent" />
+                </svg>
+              </span>
             </h1>
-            <p ref={subtitleRef} className="text-white/70 text-lg max-w-xl mb-8">{t('doctorsHeroSub')}</p>
+            
+            <p ref={subtitleRef} className="text-sub text-lg max-w-xl mb-8">{t('doctorsHeroSub')}</p>
+            
             <div ref={searchRef} className="flex flex-wrap gap-3 max-w-2xl">
               <div className="flex-1 relative min-w-60">
                 <Search size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
@@ -185,7 +187,7 @@ useScrollFade(gridRef, { selector: '.doctor-card', y: 40, stagger: 0.08, start: 
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   placeholder={t('searchDoctorsPlaceholder')}
-                  className="w-full pl-10 pr-10 py-3 rounded-xl border-2 border-white/20 bg-white/95 text-text placeholder:text-muted focus:outline-none focus:border-white/60 transition-all shadow-md"
+                  className="w-full pl-10 pr-10 py-3 rounded-xl border border-border bg-white text-text placeholder:text-muted focus:outline-none focus:border-primary/50 transition-all shadow-sm"
                 />
                 {search && (
                   <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-text">
@@ -195,7 +197,7 @@ useScrollFade(gridRef, { selector: '.doctor-card', y: 40, stagger: 0.08, start: 
               </div>
               <button
                 onClick={() => setShowFilter(!showFilter)}
-                className="flex items-center gap-2 px-5 py-3 rounded-xl border-2 border-white/30 bg-white/10 text-white font-medium hover:bg-white/20 transition whitespace-nowrap"
+                className="flex items-center gap-2 px-5 py-3 rounded-xl border border-border bg-white text-text font-medium hover:bg-neutral-50 transition whitespace-nowrap shadow-sm"
               >
                 <SlidersHorizontal size={17} />
                 {t('filters')} {activeFilters.length > 0 && `(${activeFilters.length})`}
@@ -206,7 +208,7 @@ useScrollFade(gridRef, { selector: '.doctor-card', y: 40, stagger: 0.08, start: 
 
         {/* Filter Panel */}
         {showFilter && (
-          <div className="bg-white border-b border-border shadow-sm">
+          <div className="bg-white border-b border-border shadow-xs">
             <div className="max-w-7xl mx-auto px-6 py-5 flex flex-wrap gap-5 items-end">
               <div className="min-w-45">
                 <label className="text-xs font-semibold text-muted uppercase tracking-wide">{t('speciality')}</label>
@@ -248,9 +250,9 @@ useScrollFade(gridRef, { selector: '.doctor-card', y: 40, stagger: 0.08, start: 
               )}
             </div>
             {activeFilters.length > 0 && (
-              <div className="px-40 pb-4 flex flex-wrap gap-2 border-t border-border pt-3">
+              <div className="px-6 pb-4 flex flex-wrap gap-2 border-t border-border pt-3 max-w-7xl mx-auto">
                 {activeFilters.map(f => (
-                  <span key={f} className="text-xs font-medium px-2.5 py-1 rounded-full bg-accent/30 text-primary-deep border border-primary/20">
+                  <span key={f} className="text-xs font-medium px-2.5 py-1 rounded-full bg-accent-soft/30 text-primary-deep border border-primary/10">
                     {f}
                   </span>
                 ))}
@@ -267,7 +269,7 @@ useScrollFade(gridRef, { selector: '.doctor-card', y: 40, stagger: 0.08, start: 
                 key={s}
                 onClick={() => setSpecialty(s)}
                 className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
-                  specialty === s ? 'bg-primary-deep text-white shadow-md' : 'bg-gray-100 text-sub hover:bg-gray-200'
+                  specialty === s ? 'bg-primary-deep text-white shadow-sm' : 'bg-gray-100 text-sub hover:bg-gray-200'
                 }`}
               >
                 {t(s.toLowerCase().replace(/ /g, '')) || s}
@@ -276,7 +278,7 @@ useScrollFade(gridRef, { selector: '.doctor-card', y: 40, stagger: 0.08, start: 
           </div>
         </div>
 
-        {/* Results */}
+        {/* Results Grid Container */}
         <div className="max-w-7xl mx-auto px-6 py-10">
           <div className="flex justify-between items-center mb-6 flex-wrap gap-3">
             <p className="text-sm text-sub">
@@ -301,7 +303,7 @@ useScrollFade(gridRef, { selector: '.doctor-card', y: 40, stagger: 0.08, start: 
               </button>
             </div>
           ) : (
-            <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ">
               {filtered.map((doctor) => (
                 <DoctorCard key={doctor._id} doctor={doctor} onClick={handleDoctorClick} />
               ))}

@@ -1,4 +1,3 @@
-
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { User, Briefcase, Upload, X, Plus, Image as ImageIcon, CheckCircle, AlertCircle, MapPin} from 'lucide-react'
@@ -108,30 +107,40 @@ export default function AddDoctor() {
   }
 
   const inputClass = (key) => `input ${errors[key] ? 'border-red-500 focus:ring-red-500/20' : ''}`
-  //if (loading) return <PageLoader />;
+
   return (
-    <div className="max-w-2xl animate-fade-in mx-auto">
-      {/* Header */}
-      <div className="mb-5">
-        <h2 className="page-title">{t('addNewDoctor')}</h2>
-        <p className="sub-text">{t('addDoctorSub')}</p>
+    <div className="max-w-2xl animate-fade-in mx-auto mt-8 flex flex-col gap-5">
+      
+      {/* FULL-WIDTH HERO HEADER CARD */}
+      <div className="card p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white border border-border rounded-xl shadow-xs">
+        <div>
+          <h2 className="text-[20px] font-bold text-primary-deep">
+            {t('addNewDoctor')}
+          </h2>
+        </div>
+        
+        <div className="flex items-center gap-3 bg-bg/50 border border-border/40 rounded-xl p-3 px-4">
+          <p className="text-xs text-sub font-medium leading-tight text-right">
+            {t('addDoctorSub') || 'Fill out the form fields to onboard a new clinical profile.'}
+          </p>
+        </div>
       </div>
 
       {/* Success Message */}
       {success && (
-        <div className="bg-green-50 border border-green-200 text-green-600 rounded-lg px-3.5 py-2.5 text-sm mb-4 flex items-center gap-2">
+        <div className="bg-green-50 border border-green-200 text-green-600 rounded-lg px-3.5 py-2.5 text-sm flex items-center gap-2">
           <CheckCircle size={16} /> ✓ {t('doctorAdded')}
         </div>
       )}
 
       {/* Error Message */}
       {apiErr && (
-        <div className="bg-red-50 border border-red-200 text-red-500 rounded-lg px-3.5 py-2.5 text-sm mb-4 flex items-center gap-2">
+        <div className="bg-red-50 border border-red-200 text-red-500 rounded-lg px-3.5 py-2.5 text-sm flex items-center gap-2">
           <AlertCircle size={16} /> {apiErr}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
 
         {/* Photo Section */}
         <Section title={t('doctorPhoto')} icon={ImageIcon}>
@@ -205,59 +214,60 @@ export default function AddDoctor() {
           </div>
         </Section>
 
-      {/* Professional Info */}
-<Section title={t('professionalInfo')} icon={Briefcase}>
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-    <Field label={t('degree')} error={errors.degree} >
-      <input 
-        className={inputClass('degree')} 
-        placeholder="DDS, BDS..."
-        value={form.degree} 
-        onChange={e => setField('degree', e.target.value)} 
-      />
-    </Field>
-    <Field label={t('experienceYrs')} error={errors.experience}>
-      <input 
-        className={inputClass('experience')} 
-        placeholder="5"
-        value={form.experience} 
-        onChange={e => setField('experience', e.target.value)} 
-      />
-    </Field>
-    <Field label={t('feesLabel')} error={errors.fees} >
-      <input 
-        type="number"
-        className={inputClass('fees')} 
-        placeholder="50"
-        value={form.fees} 
-        onChange={e => setField('fees', e.target.value)} 
-      />
-    </Field>
-  </div>
-  <Field label={t('about')} error={errors.about} >
-    <textarea 
-      className={`${inputClass('about')} resize-none min-h-20`}
-      placeholder={t('des') || "Brief description about the doctor..."}
-      value={form.about} 
-      onChange={e => setField('about', e.target.value)}   
-      rows={3}
-    />
-  </Field>
-</Section>
+        {/* Professional Info */}
+        <Section title={t('professionalInfo')} icon={Briefcase}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+            <Field label={t('degree')} error={errors.degree} >
+              <input 
+                className={inputClass('degree')} 
+                placeholder="DDS, BDS..."
+                value={form.degree} 
+                onChange={e => setField('degree', e.target.value)} 
+              />
+            </Field>
+            <Field label={t('experienceYrs')} error={errors.experience}>
+              <input 
+                className={inputClass('experience')} 
+                placeholder="5"
+                value={form.experience} 
+                onChange={e => setField('experience', e.target.value)} 
+              />
+            </Field>
+            <Field label={t('feesLabel')} error={errors.fees} >
+              <input 
+                type="number"
+                className={inputClass('fees')} 
+                placeholder="50"
+                value={form.fees} 
+                onChange={e => setField('fees', e.target.value)} 
+              />
+            </Field>
+          </div>
+          <Field label={t('about')} error={errors.about} >
+            <textarea 
+              className={`${inputClass('about')} resize-none min-h-20`}
+              placeholder={t('des') || "Brief description about the doctor..."}
+              value={form.about} 
+              onChange={e => setField('about', e.target.value)}   
+              rows={3}
+            />
+          </Field>
+        </Section>
 
-        {/* Actions */}
-        <div className="flex gap-3 pb-6">
+        {/* Action Controls */}
+        <div className="flex justify-end gap-3 pb-6">
           <button 
             type="button" 
             onClick={() => navigate('/admin/doctors')}
-            className="btn btn-ghost flex items-center gap-2"
+            className="px-5 py-2 rounded-xl text-sm border border-border bg-white text-sub  hover:text-red-500 hover:border-red-50 transition-all flex items-center gap-2"
           >
             <X size={16} /> {t('cancel')}
           </button>
+          
           <button 
             type="submit" 
             disabled={loading} 
-            className="btn btn-primary flex items-center gap-2"
+            className="px-5 py-2 rounded-xl text-sm bg-primary text-white hover:bg-primary-hov shadow-xs disabled:opacity-70 transition-all flex items-center gap-2"
           >
             {loading ? (
               <>

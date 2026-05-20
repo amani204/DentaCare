@@ -76,7 +76,7 @@ export default function Doctors() {
             <p className="text-sub mb-3">{t('doctorsSub')}</p>
             <Link
               to="/doctors"
-              className="inline-flex items-center gap-2 text-text font-medium hover:gap-3 transition-all duration-200"
+              className="inline-flex items-center gap-2 text-gray-500 font-medium hover:gap-3 hover:text-primary transition-all duration-200"
             >
               {t('viewAllDoctors')} <ArrowRight size={15} />
             </Link>
@@ -92,7 +92,7 @@ export default function Doctors() {
             <div
               key={doc._id}
               onClick={() => navigate(`/doctors/${doc._id}`)}
-              className="doctor-card  bg-white border border-border rounded-[10px] overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-primary group cursor-pointer"
+              className="doctor-card  bg-white border border-border rounded-[10px] overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-sm hover:border-gray-500 group cursor-pointer"
             >
               <div className="h-80 relative bg-linear-to-br from-accent-soft/20 to-accent-soft/5 flex items-center justify-center overflow-hidden">
                {doc.image ? (

@@ -9,8 +9,8 @@ const SERVICES = [
     number: '01',
     titleKey: 'service1Title',
     descKey: 'service1Desc',
-    color: 'bg-[#D0E4FF]',
-    textColor: 'text-[#091E5D]',
+    color: 'bg-[#C4F2E0]',
+    textColor: 'text-primary',
     featuresKeys: ['service1Feature1', 'service1Feature2', 'service1Feature3'],
   },
   {
@@ -18,8 +18,8 @@ const SERVICES = [
     number: '02',
     titleKey: 'service2Title',
     descKey: 'service2Desc',
-    color: 'bg-[#F6FDD0]',
-    textColor: 'text-[#5B6800]',
+    color: 'bg-[#C4F2E0]',
+    textColor: 'text-primary',
     featuresKeys: ['service2Feature1', 'service2Feature2', 'service2Feature3'],
   },
   {
@@ -27,8 +27,8 @@ const SERVICES = [
     number: '03',
     titleKey: 'service3Title',
     descKey: 'service3Desc',
-    color: 'bg-[#FEF9EE]',
-    textColor: 'text-[#92400E]',
+    color: 'bg-[#C4F2E0]',
+    textColor: 'text-primary',
     featuresKeys: ['service3Feature1', 'service3Feature2', 'service3Feature3'],
   },
   {
@@ -36,8 +36,8 @@ const SERVICES = [
     number: '04',
     titleKey: 'service4Title',
     descKey: 'service4Desc',
-    color: 'bg-[#FFF0F0]',
-    textColor: 'text-[#991B1B]',
+    color: 'bg-[#C4F2E0]',
+    textColor: 'text-primary',
     featuresKeys: ['service4Feature1', 'service4Feature2', 'service4Feature3'],
   },
   {
@@ -45,8 +45,8 @@ const SERVICES = [
     number: '05',
     titleKey: 'service5Title',
     descKey: 'service5Desc',
-    color: 'bg-[#F0FDF4]',
-    textColor: 'text-[#166534]',
+    color: 'bg-[#C4F2E0]',
+    textColor: 'text-primary',
     featuresKeys: ['service5Feature1', 'service5Feature2', 'service5Feature3'],
   },
   {
@@ -54,8 +54,8 @@ const SERVICES = [
     number: '06',
     titleKey: 'service6Title',
     descKey: 'service6Desc',
-    color: 'bg-[#EDE9FE]',
-    textColor: 'text-[#5B21B6]',
+    color: 'bg-[#C4F2E0]',
+    textColor: 'text-priamey',
     featuresKeys: ['service6Feature1', 'service6Feature2', 'service6Feature3'],
   },
 ];
@@ -101,7 +101,7 @@ export default function Services() {
             return (
               <div
                 key={titleKey}
-                className="service-card opacity-0 bg-white border border-border rounded-[10px] p-6 relative overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-primary group"
+                className="service-card opacity-0 bg-white border border-border rounded-[10px] p-6 relative overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-2 hover:shadow-sm hover:border-gray-500 group"
               >
                 <span className="absolute top-4 right-5 text-5xl font-bold opacity-20 pointer-events-none">
                   {number}

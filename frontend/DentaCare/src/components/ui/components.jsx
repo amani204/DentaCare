@@ -60,7 +60,7 @@ export function StatCard({ title, value, icon: Icon, trend, color = 'primary' })
   return (
     <div className={`
       card p-5 relative overflow-hidden transition-all duration-200 
-      hover:shadow-lg hover:-translate-y-0.5 border-l-2 ${v.border} ${v.bg}
+      hover:shadow-sm hover:-translate-y-0.5 border-l-2 ${v.border} ${v.bg}
     `}>
       <div className="relative">
         <div className="flex justify-between items-start mb-3.5">
@@ -108,7 +108,7 @@ export function MiniStat({ title, value, color = 'primary' }) {
   return (
     <div className={`
       card p-5 relative overflow-hidden transition-all duration-200 
-      hover:shadow-lg hover:-translate-y-0.5 border-l-2 ${v.border} ${v.bg}
+      hover:shadow-sm hover:-translate-y-0.5 border-l-2 ${v.border} ${v.bg}
     `}>
       <div className="relative">
         <div className="flex justify-between items-start mb-3.5">

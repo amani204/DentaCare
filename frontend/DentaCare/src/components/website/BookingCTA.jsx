@@ -95,9 +95,6 @@ export default function BookingCTA() {
           className="relative z-10 max-w-7xl mx-auto px-6 opacity-0"
         >
           <div className="max-w-2xl mx-auto text-center">
-            <span className="inline-flex items-center gap-2 text-accent-soft uppercase tracking-wider bg-accent-soft/10 backdrop-blur-sm border border-white/30 rounded-full px-4 py-1.5 text-sm font-semibold mb-6">
-              ✦ {t('ctaBadge')}
-            </span>
             <h2 className="heading-lg text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
               {t('ctaHeading1')}{' '}
               <span className="text-white">{t('ctaHeading2')}</span>

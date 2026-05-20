@@ -87,11 +87,18 @@ export default function Appointments() {
   return (
     <div className="flex flex-col gap-5 animate-fade-in">
 
-      {/* Header Section */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      {/* FULL-WIDTH HERO HEADER CARD */}
+      <div className="card p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white border border-border rounded-xl shadow-xs">
         <div>
-          <h2 className="page-title">{t('allAppointments')}</h2>
-          <p className="sub-text">{apts.length} {t('total')}</p>
+          <h2 className="text-[20px] font-bold text-primary-deep">
+            {t('allAppointments')}
+          </h2>
+        </div>
+        
+        <div className="flex items-center gap-3 bg-bg/50 border border-border/40 rounded-xl p-3 px-4">
+          <p className="text-xs text-sub font-medium leading-tight text-right">
+            {apts.length} {t('total')} {t('appointments') || 'appointments logged across the system.'}
+          </p>
         </div>
       </div>
 
@@ -114,7 +121,7 @@ export default function Appointments() {
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`flex items-center gap-2 px-4 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-1.5 text-xs rounded-lg transition-all whitespace-nowrap ${
                   filter === f
                     ? 'bg-white text-primary shadow-sm border border-border/50'
                     : 'text-sub hover:text-text'
@@ -138,7 +145,7 @@ export default function Appointments() {
           <div className="relative w-full lg:max-w-md">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
             <input
-              className="input pl-9 bg-bg/50 border-none focus:bg-white transition-all w-full"
+              className="input pl-9 border-gray-200 transition-all w-full"
               placeholder={t('search')}
               value={search}
               onChange={e => setSearch(e.target.value)}
@@ -169,7 +176,7 @@ export default function Appointments() {
                   {headers.map(({ key, icon: Icon, label }) => (
                     <th
                       key={key}
-                      className="text-left text-xs text-primary-hov uppercase tracking-wide px-4 py-3 whitespace-nowrap"
+                      className="text-left text-[14px] font-light text-primary-hov px-4 py-3 whitespace-nowrap"
                     >
                       <div className="flex items-center gap-1.5">
                         {Icon && <Icon size={12} />}
@@ -206,14 +213,14 @@ export default function Appointments() {
                         )}
                         <div>
                           <p className="text-sm font-medium text-text leading-tight">{a.docData?.name}</p>
-                          <p className="text-[10px] text-muted uppercase tracking-tighter">{a.docData?.speciality}</p>
+                          <p className="text-[10px] text-muted ">{a.docData?.speciality}</p>
                         </div>
                       </div>
                     </td>
 
                     <td className="px-4 py-3 text-sm text-sub whitespace-nowrap">{a.slotDate?.replace(/_/g, '/')}</td>
                     <td className="px-4 py-3 text-sm text-sub whitespace-nowrap">{a.slotTime}</td>
-                    <td className="px-4 py-3 text-sm  text-primary whitespace-nowrap">{a.amount}DA</td>
+                    <td className="px-4 py-3 text-sm font-medium text-primary whitespace-nowrap">{a.amount}DA</td>
                     
                     {/* Payment Status – hidden if completed (completed => paid) */}
                     <td className="px-4 py-3 whitespace-nowrap">

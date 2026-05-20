@@ -364,7 +364,10 @@ export default function DoctorDetailsPage() {
   return (
     <main>
       <Navbar />
-      <div ref={pageRef} className="min-h-screen bg-bg pt-28 pb-16">
+      <div ref={pageRef} className="min-h-screen bg-whites pt-28 pb-16">
+        <div className="absolute top-[-10%] right-[-5%] w-125 h-125 bg-[#CDE9FF]/40 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-100 h-100 bg-[#CDE9FF]/5 rounded-full blur-[100px]" />
+
         <div className="max-w-7xl mx-auto px-6">
           <button
             ref={backBtnRef}
@@ -392,9 +395,9 @@ export default function DoctorDetailsPage() {
                   <p className="text-primary font-medium mb-4">{doctor.speciality}</p>
                   <button
                     onClick={handleBookClick}
-                    className={`w-full py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
+                    className={`w-full py-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${
                       doctor.available
-                        ? 'btn-primary text-white shadow-md hover:shadow-lg hover:-translate-y-0.5'
+                        ? 'inline-flex items-center gap-2 btn-primary font-medium px-6 py-3 rounded-xl shadow-md hover:shadow-sm'
                         : 'bg-gray-100 text-muted cursor-not-allowed'
                     }`}
                   >
@@ -423,7 +426,7 @@ export default function DoctorDetailsPage() {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {doctor.degree && (
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-primary-soft/20 transition-all duration-300 hover:translate-x-1">
+                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl ">
                       <GraduationCap size={18} className="text-primary" />
                       <div>
                         <p className="text-xs text-muted">{t('degree')}</p>
@@ -431,22 +434,22 @@ export default function DoctorDetailsPage() {
                       </div>
                     </div>
                   )}
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-primary-soft/20 transition-all duration-300 hover:translate-x-1">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
                     <Briefcase size={18} className="text-primary" />
                     <div>
                       <p className="text-xs text-muted">{t('experience')}</p>
                       <p className="font-medium text-text">{doctor.experience} {t('years')}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-primary-soft/20 transition-all duration-300 hover:translate-x-1">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl ">
                     <Stethoscope size={18} className="text-primary" />
                     <div>
                       <p className="text-xs text-muted">{t('speciality')}</p>
                       <p className="font-medium text-text">{doctor.speciality}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-primary-soft/20 transition-all duration-300 hover:translate-x-1">
-                    <DollarSign size={18} className="text-primary" />
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl ">
+                      <DollarSign size={18} className="text-primary" />
                     <div>
                       <p className="text-xs text-muted">{t('feePerSession')}</p>
                       <p className="font-medium text-text">{doctor.fees}DA</p>

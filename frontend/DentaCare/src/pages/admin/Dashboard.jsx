@@ -71,38 +71,52 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col gap-5 animate-fade-in mt-8">
-      <div>
-        <h2 className="text-3xl font-bold text-primary-deep mb-2">
-          {new Date().toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-          })}
-        </h2>
-        <p className="sub-text">
-          <span className="text-text font-semibold">{s?.appointments?.today ?? 0}</span>
-          {' '}{t('upcomingToday')}
-        </p>
-      </div>
+      
+      {/* MAIN TOP GRID CONTAINER */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+        
+        {/* FULL WIDTH HERO CARD */}
+        <div className="card p-6 sm:col-span-2 lg:col-span-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white border border-border rounded-xl shadow-xs">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-primary-deep tracking-tight">
+              {new Date().toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })}
+            </h2>
+          </div>
+          
+          <div className="flex items-center gap-3 bg-bg/50 border border-border/40 rounded-xl p-3.5 sm:min-w-[220px]">
+            <div className="inline-flex items-center justify-center bg-accent-soft text-primary-hov font-bold h-9 px-3 rounded-lg text-base shadow-2xs">
+              {s?.appointments?.today ?? 0}
+            </div>
+            <p className="text-xs text-text font-medium leading-tight">
+              {t('upcomingToday') || 'appointments scheduled for today'}
+            </p>
+          </div>
+        </div>
+
+        {/* STAT CARDS */}
         <StatCard
           title={t('totalDoctors')} value={s?.doctors?.total ?? 0}
           icon={Stethoscope} trend={`${s?.doctors?.available ?? 0} ${t('available')}`}
-          color="success"
+          color="accentSoft"
         />
         <StatCard
           title={t('totalPatients')} value={s?.patients?.total ?? 0}
           icon={User} trend={t('registered')}
-          color="accent"
+          color="success"
         />
         <StatCard
           title={t('totalAppointments')} value={s?.appointments?.total ?? 0}
           icon={CalendarDays} trend={`${s?.appointments?.today ?? 0} ${t('today')}`}
-          color="primary"
+          color="accent"
         />
       </div>
 
+      {/* ANALYTICS CHART */}
       <div className="card p-5">
         <h3 className="section-title mb-4">{t('appointmentStats')}</h3>
         <ResponsiveContainer width="100%" height={185}>
@@ -128,6 +142,7 @@ export default function Dashboard() {
         </ResponsiveContainer>
       </div>
 
+      {/* APPOINTMENTS DATA CONTAINER */}
       <div className="card overflow-hidden">
         <div className="flex justify-between items-center p-5 border-b border-border bg-white">
           <h3 className="section-title">{t('recentAppointments')}</h3>
@@ -145,7 +160,7 @@ export default function Dashboard() {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b border-border bg-bg/40">
-                  <th className="text-left  text-[10px] font-bold text-muted uppercase tracking-widest px-4 py-3 w-10">#</th>
+                  <th className="text-left  text-[10px] font-bold text-muted px-4 py-3 w-10">#</th>
                   {[
                     { label: t('patient'), icon: User },
                     { label: t('doctor'), icon: Stethoscope },
@@ -155,7 +170,7 @@ export default function Dashboard() {
                     { label: t('status'), icon: Activity },
                     { label: t('actions'), icon: null }
                   ].map((h, idx) => (
-                    <th key={idx} className="text-left text-[10px]  text-primary-hov uppercase tracking-widest px-4 py-3 whitespace-nowrap">
+                    <th key={idx} className="text-left text-[14px] font-light text-primary-hov  px-4 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-1.5">
                         {h.icon && <h.icon size={12} />}
                         {h.label}
@@ -191,7 +206,7 @@ export default function Dashboard() {
                         )}
                         <div>
                           <p className="text-sm  text-text leading-tight">{a.docData?.name}</p>
-                          <p className="text-[10px] text-muted uppercase tracking-tighter mt-0.5">{a.docData?.speciality}</p>
+                          <p className="text-[10px] text-muted  mt-0.5">{a.docData?.speciality}</p>
                         </div>
                       </div>
                      </td>

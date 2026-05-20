@@ -1,7 +1,6 @@
-
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Plus, Trash2, ToggleLeft, ToggleRight, Stethoscope, DollarSign, GraduationCap, Activity, ChevronDown, Users, Clock, Layers, CheckCircle } from 'lucide-react'
+import { Search, Trash2, ToggleLeft, ToggleRight, Stethoscope, DollarSign, GraduationCap, Activity, ChevronDown, Users, Clock, Layers, CheckCircle } from 'lucide-react'
 import { Badge, EmptyState, Modal, StatCard, MiniStat } from '../../components/ui/components'
 import useAdminStore from '../../store/adminStore'
 import useT from '../../hooks/useT'
@@ -61,99 +60,107 @@ export default function DoctorsList() {
   if (loading) return <PageLoader />;
 
   return (
-    <div className="flex flex-col gap-5 animate-fade-in">
+    <div className="flex flex-col gap-5 animate-fade-in mt-8">
 
-      {/* Header */}
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div>
-          <h2 className="page-title">{t('allDoctors')}</h2>
-          <p className="sub-text">{doctors.length} {t('registered')}</p>
+      {/* FILTER SECTION WITH FULL-WIDTH HERO HEADER */}
+      <div className="flex flex-col gap-6 bg-white p-5 rounded-2xl border border-border shadow-sm">
+        
+        {/* NEW FULL-WIDTH HERO HEADER INTEGRATED INSIDE THE SECTION */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2">
+          <div>
+            <h2 className="text-[20px] font-bold text-primary-deep">
+              {t('allDoctors')}
+            </h2>
+          </div>
+          
+          <div className="flex items-center gap-3 bg-bg/50 border border-border/40 rounded-xl p-3.5 sm:min-w-[200px]">
+            <div className="inline-flex items-center justify-center bg-accent-soft text-primary-hov font-bold h-9 px-3 rounded-lg text-base shadow-2xs">
+              {doctors.length}
+            </div>
+            <p className="text-xs text-text font-medium leading-tight">
+              {t('registered') || 'medical profiles registered'}
+            </p>
+          </div>
         </div>
-        <button onClick={() => navigate('/admin/add-doctor')} className="btn btn-primary flex items-center gap-2">
-          <Plus size={16} />
-          {t('addDoctor')}
-        </button>
-      </div>
-{/* Filter Section */}
-<div className="flex flex-col gap-6 bg-white p-5 rounded-2xl border border-border shadow-sm">
-  
-  {/* Stats Overview */}
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-    <MiniStat
-      title={t('totalDoctors')}
-      value={doctors.length}
-   a   color="success"
-    />
-    <MiniStat
-      title={t('available')}
-      value={doctors.filter(d => d.available).length}
-      color="accentSoft"
-    />
-    <MiniStat
-      title={t('onLeave')}
-      value={doctors.filter(d => !d.available).length}
-      color="accent"
-    />
-    <MiniStat
-      title={t('specialities')}
-      value={SPECIALITIES.length}
-      color="primary"
-    />
-  </div>
 
-  {/* The actual controls */}
-  <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between pt-4 border-t border-dashed border-border">
-    
-    {/* Search */}
-    <div className="relative flex-1 w-full max-w-md">
-      <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-      <input
-        className="input pl-9 w-full bg-bg/50 border-none focus:bg-white transition-all"
-        placeholder={t('search')}
-        value={search}
-        onChange={e => setSearch(e.target.value)}
-      />
-    </div>
+        {/* Stats Overview */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <MiniStat
+            title={t('totalDoctors')}
+            value={doctors.length}
+            color="success"
+          />
+          <MiniStat
+            title={t('available')}
+            value={doctors.filter(d => d.available).length}
+            color="accentSoft"
+          />
+          <MiniStat
+            title={t('onLeave')}
+            value={doctors.filter(d => !d.available).length}
+            color="accent"
+          />
+          <MiniStat
+            title={t('specialities')}
+            value={SPECIALITIES.length}
+            color="primary"
+          />
+        </div>
 
-    <div className="flex flex-wrap gap-3 items-center w-full lg:w-auto">
-      {/* Quick Status Filters */}
-      <div className="flex bg-bg p-1 rounded-xl border border-border">
-        <button
-          onClick={() => setFilter('all')}
-          className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-            filter === 'all' ? 'bg-white text-primary shadow-sm' : 'text-sub hover:text-text'
-          }`}
-        >
-          <Users size={14} /> {t('all')}
-        </button>
-        <button
-          onClick={() => setFilter('active')}
-          className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-            filter === 'active' ? 'bg-white text-emerald-600 shadow-sm' : 'text-sub hover:text-text'
-          }`}
-        >
-          <Activity size={14} /> {t('active')}
-        </button>
+        {/* The actual controls */}
+        <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between pt-4 border-t border-dashed border-border">
+          
+          {/* Search */}
+          <div className="relative flex-1 w-full max-w-md">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+            <input
+              className="input pl-9 w-full  border-gray-200  transition-all"
+              placeholder={t('search')}
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
+
+          <div className="flex flex-wrap gap-3 items-center w-full lg:w-auto">
+            {/* Quick Status Filters */}
+            <div className="flex bg-bg p-1 rounded-xl border border-border">
+              <button
+                onClick={() => setFilter('all')}
+                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                  filter === 'all' ? 'bg-white text-primary shadow-sm' : 'text-sub hover:text-text'
+                }`}
+              >
+                <Users size={14} /> {t('all')}
+              </button>
+              <button
+                onClick={() => setFilter('active')}
+                className={`px-4 py-1.5 rounded-lg text-xs transition-all flex items-center gap-1.5 ${
+                  filter === 'active' ? 'bg-white text-emerald-600 shadow-sm' : 'text-sub hover:text-text'
+                }`}
+              >
+                <Activity size={14} /> {t('active')}
+              </button>
+            </div>
+
+            {/* Speciality Dropdown */}
+            <div className="relative min-w-50">
+              <Stethoscope size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted z-10" />
+              <select
+                className="input pl-9 pr-8 appearance-none cursor-pointer bg-bg/50 border-none"
+                value={filter}
+                onChange={e => setFilter(e.target.value)}
+              >
+                <option value="all">{t('filterSpeciality')}</option>
+                {SPECIALITIES.map(s => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+              <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Speciality Dropdown */}
-      <div className="relative min-w-50">
-        <Stethoscope size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted z-10" />
-        <select
-          className="input pl-9 pr-8 appearance-none cursor-pointer bg-bg/50 border-none"
-          value={filter}
-          onChange={e => setFilter(e.target.value)}
-        >
-          <option value="all">{t('filterSpeciality')}</option>
-          {SPECIALITIES.map(s => (
-            <option key={s} value={s}>{s}</option>
-          ))}
-        </select>
-        <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
-      </div>
-    </div>
-  </div>
-</div>
       {/* Cards grid */}
       {filtered.length === 0
         ? <EmptyState message={t('noDoctors')}
@@ -161,7 +168,7 @@ export default function DoctorsList() {
         : (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-3.5">
             {filtered.map(d => (
-              <div key={d._id} className="card-hover p-4 flex flex-col gap-3">
+              <div key={d._id} className="card p-4 flex flex-col gap-3">
 
                 {/* Image */}
                 <div className="relative">
@@ -184,7 +191,7 @@ export default function DoctorsList() {
                     <GraduationCap size={12} /> {d.degree} · {d.experience} {t('experience')}
                   </span>
                   <span className="font-bold text-sm text-primary-hov flex items-center gap-0.5">
-                    <DollarSign size={12} />{d.fees}DA
+                    {d.fees}DA
                   </span>
                 </div>
 

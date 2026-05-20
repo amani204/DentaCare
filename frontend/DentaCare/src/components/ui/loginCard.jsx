@@ -312,7 +312,7 @@ export const LoginCard = ({
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-accent-soft hover:bg-accent-soft/80 text-white font-medium py-2.5 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2 transform hover:scale-[1.02] active:scale-[0.98]"
+            className="w-full bg-accent-soft hover:bg-accent-soft/80 text-primary font-medium py-2.5 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2 transform hover:scale-[1.02] active:scale-[0.98]"
           >
             {isLoading ? (
               <>

@@ -51,12 +51,6 @@ export default function Hero() {
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-8 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="flex flex-col gap-6 mb-12">
-            <div ref={tagRef} className="opacity-0">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-soft/30 text-primary-deep text-sm font-medium">
-                ✦ {t('heroTag')}
-              </span>
-            </div>
-
             <h1 ref={headingRef} className="heading-lg text-5xl md:text-6xl lg:text-7xl font-black text-text opacity-0">
               {t('heroHeading1')}{' '}
               <span className="relative text-[#2C2C2A]">
@@ -74,10 +68,10 @@ export default function Hero() {
             </p>
 
             <div ref={buttonsRef} className="flex flex-wrap gap-3">
-              <Link to="/doctors" className="btn-hero inline-flex items-center gap-2 btn-primary font-medium px-6 py-3 rounded-xl shadow-md hover:shadow-lg">
+              <Link to="/doctors" className=" inline-flex items-center gap-2 btn-primary font-medium px-6 py-3 rounded-xl shadow-md hover:shadow-sm">
                 {t('bookAppointment')} <ArrowRight size={16} />
               </Link>
-              <Link to="/about" className="btn-hero inline-flex items-center gap-2 border border-primary text-primary hover:bg-primary/5 font-medium px-6 py-3 rounded-xl">
+              <Link to="/about" className="btn-hero inline-flex items-center gap-2 border border-gray-500 text-primary hover:bg-gray-100 font-medium px-6 py-3 rounded-xl">
                 {t('learnMore')}
               </Link>
              
@@ -123,7 +117,7 @@ export default function Hero() {
               <p className="text-xs text-sub">{t('testimonial')}</p>
               <div className="flex items-center gap-1 mt-1">
                 <div className="w-5 h-5 rounded-full bg-primary-soft flex items-center justify-center text-[10px] font-bold text-primary-deep">A</div>
-                <span className="text-[10px] text-sub">Amani Z. · {t('verifiedPatient')}</span>
+                <span className="text-[10px] text-sub">Amani A. · {t('verifiedPatient')}</span>
               </div>
             </div>
 

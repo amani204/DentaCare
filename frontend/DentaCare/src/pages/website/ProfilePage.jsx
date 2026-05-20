@@ -3,10 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
-  User, Phone, Calendar, MapPin, Camera, Save,
+  Phone, Calendar, Camera, Save,
   Edit2, Clock, DollarSign, CheckCircle, XCircle,
-  CalendarDays, CreditCard, Ban, AlertCircle,
-  ChevronRight, Filter
+  CalendarDays, CreditCard, Ban, AlertCircle
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useFadeIn } from '../../hooks/gsap';
@@ -43,9 +42,7 @@ export default function ProfilePage() {
   const [cancellingId, setCancellingId] = useState(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
-  const [processingPayment, setProcessingPayment] = useState(null);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [paymentAppointment, setPaymentAppointment] = useState(null);
+  const [processingPayment, setProcessingPayment] = useState(false);
   const [filter, setFilter] = useState('all');
 
   // Simple fade‑in (no scroll trigger)
@@ -167,7 +164,6 @@ export default function ProfilePage() {
       const { data } = await api.post('/appointment/cancel', { appointmentId: selectedAppointment._id }, { headers: { token } });
       if (data.success) {
         toast.success(t('appointmentCancelled') || 'Appointment cancelled successfully');
-        // Refresh the appointments list immediately
         await fetchAppointments();
         setShowCancelModal(false);
         setSelectedAppointment(null);
@@ -181,18 +177,12 @@ export default function ProfilePage() {
     }
   };
 
-  const handlePaymentClick = (appointment) => {
+  const handleStripePayment = async (appointment) => {
     gsap.fromTo('.payment-btn', { scale: 1 }, { scale: 0.95, duration: 0.1, yoyo: true, repeat: 1 });
-    setPaymentAppointment(appointment);
-    setShowPaymentModal(true);
-  };
-
-  const handleStripePayment = async () => {
-    if (!paymentAppointment) return;
-    setProcessingPayment('stripe');
+    setProcessingPayment(true);
     try {
       const { data } = await api.post('/payment/stripe-checkout', {
-        appointmentId: paymentAppointment._id,
+        appointmentId: appointment._id,
       }, { headers: { token } });
       if (data.success && data.sessionUrl) {
         window.location.href = data.sessionUrl;
@@ -200,37 +190,16 @@ export default function ProfilePage() {
     } catch (error) {
       toast.error(t('stripeError') || 'Stripe redirect failed');
     } finally {
-      setProcessingPayment(null);
+      setProcessingPayment(false);
     }
   };
 
-  const handleChargilyPayment = async () => {
-    if (!paymentAppointment) return;
-    setProcessingPayment('chargily');
+  const verifyPaymentStatus = async (appointmentId, sessionId) => {
     try {
-      const { data } = await api.post('/payment/chargily-checkout', {
-        appointmentId: paymentAppointment._id,
-      }, { headers: { token } });
-      if (data.success && data.checkoutUrl) {
-        window.location.href = data.checkoutUrl;
-      } else {
-        toast.error(data.message || t('chargilyError') || 'Chargily error');
-      }
-    } catch (error) {
-      toast.error(t('chargilyError') || 'Chargily redirect failed');
-    } finally {
-      setProcessingPayment(null);
-    }
-  };
-
-  const verifyPaymentStatus = async (appointmentId, paymentMethod, sessionId) => {
-    try {
-      const endpoint = paymentMethod === 'stripe' ? '/payment/stripe-verify' : '/payment/chargily-verify';
-      const payload = paymentMethod === 'stripe' ? { sessionId } : { appointmentId };
-      const { data } = await api.post(endpoint, payload, { headers: { token } });
+      const { data } = await api.post('/payment/stripe-verify', { sessionId }, { headers: { token } });
       if (data.success) {
         toast.success(t('paymentSuccess') || 'Payment successful!');
-        await fetchAppointments(); // Refresh appointments after successful payment
+        await fetchAppointments();
       } else {
         toast.error(data.message || t('paymentFailed') || 'Verification failed');
       }
@@ -244,11 +213,10 @@ export default function ProfilePage() {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentStatus = urlParams.get('payment_status');
     const appointmentId = urlParams.get('appointment_id');
-    const paymentMethod = urlParams.get('payment_method');
     const sessionId = urlParams.get('session_id');
 
-    if (paymentStatus === 'success' && appointmentId) {
-      verifyPaymentStatus(appointmentId, paymentMethod, sessionId);
+    if (paymentStatus === 'success' && appointmentId && sessionId) {
+      verifyPaymentStatus(appointmentId, sessionId);
       navigate('/profile', { replace: true });
     } else if (paymentStatus === 'cancelled') {
       toast.error(t('paymentCancelled') || 'Payment was cancelled');
@@ -339,7 +307,7 @@ export default function ProfilePage() {
                       <div className="mt-4 space-y-2">
                         {profileData.phone && <div className="flex items-center gap-2 text-sub"><Phone size={14} /><span className="text-sm">{profileData.phone}</span></div>}
                       </div>
-                      <button onClick={() => setEditing(true)} className="mt-6 w-full py-2 rounded-lg border border-primary text-primary hover:bg-primary/5 transition flex items-center justify-center gap-2">
+                      <button onClick={() => setEditing(true)} className="mt-6 w-full py-2 rounded-lg border border-primary text-primary hover:bg-gray-50 transition flex items-center justify-center gap-2">
                         <Edit2 size={16} /> {t('editProfile')}
                       </button>
                     </>
@@ -382,7 +350,7 @@ export default function ProfilePage() {
                   <div className="text-center py-12">
                     <CalendarDays size={48} className="text-muted mx-auto mb-4" />
                     <p className="text-sub">{t('noAppointments')}</p>
-                    <button onClick={() => navigate('/doctors')} className="mt-4 btn-primary py-2 px-4 rounded-lg">{t('bookAppointment')}</button>
+                    <button onClick={() => navigate('/doctors')} className="mt-4 bg-primary text-white py-2 px-4 rounded-lg">{t('bookAppointment')}</button>
                   </div>
                 ) : (
                   <div className="divide-y divide-border">
@@ -407,8 +375,8 @@ export default function ProfilePage() {
                             <div className="flex gap-2">
                               {!apt.cancelled && !apt.isCompleted && !apt.isPaid && (
                                 <>
-                                  <button onClick={() => handlePaymentClick(apt)} disabled={processingPayment !== null} className="payment-btn flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary text-white hover:bg-primary-deep transition text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
-                                    {processingPayment !== null ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <CreditCard size={14} />}
+                                  <button onClick={() => handleStripePayment(apt)} disabled={processingPayment} className="payment-btn flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary text-white hover:bg-primary-deep transition text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                                    {processingPayment ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <CreditCard size={14} />}
                                     {t('payNow')}
                                   </button>
                                   <button onClick={() => { setSelectedAppointment(apt); setShowCancelModal(true); }} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition text-sm font-medium">
@@ -432,31 +400,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Payment Modal  */}
-      {showPaymentModal && paymentAppointment && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowPaymentModal(false)} />
-          <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-scale-up">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 rounded-full bg-primary-soft flex items-center justify-center mx-auto mb-4"><CreditCard size={24} className="text-primary" /></div>
-              <h3 className="text-xl font-bold text-text">{t('selectPaymentMethod')}</h3>
-            </div>
-            <div className="space-y-3">
-              <button onClick={handleStripePayment} disabled={processingPayment !== null} className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-border hover:border-primary transition-all hover:shadow-md disabled:opacity-50">
-                <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-lg bg-[#635BFF]/10 flex items-center justify-center"><svg className="w-6 h-6 text-[#635BFF]" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 7.5h-3v6h3v-6zm-4.5 0h-3v6h3v-6zm-4.5 0H6v6h1.5v-6zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg></div><div className="text-left"><p className="font-semibold text-text">{t('stripeLabel')}</p><p className="text-xs text-sub">{t('stripeDescription')}</p></div></div>
-                {processingPayment === 'stripe' ? <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" /> : <ChevronRight size={20} className="text-muted" />}
-              </button>
-              <button onClick={handleChargilyPayment} disabled={processingPayment !== null} className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-border hover:border-primary transition-all hover:shadow-md disabled:opacity-50">
-                <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center"><svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg></div><div className="text-left"><p className="font-semibold text-text">{t('chargilyLabel')}</p><p className="text-xs text-sub">{t('chargilyDescription')}</p></div></div>
-                {processingPayment === 'chargily' ? <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" /> : <ChevronRight size={20} className="text-muted" />}
-              </button>
-            </div>
-            <button onClick={() => setShowPaymentModal(false)} className="w-full mt-6 py-2 text-sub hover:text-text transition">{t('cancel')}</button>
-          </div>
-        </div>
-      )}
-
-      {/* Cancel Modal  */}
+      {/* Cancel Modal */}
       {showCancelModal && selectedAppointment && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowCancelModal(false)} />

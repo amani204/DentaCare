@@ -1,14 +1,9 @@
 import Stripe from 'stripe';
-import { ChargilyClient } from '@chargily/chargily-pay';
 import Appointment from '../models/appointmentModel.js';
 import Doctor from '../models/doctorModel.js';
 import User from '../models/userModel.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-const chargilyClient = new ChargilyClient({
-  api_key: process.env.CHARGILY_API_KEY,
-  mode: process.env.CHARGILY_MODE || 'test'
-});
 
 // --- STRIPE: CREATE SESSION ---
 export const createCheckoutStripeSession = async (req, res) => {
@@ -64,47 +59,5 @@ export const verifyStripePayment = async (req, res) => {
     res.json({ success: false, message: 'Payment failed' });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// --- CHARGILY: CREATE CHECKOUT ---
-export const createChargilyCheckout = async (req, res) => {
-  try {
-    const userId = req.userId;
-    const { appointmentId } = req.body;
-    const appointment = await Appointment.findById(appointmentId);
-    const doctor = await Doctor.findById(appointment.docId);
-
-    const checkout = await chargilyClient.createCheckout({
-      items: [{
-        price: appointment.amount, // In test mode, keep as simple integer
-        quantity: 1,
-        name: `Consultation - Dr. ${doctor.name}`,
-      }],
-      success_url: `${process.env.FRONTEND_URL}/profile?payment_status=success&appointment_id=${appointmentId}&payment_method=chargily`,
-      failure_url: `${process.env.FRONTEND_URL}/profile?payment_status=cancelled`,
-      metadata: [{ name: "appointmentId", value: appointmentId.toString() }],
-      currency: 'dzd',
-    });
-
-    res.json({ success: true, checkoutUrl: checkout.checkout_url });
-  } catch (error) {
-    res.json({ success: false, message: error.message });
-  }
-};
-
-// --- CHARGILY: VERIFY ---
-export const verifyChargilyPayment = async (req, res) => {
-  try {
-    const { appointmentId } = req.body; 
-    // In test mode, we'll verify by checking the local appointment record
-    // Usually, you'd use a Webhook, but for testing, we mark as paid if we reached this logic
-    await Appointment.findByIdAndUpdate(appointmentId, {
-      isPaid: true,
-      paymentDate: new Date(),
-    });
-    res.json({ success: true, message: 'Verified' });
-  } catch (error) {
-    res.json({ success: false, message: error.message });
   }
 };

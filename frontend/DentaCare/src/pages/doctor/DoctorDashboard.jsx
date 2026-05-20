@@ -84,34 +84,41 @@ export default function DoctorDashboard() {
   if (loading) return <PageLoader />
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between mt-8">
+    <div className="space-y-6 animate-in fade-in duration-500 w-full">
+      
+      {/* 1. Greeting & Top Summary (Full Width) */}
+      <div className="flex items-center justify-between w-full mt-8 bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-border/60 shadow-xs">
         <div>
-          <h2 className="text-2xl font-bold text-primary mb-2">
+          <h2 className="text-2xl font-bold text-primary-deep tracking-tight">
             {greeting}, Dr. {doctor?.name?.split(' ')[1] || 'Doctor'}
           </h2>
-          <p className="text-sub text-sm">
-            <span className="text-primary font-semibold">{todayApts.length}</span>
-            {' '}{t('appointmentsToday')}
+          <p className="text-muted text-sm  mt-1">
+            <span className="text-primary font-semibold">{todayApts.length}</span> {t('appointmentsToday')}
           </p>
         </div>
+        
         <div className="flex items-center gap-3">
-          <div className="text-center px-4 py-2 bg-primary-soft/50 rounded-xl border border-primary-soft/50">
-            <p className="text-xl font-bold text-primary-deep">{todayApts.filter(a => !a.isCompleted).length}</p>
-            <p className="text-xs text-sub">{t('remaining')}</p>
+          <div className="text-center px-5 py-2.5 bg-bg border border-border rounded-xl">
+            <p className="text-lg font-bold text-primary-deep leading-none">
+              {todayApts.filter(a => !a.isCompleted).length}
+            </p>
+            <p className="text-[14px]  mt-1">{t('remaining')}</p>
           </div>
-          <div className="text-center px-4 py-2 bg-accent-soft/50 rounded-xl border border-accent-soft/50">
-            <p className="text-xl font-bold text-emerald-600">{todayApts.filter(a => a.isCompleted).length}</p>
-            <p className="text-xs text-sub">{t('done')}</p>
+          <div className="text-center px-5 py-2.5 bg-emerald-50 border border-emerald-100 rounded-xl">
+            <p className="text-lg font-bold leading-none text-emerald-600 ">
+              {todayApts.filter(a => a.isCompleted).length}
+            </p>
+            <p className="text-[14px] text-emerald-600/70 mt-1">{t('done')}</p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      {/* 2. Stats Grid (Full Width) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
         <StatCard title={t('totalAppointments')} value={d?.totalAppointments ?? 0} icon={CalendarDays} trend={t('allTime')} color="accent" />
         <StatCard title={t('completedApts')} value={d?.completedAppointments ?? 0} icon={CheckCircle} trend={t('fromCompleted')} color="success" />
         <StatCard title={t('upcomingApts')} value={d?.pendingAppointments ?? 0} icon={Clock} trend={t('$scheduled')} color="purple" />
-        <StatCard title={t('totalEarnings')} value={`${(d?.totalEarnings ?? 0).toLocaleString()}DA`} icon={DollarSign} trend={t('fromCompleted')} color="accentSoft" />
+        <StatCard title={t('totalEarnings')} value={`${(d?.totalEarnings ?? 0).toLocaleString()} DA`} icon={DollarSign} trend={t('fromCompleted')} color="accentSoft" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-5">
@@ -138,7 +145,7 @@ export default function DoctorDashboard() {
         <div className="bg-white/80 backdrop-blur-sm rounded-[10px] border border-primary/10 shadow-lg p-5">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-text">{t('todaySchedule')}</h3>
-            <span className="text-xs font-semibold px-2 py-1 rounded-full bg-primary/10 text-primary-deep border border-primary/20">
+            <span className="text-xs font-semibold px-2 py-1 rounded-full bg-accent-soft/10 text-accent-soft border border-accent-soft/20">
               {new Date().toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'short' })}
             </span>
           </div>
