@@ -51,7 +51,6 @@ DentaCare serves three distinct user roles, each with a fully authenticated inte
 - bcryptjs
 - Cloudinary (image uploads)
 - Stripe (card payments)
-- Chargily (Algerian gateway — CIB, EDAHABIA)
 - Nodemailer (OTP emails)
 
 </td>
@@ -66,7 +65,7 @@ DentaCare serves three distinct user roles, each with a fully authenticated inte
 - Browse doctors with search, specialty filter, sort by fees or experience
 - Interactive booking modal — week view calendar + time slot picker
 - Full auth flow — signup, login, forgot password with OTP email, reset password
-- Pay for appointments via **Stripe** or **Chargily** (redirect checkout + verification)
+- Pay for appointments via **Stripe** (redirect checkout + verification)
 - View all appointments with live status badges (pending / confirmed / completed / cancelled)
 - Edit profile — name, phone, photo
 - Cancel unpaid appointments (slot released back to doctor)
@@ -89,7 +88,7 @@ DentaCare serves three distinct user roles, each with a fully authenticated inte
 - Full English / French i18n via custom `useT` hook (single source of truth)
 - Skeleton loaders for all async operations
 - Smart fallback data when API is unavailable
-- Stripe + Chargily payment verification on redirect return
+- Stripe payment verification on redirect return
 
 ---
 
@@ -159,8 +158,6 @@ CLOUDINARY_CLOUD_NAME=...
 CLOUDINARY_API_KEY=...
 CLOUDINARY_API_SECRET=...
 STRIPE_SECRET_KEY=sk_test_...
-CHARGILY_API_KEY=...
-CHARGILY_MODE=test
 FRONTEND_URL=http://localhost:5173
 EMAIL_USER=your@gmail.com
 EMAIL_PASS=your-app-password
@@ -236,7 +233,6 @@ Key steps:
 |-----------|----------|
 | Double booking prevention | Server-side slot validation before saving appointment |
 | Multi-role authentication | Separate JWT tokens and middleware per role |
-| Algerian payment integration | Chargily gateway with redirect checkout and server-side verification |
 | API quota limits | Smart fallback data with 60-min retry cache |
 | GSAP memory leaks | `gsap.context()` with proper cleanup in every hook |
 | Render free tier cold starts | Preconnect hints + skeleton loaders hide the delay |
@@ -246,7 +242,7 @@ Key steps:
 ## What I Learned
 
 - Designing a multi-role authentication system from scratch
-- Integrating two different payment gateways (international + local)
+- Integrating Stripe for secure online payments
 - Building reusable animation hooks with proper cleanup
 - Implementing i18n without a library using a custom hook
 - Optimising Lighthouse scores — images, accessibility, SEO
@@ -265,8 +261,8 @@ Key steps:
 
 **Amani Adjailia**
 
-[![GitHub](https://img.shields.io/badge/GitHub-amani204-181717?style=flat-square&logo=github)](https://github.com/amani204).
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-AmyA-0A66C2?style=flat-square&logo=linkedin)](https://linkedin.com/in/amy-a-810721390/)
+[![GitHub](https://img.shields.io/badge/GitHub-amani204-181717?style=flat-square&logo=github)](https://github.com/amani204)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-amani-0A66C2?style=flat-square&logo=linkedin)](https://linkedin.com/in/amani-a-810721390/)
 
 ---
 
