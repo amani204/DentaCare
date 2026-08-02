@@ -259,13 +259,8 @@ Key steps:
 
 ## Author
 
-**Amani Adjailia**
+*Amani*
 
 [![GitHub](https://img.shields.io/badge/GitHub-amani204-181717?style=flat-square&logo=github)](https://github.com/amani204)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-amani-0A66C2?style=flat-square&logo=linkedin)](https://linkedin.com/in/amani-a-810721390/)
 
----
-
-## License
-
-MIT License
